@@ -179,9 +179,12 @@ export async function fetchAppMeta(): Promise<Record<string, string>> {
 }
 
 // ───────────────────────── App startup
-export async function bootstrap(): Promise<void> {
-  must(await supabase.rpc('bootstrap_user'));
-  await supabase.rpc('activate_my_due_plans');
+/** Seed / top up the user's data and activate due plans. Returns whether anything changed. */
+export async function bootstrap(): Promise<boolean> {
+  const created = must(await supabase.rpc('bootstrap_user')) as Record<string, unknown> | null;
+  const { data: activated } = await supabase.rpc('activate_my_due_plans');
+  const { exercises = 0, ...rest } = created ?? {};
+  return Number(exercises) > 0 || Object.keys(rest).length > 0 || activated === 1;
 }
 
 export async function verifyPin(pin: string): Promise<{ ok: boolean; attempts_left: number; locked_out: boolean }> {
@@ -413,6 +416,19 @@ export type BackfillItem = {
 };
 
 /** Backfill / quick log: create a completed session with its exercises + sets (§6.2, §6.2a). */
+/** A scheduled day he didn't train ("nghỉ buổi này"): kept as a skipped session with the reason. */
+export async function skipScheduledDay(args: { date: IsoDate; kind: SessionKind; note: string | null }): Promise<void> {
+  must(
+    await supabase.from('workout_sessions').insert({
+      session_date: args.date,
+      kind: args.kind,
+      status: 'skipped',
+      is_backfill: args.date !== todayVN(),
+      note: args.note,
+    }),
+  );
+}
+
 export async function createBackfillSession(args: {
   date: IsoDate;
   kind: SessionKind;

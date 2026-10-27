@@ -1,54 +1,43 @@
 import { createBrowserRouter } from 'react-router';
 import { AppShell } from './app/AppShell';
-import { BodyPage } from './app/body/BodyPage';
-import { InbodyPage } from './app/body/InbodyPage';
-import { PhotoCapturePage } from './app/body/PhotoCapturePage';
-import { PhotoComparePage } from './app/body/PhotoComparePage';
-import { PhotosPage } from './app/body/PhotosPage';
-import { ExerciseDetailPage } from './app/exercises/ExerciseDetailPage';
-import { ExercisesPage } from './app/exercises/ExercisesPage';
-import { AboutPage } from './app/more/AboutPage';
-import { BackupPage } from './app/more/BackupPage';
-import { MorePage } from './app/more/MorePage';
-import { PlanDetailPage } from './app/more/PlanDetailPage';
-import { PlanEditPage } from './app/more/PlanEditPage';
-import { PlansPage } from './app/more/PlansPage';
-import { RemindersPage } from './app/more/RemindersPage';
-import { ReviewsPage } from './app/more/ReviewsPage';
 import { TodayPage } from './app/today/TodayPage';
-import { BackfillPage } from './app/training/BackfillPage';
-import { QuickLogPage } from './app/training/QuickLogPage';
-import { SessionDetailPage } from './app/training/SessionDetailPage';
-import { SimpleSessionPage } from './app/training/SimpleSessionPage';
-import { TrainingPage } from './app/training/TrainingPage';
-import { WorkoutFlowPage } from './app/workout/WorkoutFlowPage';
+import { Splash } from './ui/components';
 
+/**
+ * "Hôm nay" ships in the main bundle; every other screen is its own chunk (charts/recharts
+ * included), so the first launch parses far less JS. Chunks are precached by the service worker.
+ */
 export const router = createBrowserRouter([
-  { path: '/workout/:id', element: <WorkoutFlowPage /> },
+  {
+    path: '/workout/:id',
+    hydrateFallbackElement: <Splash />,
+    lazy: () => import('./app/workout/WorkoutFlowPage').then((m) => ({ Component: m.WorkoutFlowPage })),
+  },
   {
     element: <AppShell />,
+    hydrateFallbackElement: <Splash />,
     children: [
       { index: true, element: <TodayPage /> },
-      { path: 'training', element: <TrainingPage /> },
-      { path: 'training/session/:id', element: <SessionDetailPage /> },
-      { path: 'training/backfill', element: <BackfillPage /> },
-      { path: 'training/quick', element: <QuickLogPage /> },
-      { path: 'training/simple/:kind', element: <SimpleSessionPage /> },
-      { path: 'exercises', element: <ExercisesPage /> },
-      { path: 'exercises/:slug', element: <ExerciseDetailPage /> },
-      { path: 'body', element: <BodyPage /> },
-      { path: 'body/inbody', element: <InbodyPage /> },
-      { path: 'body/photos', element: <PhotosPage /> },
-      { path: 'body/photos/capture', element: <PhotoCapturePage /> },
-      { path: 'body/photos/compare', element: <PhotoComparePage /> },
-      { path: 'more', element: <MorePage /> },
-      { path: 'more/plans', element: <PlansPage /> },
-      { path: 'more/plans/:id', element: <PlanDetailPage /> },
-      { path: 'more/plans/:id/edit', element: <PlanEditPage /> },
-      { path: 'more/reviews', element: <ReviewsPage /> },
-      { path: 'more/reminders', element: <RemindersPage /> },
-      { path: 'more/backup', element: <BackupPage /> },
-      { path: 'more/about', element: <AboutPage /> },
+      { path: 'training', lazy: () => import('./app/training/TrainingPage').then((m) => ({ Component: m.TrainingPage })) },
+      { path: 'training/session/:id', lazy: () => import('./app/training/SessionDetailPage').then((m) => ({ Component: m.SessionDetailPage })) },
+      { path: 'training/backfill', lazy: () => import('./app/training/BackfillPage').then((m) => ({ Component: m.BackfillPage })) },
+      { path: 'training/quick', lazy: () => import('./app/training/QuickLogPage').then((m) => ({ Component: m.QuickLogPage })) },
+      { path: 'training/simple/:kind', lazy: () => import('./app/training/SimpleSessionPage').then((m) => ({ Component: m.SimpleSessionPage })) },
+      { path: 'exercises', lazy: () => import('./app/exercises/ExercisesPage').then((m) => ({ Component: m.ExercisesPage })) },
+      { path: 'exercises/:slug', lazy: () => import('./app/exercises/ExerciseDetailPage').then((m) => ({ Component: m.ExerciseDetailPage })) },
+      { path: 'body', lazy: () => import('./app/body/BodyPage').then((m) => ({ Component: m.BodyPage })) },
+      { path: 'body/inbody', lazy: () => import('./app/body/InbodyPage').then((m) => ({ Component: m.InbodyPage })) },
+      { path: 'body/photos', lazy: () => import('./app/body/PhotosPage').then((m) => ({ Component: m.PhotosPage })) },
+      { path: 'body/photos/capture', lazy: () => import('./app/body/PhotoCapturePage').then((m) => ({ Component: m.PhotoCapturePage })) },
+      { path: 'body/photos/compare', lazy: () => import('./app/body/PhotoComparePage').then((m) => ({ Component: m.PhotoComparePage })) },
+      { path: 'more', lazy: () => import('./app/more/MorePage').then((m) => ({ Component: m.MorePage })) },
+      { path: 'more/plans', lazy: () => import('./app/more/PlansPage').then((m) => ({ Component: m.PlansPage })) },
+      { path: 'more/plans/:id', lazy: () => import('./app/more/PlanDetailPage').then((m) => ({ Component: m.PlanDetailPage })) },
+      { path: 'more/plans/:id/edit', lazy: () => import('./app/more/PlanEditPage').then((m) => ({ Component: m.PlanEditPage })) },
+      { path: 'more/reviews', lazy: () => import('./app/more/ReviewsPage').then((m) => ({ Component: m.ReviewsPage })) },
+      { path: 'more/reminders', lazy: () => import('./app/more/RemindersPage').then((m) => ({ Component: m.RemindersPage })) },
+      { path: 'more/backup', lazy: () => import('./app/more/BackupPage').then((m) => ({ Component: m.BackupPage })) },
+      { path: 'more/about', lazy: () => import('./app/more/AboutPage').then((m) => ({ Component: m.AboutPage })) },
     ],
   },
 ]);

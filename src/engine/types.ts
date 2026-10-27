@@ -41,7 +41,7 @@ export type WarmupLog = {
   skipped?: boolean;
 };
 
-export type SessionStatus = 'in_progress' | 'completed' | 'abandoned';
+export type SessionStatus = 'in_progress' | 'completed' | 'abandoned' | 'skipped';
 
 export type SessionRow = {
   id: string;

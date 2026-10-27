@@ -1,0 +1,31 @@
+{
+  "aliases": [
+    "overhead press",
+    "ohp",
+    "military press",
+    "đẩy vai đòn",
+    "đẩy vai đứng"
+  ],
+  "secondary_muscles": [
+    "side_delt",
+    "triceps",
+    "abs"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Đòn tựa trước vai, tay rộng hơn vai một chút",
+    "Siết bụng và mông, không ưỡn lưng",
+    "Đẩy thẳng lên, đòn qua đầu thì đưa đầu ra trước"
+  ],
+  "common_mistakes": [
+    "Ưỡn lưng dưới để đẩy",
+    "Đẩy đòn vòng ra trước mặt"
+  ],
+  "slug": "overhead_press",
+  "name_vi": "Đẩy vai tạ đòn đứng",
+  "primary_muscle": "front_delt",
+  "movement_pattern": "vertical_push",
+  "kind": "compound",
+  "equipment": "barbell"
+}

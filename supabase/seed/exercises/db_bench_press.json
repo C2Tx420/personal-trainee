@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "db bench press",
+    "dumbbell bench press",
+    "đẩy ngực tạ đơn",
+    "đẩy ngực ghế phẳng"
+  ],
+  "secondary_muscles": [
+    "front_delt",
+    "triceps"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Bả vai siết ra sau, bàn chân bám sàn",
+    "Hạ tạ tới ngang ngực, khuỷu ~45°",
+    "Đẩy lên và hơi chụm vào giữa"
+  ],
+  "common_mistakes": [
+    "Hạ quá sâu làm căng vai",
+    "Khuỷu bè 90°"
+  ],
+  "slug": "db_bench_press",
+  "name_vi": "Đẩy ngực tạ đơn ghế phẳng",
+  "primary_muscle": "chest",
+  "movement_pattern": "horizontal_push",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

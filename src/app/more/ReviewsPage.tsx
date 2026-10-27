@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { markReviewRead } from '@/data/api';
 import { qk, useInvalidate, usePlans, useReviews } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
-import { Badge, Button, Card, Empty, Page, Spinner } from '@/ui/components';
+import { Badge, Button, Card, Empty, Page, Skeleton } from '@/ui/components';
 
 export function ReviewsPage() {
   const nav = useNavigate();
@@ -21,7 +21,7 @@ export function ReviewsPage() {
     return () => clearTimeout(t);
   }, [unread, invalidate]);
 
-  if (reviews.isLoading) return <Page title="Nhận xét coach" back="/more"><Spinner /></Page>;
+  if (reviews.isLoading) return <Page title="Nhận xét coach" back="/more"><Skeleton /></Page>;
   return (
     <Page title="Nhận xét coach" back="/more">
       <p className="mb-3 text-xs text-muted">Claude Code viết sau mỗi lần review đầu tuần. Đề xuất thay đổi (nếu có) nằm ở draft lộ trình — anh duyệt mới có hiệu lực.</p>

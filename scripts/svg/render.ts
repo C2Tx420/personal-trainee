@@ -16,6 +16,8 @@ export type SidePose = {
   p: Pt; // hip
   k: Pt; // knee
   f: Pt; // foot
+  k2?: Pt; // rear knee (split stance)
+  f2?: Pt; // rear foot
 };
 
 export type FrontPose = {
@@ -139,6 +141,7 @@ function figure(p: Pose, dx: number, primary: string[], secondary: string[]): st
       if (k) out.push(`<circle class="${k.trim()}f" cx="${f1(sh[0] + dx)}" cy="${f1(sh[1])}" r="6.5"/>`);
     }
   } else {
+    if (p.k2 && p.f2) out.push(seg(p.p, p.k2, dx, c('thigh')), seg(p.k2, p.f2, dx, c('shin')));
     out.push(seg(p.p, p.k, dx, c('thigh')), seg(p.k, p.f, dx, c('shin')));
     out.push(seg(p.s, p.p, dx, c('torso')));
     out.push(seg(p.s, p.e, dx, c('upperarm')), seg(p.e, p.w, dx, c('forearm')));

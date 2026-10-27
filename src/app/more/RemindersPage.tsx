@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { sendTestPush, subscribePush, updateNotification } from '@/data/api';
 import { qk, useInvalidate, useNotificationSettings } from '@/data/queries';
 import { REMINDER_LABEL, type ReminderKind } from '@/engine/reminders';
-import { Banner, Button, Card, Input, Page, Spinner, Toggle } from '@/ui/components';
+import { Banner, Button, Card, Input, Page, Skeleton, Toggle } from '@/ui/components';
 
 const WD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
@@ -12,7 +12,7 @@ export function RemindersPage() {
   const [msg, setMsg] = useState<{ tone: 'ok' | 'bad'; text: string } | null>(null);
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
 
-  if (settings.isLoading) return <Page title="Nhắc nhở" back="/more"><Spinner /></Page>;
+  if (settings.isLoading) return <Page title="Nhắc nhở" back="/more"><Skeleton /></Page>;
 
   async function patch(id: string, p: Parameters<typeof updateNotification>[1]) {
     await updateNotification(id, p);

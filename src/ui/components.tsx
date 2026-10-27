@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, useEffect } from 'react';
+import { type ButtonHTMLAttributes, createContext, type InputHTMLAttributes, type ReactNode, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { svgDataUrl } from '@/engine/svg-validate';
 import { IconBack, IconClose } from './icons';
@@ -7,8 +7,15 @@ export function cx(...xs: (string | false | null | undefined)[]): string {
   return xs.filter(Boolean).join(' ');
 }
 
-/** Sticky glass header class (used by Page and the workout flow). */
-export const GLASS_HEADER = 'glass-strong safe-top sticky top-0 z-20 -mx-4 border-x-0 border-t-0';
+/**
+ * Sticky glass header class (used by Page and the workout flow). The top padding is the
+ * safe area; each header sets its own min-height on top of it so content never hugs the
+ * bottom edge on notch / Dynamic Island phones.
+ */
+export const GLASS_HEADER = 'glass-strong sticky top-0 z-20 -mx-4 border-x-0 border-t-0 pt-[env(safe-area-inset-top)]';
+
+/** App-wide banners (resume workout, DB outdated…) that Page renders right under its header. */
+export const PageBanners = createContext<ReactNode>(null);
 
 // ───────────────────────── Page layout
 export function Page({
@@ -25,9 +32,10 @@ export function Page({
   wide?: boolean;
 }) {
   const nav = useNavigate();
+  const banners = useContext(PageBanners);
   return (
     <div className={cx('mx-auto w-full px-4 pb-32', wide ? 'max-w-3xl' : 'max-w-xl')}>
-      <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-14 items-center gap-2 px-4')}>
+      <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-[calc(3.5rem+env(safe-area-inset-top))] items-center gap-2 px-4')}>
         {back && (
           <button
             aria-label="Quay lại"
@@ -40,6 +48,7 @@ export function Page({
         <h1 className="min-w-0 flex-1 truncate text-[19px] font-bold tracking-tight">{title}</h1>
         {right}
       </header>
+      {banners}
       {children}
     </div>
   );
@@ -274,6 +283,37 @@ export function Spinner({ label = 'Đang tải…' }: { label?: string }) {
     <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted" role="status">
       <span className="size-4 animate-spin rounded-full border-2 border-line border-t-accent" />
       {label}
+    </div>
+  );
+}
+
+/** Full-screen launch screen — mirrors the static splash in index.html so the hand-off is seamless. */
+export function Splash({ label }: { label?: string }) {
+  return (
+    <div className="fixed inset-0 grid place-items-center px-6" role="status">
+      <div className="flex flex-col items-center">
+        <img src="/icons/favicon.svg" alt="" className="mb-4 size-16 rounded-[18px]" />
+        <div className="text-xl font-bold tracking-tight">Personal <span className="text-accent">Trainee</span></div>
+        <div className="mt-6 flex h-5 items-center gap-2 text-sm text-muted">
+          <span className="size-4 animate-spin rounded-full border-2 border-line border-t-accent" />
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Placeholder cards while a page's first query loads — keeps the layout from jumping. */
+export function Skeleton({ cards = 3 }: { cards?: number }) {
+  return (
+    <div role="status" aria-label="Đang tải…" className="animate-pulse">
+      {Array.from({ length: cards }, (_, i) => (
+        <div key={i} className="glass rounded-card mb-3 p-4">
+          <div className="mb-3 h-4 w-2/5 rounded-full bg-white/[0.08]" />
+          <div className="mb-2 h-3 w-full rounded-full bg-white/[0.05]" />
+          <div className="h-3 w-3/4 rounded-full bg-white/[0.05]" />
+        </div>
+      ))}
     </div>
   );
 }

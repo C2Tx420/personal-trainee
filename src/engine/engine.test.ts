@@ -113,9 +113,10 @@ describe('warmup (§4.8)', () => {
     expect(plannedSets(push.items[0], 5, 27).slice(0, 2).map((p) => [p.targetKg, p.repMax])).toEqual([[20, 12], [20, 12]]);
     expect(plannedSets(push.items[0], 5, null)[0].targetKg).toBeNull();
   });
-  it('bài giây (plank) không sinh hiệp làm nóng; [] không làm nóng', () => {
+  it('bài giây không sinh hiệp làm nóng; [] không làm nóng', () => {
     const legs = parsePlanContent(PLAN_V1).templates.find((t) => t.key === 'legs')!;
-    expect(plannedSets(legs.items[5], 0, null).every((p) => p.setType === 'working')).toBe(true);
+    const timed = { ...legs.items[0], unit: 'seconds' as const, rep_min: 30, rep_max: 45 };
+    expect(plannedSets(timed, 0, null).every((p) => p.setType === 'working')).toBe(true);
     expect(plannedSets(pull.items[2], 5, null).filter((p) => p.setType === 'warmup')).toHaveLength(0);
   });
 });

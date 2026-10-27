@@ -27,7 +27,7 @@ export function LoginPage() {
     <div className="safe-top mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6">
       <div className="mb-8 text-center">
         <img src="/icons/favicon.svg" alt="" className="mx-auto mb-5 size-16 rounded-[18px]" />
-        <h1 className="text-[28px] font-bold tracking-tight">Sức khỏe <span className="text-accent">&</span> Tập luyện</h1>
+        <h1 className="text-[28px] font-bold tracking-tight">Personal <span className="text-accent">Trainee</span></h1>
         <p className="mt-1 text-sm text-muted">Đăng nhập một lần trên thiết bị này</p>
       </div>
       <form onSubmit={submit} className="glass rounded-card p-5">

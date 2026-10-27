@@ -4,7 +4,7 @@ import { approvePlan, createDraft } from '@/data/api';
 import { qk, useExerciseMaps, useInvalidate, usePlans } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
 import { type PlanContent, planContentSchema, validatePlanRules } from '@/engine/plan-schema';
-import { Banner, Button, Card, ErrorBox, ExerciseImg, Field, Input, Page, SectionTitle, Spinner } from '@/ui/components';
+import { Banner, Button, Card, ErrorBox, ExerciseImg, Field, Input, Page, SectionTitle, Skeleton } from '@/ui/components';
 import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 
 const num = (s: string) => (s.trim() === '' ? null : Number(s.replace(',', '.')));
@@ -23,7 +23,7 @@ export function PlanEditPage() {
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
 
-  if (plans.isLoading || ex.loading) return <Page title="Sửa lộ trình" back={`/more/plans/${id}`}><Spinner /></Page>;
+  if (plans.isLoading || ex.loading) return <Page title="Sửa lộ trình" back={`/more/plans/${id}`}><Skeleton /></Page>;
   if (!base) return <Page title="Sửa lộ trình" back="/more/plans"><ErrorBox error="Không tìm thấy" /></Page>;
   const c = content ?? structuredClone(base.content);
   const set = (fn: (d: PlanContent) => void) => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { usePhotos } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
-import { Chip, Empty, Page, Segmented, Spinner } from '@/ui/components';
+import { Chip, Empty, Page, Segmented, Skeleton } from '@/ui/components';
 import { PhotoThumb } from './PhotoThumb';
 
 /** Compare 2 dates at the same angle: side by side or an overlay slider. */
@@ -13,7 +13,7 @@ export function PhotoComparePage() {
   const [b, setB] = useState<string | null>(null);
   const [pos, setPos] = useState(50);
 
-  if (photos.isLoading) return <Page title="So sánh ảnh" back="/body/photos"><Spinner /></Page>;
+  if (photos.isLoading) return <Page title="So sánh ảnh" back="/body/photos"><Skeleton /></Page>;
   const list = photos.data ?? [];
   const dates = [...new Set(list.map((p) => p.taken_on))].sort();
   const dA = a ?? dates[0];

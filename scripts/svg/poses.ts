@@ -55,6 +55,12 @@ export const DRAWINGS: Record<string, Drawing> = {
     b: S({ head: [30, 110], s: [44, 114], p: [98, 116], k: [124, 100], f: [134, 190], e: [47, 84], w: [50, 58] }),
     hold: 'bar',
   },
+  db_bench_press: {
+    props: benchProps,
+    a: S({ head: [30, 110], s: [44, 114], p: [98, 116], k: [124, 100], f: [134, 190], e: [38, 138], w: [50, 104] }),
+    b: S({ head: [30, 110], s: [44, 114], p: [98, 116], k: [124, 100], f: [134, 190], e: [47, 84], w: [50, 60] }),
+    hold: 'db',
+  },
   incline_db_press: {
     props: [{ t: 'line', a: [92, 134], b: [50, 66], w: 9 }, { t: 'line', a: [80, 134], b: [80, 190] }],
     a: S({ head: [52, 60], s: [60, 80], p: [88, 128], k: [120, 132], f: [122, 190], e: [48, 104], w: [66, 84] }),
@@ -83,6 +89,11 @@ export const DRAWINGS: Record<string, Drawing> = {
     a: SS({ e: [72, 92], w: [74, 62] }),
     b: SS({ e: [68, 40], w: [70, 14] }),
     hold: 'db',
+  },
+  overhead_press: {
+    a: ST({ e: [90, 80], w: [94, 60] }),
+    b: ST({ e: [76, 42], w: [78, 18] }),
+    hold: 'bar',
   },
   db_lateral_raise: { a: F(frontStand, lateralA), b: F(frontStand, lateralB), hold: 'db' },
   cable_lateral_raise: {
@@ -207,11 +218,37 @@ export const DRAWINGS: Record<string, Drawing> = {
     hold: 'bar',
     motion: 'p',
   },
+  bulgarian_split_squat: {
+    props: [{ t: 'rect', x: 4, y: 136, w: 36, h: 8 }, { t: 'line', a: [22, 144], b: [22, 190] }],
+    a: S({ head: [74, 38], s: [74, 58], p: [74, 114], k: [96, 150], f: [100, 190], k2: [56, 152], f2: [30, 136], e: [74, 86], w: [76, 112] }),
+    b: S({ head: [74, 70], s: [74, 90], p: [72, 144], k: [108, 146], f: [104, 190], k2: [60, 182], f2: [30, 136], e: [74, 118], w: [76, 144] }),
+    hold: 'db',
+    motion: 'p',
+  },
+  db_lunge: {
+    a: S({ head: [72, 38], s: [72, 58], p: [72, 114], k: [74, 152], f: [72, 190], k2: [70, 152], f2: [68, 190], e: [72, 86], w: [74, 112] }),
+    b: S({ head: [74, 70], s: [74, 90], p: [72, 144], k: [110, 146], f: [108, 190], k2: [62, 180], f2: [28, 186], e: [74, 118], w: [76, 144] }),
+    hold: 'db',
+    motion: 'p',
+  },
+  deadlift: {
+    a: S({ head: [112, 102], s: [92, 110], p: [40, 130], k: [78, 152], f: [80, 190], e: [91, 137], w: [90, 164] }),
+    b: ST({ e: [72, 88], w: [74, 116] }),
+    hold: 'bar',
+    motion: 'p',
+  },
   romanian_deadlift: {
     a: ST({ e: [70, 88], w: [72, 114] }),
     b: S({ head: [114, 82], s: [100, 88], p: [56, 106], k: [66, 148], f: [66, 190], e: [104, 116], w: [106, 142] }),
     hold: 'db',
     motion: 'head',
+  },
+  hip_thrust: {
+    props: [{ t: 'rect', x: 8, y: 112, w: 40, h: 8 }, { t: 'line', a: [28, 120], b: [28, 190] }],
+    a: S({ head: [30, 104], s: [44, 116], p: [82, 168], k: [116, 140], f: [122, 190], e: [62, 152], w: [80, 160] }),
+    b: S({ head: [30, 104], s: [44, 116], p: [86, 126], k: [120, 128], f: [122, 190], e: [62, 132], w: [84, 118] }),
+    hold: 'bar',
+    motion: 'p',
   },
   leg_curl: {
     props: [...seatProps, { t: 'rect', x: 92, y: 112, w: 26, h: 8 }],

@@ -6,7 +6,7 @@ import { addDays, formatVN, todayVN, WEEKDAY_LABEL, WEEKDAYS } from '@/engine/da
 import { formatNumberVN } from '@/engine/math';
 import { diffPlans } from '@/engine/plan-diff';
 import { validatePlanRules } from '@/engine/plan-schema';
-import { Badge, Banner, Button, Card, Chip, Empty, ErrorBox, ExerciseImg, Field, Input, Page, SectionTitle, Segmented, Sheet, Spinner } from '@/ui/components';
+import { Badge, Banner, Button, Card, Chip, Empty, ErrorBox, ExerciseImg, Field, Input, Page, SectionTitle, Segmented, Sheet, Skeleton } from '@/ui/components';
 import { ExerciseLine } from '../shared';
 import { CREATED_BY_LABEL, StatusBadge } from './plan-ui';
 
@@ -32,7 +32,7 @@ export function PlanDetailPage() {
   const [error, setError] = useState<unknown>(null);
   const [result, setResult] = useState<string | null>(null);
 
-  if (plans.isLoading || ex.loading) return <Page title="Lộ trình" back="/more/plans"><Spinner /></Page>;
+  if (plans.isLoading || ex.loading) return <Page title="Lộ trình" back="/more/plans"><Skeleton /></Page>;
   const p = plans.data?.find((x) => x.id === id);
   if (!p) return <Page title="Lộ trình" back="/more/plans"><Empty>Không tìm thấy</Empty></Page>;
   const active = plans.data!.find((x) => x.status === 'active');

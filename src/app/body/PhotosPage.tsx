@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { deletePhoto, type PhotoRow } from '@/data/api';
 import { qk, useInvalidate, usePhotos } from '@/data/queries';
 import { diffDays, formatVN, todayVN } from '@/engine/dates';
-import { Banner, Button, Card, Empty, Page, Sheet, Spinner } from '@/ui/components';
+import { Banner, Button, Card, Empty, Page, Sheet, Skeleton } from '@/ui/components';
 import { PhotoThumb } from './PhotoThumb';
 
 const LABEL = { front: 'Chính diện', side: 'Nghiêng', back: 'Lưng' } as const;
@@ -14,7 +14,7 @@ export function PhotosPage() {
   const invalidate = useInvalidate();
   const [del, setDel] = useState<PhotoRow | null>(null);
 
-  if (photos.isLoading) return <Page title="Ảnh tiến độ" back="/body"><Spinner /></Page>;
+  if (photos.isLoading) return <Page title="Ảnh tiến độ" back="/body"><Skeleton /></Page>;
   const list = photos.data ?? [];
   const dates = [...new Set(list.map((p) => p.taken_on))];
   const last = dates[0];

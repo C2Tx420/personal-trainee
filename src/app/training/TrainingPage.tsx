@@ -6,7 +6,7 @@ import { formatNumberVN } from '@/engine/math';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { topSetSeries, volumeKg, weeklyVolumeByExercise, weekSummary } from '@/engine/workout-summary';
 import { SimpleBars, SimpleLine } from '@/ui/charts';
-import { Badge, Button, Card, Empty, ErrorBox, Page, ProgressBar, SectionTitle, Segmented, Spinner, Stat } from '@/ui/components';
+import { Badge, Button, Card, Empty, ErrorBox, Page, ProgressBar, SectionTitle, Segmented, Skeleton, Stat } from '@/ui/components';
 
 export function TrainingPage() {
   const nav = useNavigate();
@@ -24,7 +24,7 @@ export function TrainingPage() {
     return [...ids].map((i) => ex.byId.get(i)).filter(Boolean).sort((a, b) => a!.name_vi.localeCompare(b!.name_vi));
   }, [data, ex.byId]);
 
-  if (training.isLoading || plan.isLoading) return <Page title="Tập"><Spinner /></Page>;
+  if (training.isLoading || plan.isLoading) return <Page title="Tập"><Skeleton /></Page>;
   if (training.error) return <Page title="Tập"><ErrorBox error={training.error} /></Page>;
   const sessions = data?.sessions ?? [];
   const content = plan.data?.content;
@@ -99,11 +99,13 @@ export function TrainingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold">
-                  {SESSION_KIND_LABEL[s.kind]} {s.is_backfill && <Badge>ghi bù</Badge>} {s.status === 'in_progress' && <Badge tone="accent">đang tập</Badge>}
+                  {SESSION_KIND_LABEL[s.kind]} {s.is_backfill && <Badge>ghi bù</Badge>} {s.status === 'in_progress' && <Badge tone="accent">đang tập</Badge>}{' '}
+                  {s.status === 'skipped' && <Badge tone="warn">nghỉ</Badge>}
                 </div>
                 <div className="text-sm text-muted">
                   {WEEKDAY_LABEL[weekdayOf(s.session_date)]}, {formatVN(s.session_date, true)}
                   {s.duration_min ? ` · ${s.duration_min} phút` : ''}
+                  {s.status === 'skipped' && s.note ? ` · ${s.note}` : ''}
                 </div>
               </div>
               <div className="tabular text-right text-sm">

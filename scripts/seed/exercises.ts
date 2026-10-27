@@ -1,7 +1,7 @@
 import type { ExerciseDef } from '../../src/engine/plan-schema';
 
 /**
- * Seed exercise library (~38 exercises). SVG illustrations are generated from scripts/svg/poses.ts.
+ * Seed exercise library (~44 exercises). SVG illustrations are generated from scripts/svg/poses.ts.
  * `aliases` = names the user commonly uses (for the substitute input + free-text quick log).
  */
 type Def = Omit<ExerciseDef, 'illustration_svg'>;
@@ -31,6 +31,12 @@ export const EXERCISES: Def[] = [
     common_mistakes: ['Nảy đòn khỏi ngực', 'Khuỷu bè 90°'],
   }),
   m({
+    slug: 'db_bench_press', name_vi: 'Đẩy ngực tạ đơn ghế phẳng', aliases: ['db bench press', 'dumbbell bench press', 'đẩy ngực tạ đơn', 'đẩy ngực ghế phẳng'],
+    primary_muscle: 'chest', secondary_muscles: ['front_delt', 'triceps'], movement_pattern: 'horizontal_push', kind: 'compound', equipment: 'dumbbell', load_step_kg: 2,
+    cues: ['Bả vai siết ra sau, bàn chân bám sàn', 'Hạ tạ tới ngang ngực, khuỷu ~45°', 'Đẩy lên và hơi chụm vào giữa'],
+    common_mistakes: ['Hạ quá sâu làm căng vai', 'Khuỷu bè 90°'],
+  }),
+  m({
     slug: 'incline_db_press', name_vi: 'Đẩy ngực dốc tạ đơn', aliases: ['incline dumbbell press', 'đẩy ngực dốc', 'incline'],
     primary_muscle: 'chest', secondary_muscles: ['front_delt', 'triceps'], movement_pattern: 'horizontal_push', kind: 'compound', equipment: 'dumbbell', load_step_kg: 2,
     cues: ['Ghế dốc 30°', 'Hạ tạ ngang ngực trên', 'Đẩy chéo nhẹ vào giữa'],
@@ -53,6 +59,12 @@ export const EXERCISES: Def[] = [
     primary_muscle: 'front_delt', secondary_muscles: ['side_delt', 'triceps'], movement_pattern: 'vertical_push', kind: 'compound', equipment: 'machine',
     cues: ['Lưng áp sát đệm', 'Tay cầm ngang tai khi bắt đầu', 'Đẩy thẳng lên, không khoá khuỷu'],
     common_mistakes: ['Ưỡn lưng khỏi đệm', 'Hạ quá thấp dưới cằm'],
+  }),
+  m({
+    slug: 'overhead_press', name_vi: 'Đẩy vai tạ đòn đứng', aliases: ['overhead press', 'ohp', 'military press', 'đẩy vai đòn', 'đẩy vai đứng'],
+    primary_muscle: 'front_delt', secondary_muscles: ['side_delt', 'triceps', 'abs'], movement_pattern: 'vertical_push', kind: 'compound', equipment: 'barbell', load_step_kg: 2.5,
+    cues: ['Đòn tựa trước vai, tay rộng hơn vai một chút', 'Siết bụng và mông, không ưỡn lưng', 'Đẩy thẳng lên, đòn qua đầu thì đưa đầu ra trước'],
+    common_mistakes: ['Ưỡn lưng dưới để đẩy', 'Đẩy đòn vòng ra trước mặt'],
   }),
   m({
     slug: 'seated_db_shoulder_press', name_vi: 'Đẩy vai tạ đơn ngồi', aliases: ['đẩy vai tạ đơn', 'dumbbell shoulder press'],
@@ -166,7 +178,7 @@ export const EXERCISES: Def[] = [
   }),
   m({
     slug: 'hack_squat', name_vi: 'Máy hack squat', aliases: ['hack squat', 'hack'],
-    primary_muscle: 'quads', secondary_muscles: ['glutes'], movement_pattern: 'squat', kind: 'compound', equipment: 'machine',
+    primary_muscle: 'quads', secondary_muscles: ['glutes'], movement_pattern: 'squat', kind: 'compound', equipment: 'machine', available_at_gym: false,
     cues: ['Lưng áp sát đệm', 'Xuống tới đùi song song', 'Gối theo hướng mũi chân'],
     common_mistakes: ['Gót chân nhấc lên'],
   }),
@@ -186,9 +198,33 @@ export const EXERCISES: Def[] = [
     cues: ['Chân bước lên trước một chút', 'Xuống tới đùi song song'], common_mistakes: ['Chân đặt quá sát thanh'],
   }),
   m({
+    slug: 'bulgarian_split_squat', name_vi: 'Bulgarian split squat tạ đơn', aliases: ['bulgarian split squat', 'bulgarian', 'split squat', 'squat chân sau gác ghế'],
+    primary_muscle: 'quads', secondary_muscles: ['glutes', 'hamstrings'], movement_pattern: 'squat', kind: 'compound', equipment: 'dumbbell', load_step_kg: 2,
+    cues: ['Mu chân sau gác lên ghế', 'Hạ thẳng xuống tới gối sau gần chạm sàn', 'Dồn trọng tâm vào chân trước, đẩy bằng cả bàn chân'],
+    common_mistakes: ['Gối trước đổ vào trong', 'Đứng quá gần ghế'],
+  }),
+  m({
+    slug: 'db_lunge', name_vi: 'Lunge tạ đơn', aliases: ['lunge', 'walking lunge', 'chùng chân', 'bước chùng'],
+    primary_muscle: 'quads', secondary_muscles: ['glutes', 'hamstrings'], movement_pattern: 'squat', kind: 'compound', equipment: 'dumbbell', load_step_kg: 2,
+    cues: ['Bước dài vừa phải, thân thẳng', 'Hạ tới hai gối ~90°', 'Đẩy bằng gót chân trước để đứng lên'],
+    common_mistakes: ['Bước quá ngắn, gối trước vượt xa mũi chân', 'Đổ người ra trước'],
+  }),
+  m({
+    slug: 'deadlift', name_vi: 'Deadlift tạ đòn', aliases: ['deadlift', 'dl', 'kéo đất'],
+    primary_muscle: 'glutes', secondary_muscles: ['hamstrings', 'lower_back', 'quads', 'upper_back'], movement_pattern: 'hinge', kind: 'compound', equipment: 'barbell', load_step_kg: 5,
+    cues: ['Đòn sát ống chân, trên giữa bàn chân', 'Hít sâu siết bụng, lưng thẳng trước khi kéo', 'Đẩy sàn bằng chân, đòn trượt sát người', 'Đứng thẳng hết hông, không ngả ra sau'],
+    common_mistakes: ['Cong lưng khi kéo', 'Đòn rời xa người', 'Giật đòn khỏi sàn'],
+  }),
+  m({
     slug: 'romanian_deadlift', name_vi: 'Romanian deadlift', aliases: ['rdl', 'romanian deadlift', 'deadlift romania'],
     primary_muscle: 'hamstrings', secondary_muscles: ['glutes', 'lower_back'], movement_pattern: 'hinge', kind: 'compound', equipment: 'dumbbell', load_step_kg: 2,
     cues: ['Đẩy hông ra sau, gối hơi cong', 'Tạ trượt sát đùi', 'Lưng thẳng suốt'], common_mistakes: ['Cong lưng', 'Biến thành squat'],
+  }),
+  m({
+    slug: 'hip_thrust', name_vi: 'Hip thrust tạ đòn', aliases: ['hip thrust', 'đẩy hông', 'hip thrust đòn'],
+    primary_muscle: 'glutes', secondary_muscles: ['hamstrings'], movement_pattern: 'hinge', kind: 'compound', equipment: 'barbell', load_step_kg: 5,
+    cues: ['Lưng trên tựa mép ghế, đòn có đệm ngang hông', 'Đẩy hông lên tới thân thẳng hàng đùi', 'Siết mông 1 giây ở đỉnh, cằm hơi cúi'],
+    common_mistakes: ['Ưỡn lưng thay vì đẩy hông', 'Bàn chân đặt quá xa'],
   }),
   m({
     slug: 'leg_curl', name_vi: 'Máy cuốn đùi sau', aliases: ['leg curl', 'cuốn đùi', 'đùi sau'],
@@ -208,7 +244,7 @@ export const EXERCISES: Def[] = [
   }),
   m({
     slug: 'plank', name_vi: 'Plank', aliases: ['plank'],
-    primary_muscle: 'abs', secondary_muscles: ['obliques'], movement_pattern: 'core', kind: 'core', equipment: 'bodyweight', load_step_kg: 0, is_time_based: true,
+    primary_muscle: 'abs', secondary_muscles: ['obliques'], movement_pattern: 'core', kind: 'core', equipment: 'bodyweight', load_step_kg: 0, is_time_based: true, archived: true,
     cues: ['Khuỷu dưới vai', 'Thân thẳng từ đầu tới gót', 'Siết bụng và mông'], common_mistakes: ['Võng hông', 'Chổng mông'],
   }),
 

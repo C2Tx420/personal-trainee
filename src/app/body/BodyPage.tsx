@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { createDraft, deleteWeight, saveWeight } from '@/data/api';
 import { qk, useActivePlan, useGoals, useInvalidate, useMeasurements, usePlans, useWeights } from '@/data/queries';
-import { MEASUREMENT_FIELDS, type MeasurementKey, whr, WHR_MALE_THRESHOLD } from '@/engine/body';
+import { MAIN_MEASUREMENT_FIELDS, MAIN_MEASUREMENTS, MEASUREMENT_FIELDS, type MeasurementKey, whr, WHR_MALE_THRESHOLD } from '@/engine/body';
 import { addDays, diffDays, formatVN, type IsoDate, todayVN, weekStart } from '@/engine/dates';
 import { formatNumberVN, round } from '@/engine/math';
 import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } from '@/engine/weight';
 import { SimpleLine } from '@/ui/charts';
-import { Badge, Banner, Button, Card, Empty, Field, Input, Page, SectionTitle, Segmented, Spinner } from '@/ui/components';
+import { Badge, Banner, Button, Card, Empty, Field, Input, Page, SectionTitle, Segmented, Skeleton } from '@/ui/components';
 
 /** start of the goal line: the InBody weigh-in on 26/10/2026 */
 const START: { date: IsoDate; kg: number } = { date: '2026-10-26', kg: 81.7 };
@@ -31,7 +31,7 @@ export function BodyPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  if (weights.isLoading || measurements.isLoading) return <Page title="Cơ thể"><Spinner /></Page>;
+  if (weights.isLoading || measurements.isLoading) return <Page title="Cơ thể"><Skeleton /></Page>;
   const logs = weights.data ?? [];
   const meas = measurements.data ?? [];
   const lastMeas = meas.at(-1);
@@ -62,7 +62,7 @@ export function BodyPage() {
     if (!w) return;
     setBusy(true);
     const measurementsNum = Object.fromEntries(
-      MEASUREMENT_FIELDS.map(([k]) => [k, m[k] ? Number(m[k]!.replace(',', '.')) || null : null]),
+      MAIN_MEASUREMENT_FIELDS.map(([k]) => [k, m[k] ? Number(m[k]!.replace(',', '.')) || null : null]),
     );
     await saveWeight({ date, weightKg: w, note: note.trim() || null, measurements: measurementsNum });
     await invalidate(qk.weights, qk.measurements);
@@ -94,6 +94,8 @@ export function BodyPage() {
     .filter((x) => x.log_date >= from && x[field] !== null)
     .map((x) => ({ label: formatVN(x.log_date), v: x[field] as number }));
   const lastWhr = lastMeas ? whr(lastMeas as never) : null;
+  // chart: the main measurements + any older one that still has data
+  const chartFields = MEASUREMENT_FIELDS.filter(([k]) => MAIN_MEASUREMENTS.includes(k) || meas.some((x) => x[k] !== null));
 
   return (
     <Page title="Cơ thể">
@@ -114,11 +116,11 @@ export function BodyPage() {
           </Field>
         </div>
         <button className="mb-2 text-sm font-medium text-accent" onClick={() => setShowMeasure((v) => !v)}>
-          {showMeasure ? '▾' : '▸'} Số đo cơ thể (tuỳ chọn, cm)
+          {showMeasure ? '▾' : '▸'} Số đo chính (tuỳ chọn, cm)
         </button>
         {showMeasure && (
           <div className="grid grid-cols-2 gap-x-3">
-            {MEASUREMENT_FIELDS.map(([k, label]) => (
+            {MAIN_MEASUREMENT_FIELDS.map(([k, label]) => (
               <Field key={k} label={label}>
                 <Input
                   inputMode="decimal"
@@ -179,7 +181,7 @@ export function BodyPage() {
       ) : (
         <Card>
           <select aria-label="Chọn số đo" className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={field} onChange={(e) => setField(e.target.value as MeasurementKey)}>
-            {MEASUREMENT_FIELDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+            {chartFields.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
           {measChart.length ? <SimpleLine data={measChart} lines={[{ key: 'v', name: 'cm' }]} /> : <Empty>Chưa có số đo này</Empty>}
           {lastWhr !== null && (

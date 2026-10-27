@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "hip thrust",
+    "đẩy hông",
+    "hip thrust đòn"
+  ],
+  "secondary_muscles": [
+    "hamstrings"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Lưng trên tựa mép ghế, đòn có đệm ngang hông",
+    "Đẩy hông lên tới thân thẳng hàng đùi",
+    "Siết mông 1 giây ở đỉnh, cằm hơi cúi"
+  ],
+  "common_mistakes": [
+    "Ưỡn lưng thay vì đẩy hông",
+    "Bàn chân đặt quá xa"
+  ],
+  "slug": "hip_thrust",
+  "name_vi": "Hip thrust tạ đòn",
+  "primary_muscle": "glutes",
+  "movement_pattern": "hinge",
+  "kind": "compound",
+  "equipment": "barbell"
+}

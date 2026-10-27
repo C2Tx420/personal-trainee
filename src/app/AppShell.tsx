@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAppMeta, useInProgress } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
 import { MIN_SCHEMA_VERSION } from '@/lib/version';
-import { Banner, cx } from '@/ui/components';
+import { Banner, cx, PageBanners } from '@/ui/components';
 import { IconBook, IconDumbbell, IconMore, IconPulse, IconToday } from '@/ui/icons';
 import { UpdatePrompt } from './UpdatePrompt';
 
@@ -28,22 +28,27 @@ export function AppShell() {
 
   const dbOutdated = meta.data?.schema_version && meta.data.schema_version < MIN_SCHEMA_VERSION;
 
+  const banners = (
+    <>
+      {dbOutdated && <Banner tone="bad">Database cần chạy migration mới ({meta.data?.schema_version} &lt; {MIN_SCHEMA_VERSION})</Banner>}
+      {inProgress.data && !loc.pathname.startsWith('/workout') && (
+        <Banner tone="accent" onClick={() => nav(`/workout/${inProgress.data!.id}`)} action={<span className="font-bold">Tiếp tục ›</span>}>
+          Đang có buổi tập dở
+        </Banner>
+      )}
+    </>
+  );
+
   return (
     <div className="min-h-dvh">
       {!online && (
-        <div className="sticky top-0 z-40 bg-warn/90 px-4 py-1.5 text-center text-sm font-semibold text-black backdrop-blur" role="alert">
+        <div className="sticky top-0 z-40 bg-warn/90 px-4 pt-[calc(env(safe-area-inset-top)+0.375rem)] pb-1.5 text-center text-sm font-semibold text-black backdrop-blur" role="alert">
           Mất kết nối — không lưu được cho tới khi có mạng
         </div>
       )}
-      <div className="mx-auto max-w-xl px-4 pt-2 empty:hidden">
-        {dbOutdated && <Banner tone="bad">Database cần chạy migration mới ({meta.data?.schema_version} &lt; {MIN_SCHEMA_VERSION})</Banner>}
-        {inProgress.data && !loc.pathname.startsWith('/workout') && (
-          <Banner tone="accent" onClick={() => nav(`/workout/${inProgress.data!.id}`)} action={<span className="font-bold">Tiếp tục ›</span>}>
-            Đang có buổi tập dở
-          </Banner>
-        )}
-      </div>
-      <Outlet />
+      <PageBanners value={banners}>
+        <Outlet />
+      </PageBanners>
       <UpdatePrompt blocked={!!inProgress.data} />
       <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(env(safe-area-inset-bottom),12px)]">
         <div className="glass-strong mx-auto flex max-w-xl gap-1 rounded-[26px] p-1.5">

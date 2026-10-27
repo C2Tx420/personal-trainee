@@ -21,5 +21,6 @@
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",
-  "equipment": "machine"
+  "equipment": "machine",
+  "available_at_gym": false
 }

@@ -1,4 +1,4 @@
-# Health & Training
+# Personal Trainee
 
 Personal single-user PWA for tracking training and body metrics: a fixed PPL + badminton schedule, a **guided workout flow** (warm-up → each exercise, each set → rest → summary), body weight, measurements, InBody scans and private progress photos. Every Monday **Claude Code** reads the data through a read-only role and submits a **plan draft** — it only takes effect once approved in the app.
 
