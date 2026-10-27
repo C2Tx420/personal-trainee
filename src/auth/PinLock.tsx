@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { verifyPin } from '@/data/api';
 import { cx } from '@/ui/components';
+import { IconLock } from '@/ui/icons';
 
 const LENGTH = 4;
 
@@ -38,16 +39,18 @@ export function PinLock({ onUnlock, onLockedOut, email }: { onUnlock: () => void
 
   return (
     <div className="safe-top mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center px-6">
-      <div className="mb-2 text-4xl">🔒</div>
-      <h1 className="text-xl font-semibold">Nhập PIN</h1>
-      <p className="mb-6 text-xs text-muted">{email}</p>
+      <div className="glass mb-4 grid size-16 place-items-center rounded-card text-accent">
+        <IconLock className="size-7" />
+      </div>
+      <h1 className="text-2xl font-bold tracking-tight">Nhập PIN</h1>
+      <p className="mb-7 text-xs text-muted">{email}</p>
       <div className={cx('mb-4 flex gap-4', shake && 'animate-pulse')} aria-label="PIN đã nhập" role="status">
         {Array.from({ length: LENGTH }, (_, i) => (
-          <span key={i} className={cx('size-4 rounded-full border-2 border-accent', i < pin.length && 'bg-accent')} />
+          <span key={i} className={cx('size-3.5 rounded-full border border-white/25 transition', i < pin.length && 'scale-110 border-transparent bg-accent')} />
         ))}
       </div>
       <p className={cx('mb-6 h-5 text-sm', msg ? 'text-bad' : 'text-muted')}>{busy ? 'Đang kiểm tra…' : msg}</p>
-      <div className="grid w-full max-w-xs grid-cols-3 gap-3">
+      <div className="grid w-full max-w-[300px] grid-cols-3 gap-4">
         {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => (
           <PinKey key={d} label={d} onClick={() => press(d)} disabled={busy} />
         ))}
@@ -65,7 +68,7 @@ function PinKey({ label, onClick, disabled, aria }: { label: string; onClick: ()
       aria-label={aria ?? label}
       disabled={disabled}
       onClick={onClick}
-      className="h-16 rounded-2xl bg-card text-2xl font-semibold shadow-sm active:bg-card-2 disabled:opacity-50"
+      className="glass-subtle mx-auto grid size-[76px] place-items-center rounded-full text-[28px] font-light transition active:bg-white/15 disabled:opacity-50"
     >
       {label}
     </button>

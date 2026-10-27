@@ -24,7 +24,7 @@ export function UpdatePrompt({ blocked }: { blocked: boolean }) {
 
   if (!needRefresh || blocked) return null;
   return (
-    <div className="fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-xl items-center gap-3 rounded-2xl bg-fg p-3 text-bg shadow-lg">
+    <div className="glass-strong fixed inset-x-3 bottom-28 z-40 mx-auto flex max-w-xl items-center gap-3 rounded-card p-3">
       <div className="min-w-0 flex-1 text-sm">
         Có phiên bản mới <b>{next ?? ''}</b>
         <div className="text-xs opacity-70">Đang dùng {APP_VERSION}</div>

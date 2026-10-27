@@ -50,14 +50,12 @@ test('01 đăng nhập + PIN', async () => {
   await unlock(page);
 });
 
-test('02 Hôm nay (sáng + tối)', async () => {
+test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ sáng)', async () => {
   await expect(page.getByText('Máy kéo xô').first()).toBeVisible();
   await expect(page.getByText(/Noel · 25\/12/)).toBeVisible();
   await expect(page.getByText(/Còn 59 ngày/)).toBeVisible();
-  await shot(page, '04-today', 'Hôm nay — buổi Pull, khởi động, đếm ngược mốc Noel');
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await shot(page, '05-today-dark', 'Hôm nay — chế độ tối');
-  await page.emulateMedia({ colorScheme: 'light' });
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(20, 18, 17)');
+  await shot(page, '04-today', 'Hôm nay — buổi Pull, khởi động, đếm ngược mốc Noel (theme kiểu Crouton)');
 });
 
 test('03 thư viện bài tập + lịch sử', async () => {
@@ -72,20 +70,20 @@ test('03 thư viện bài tập + lịch sử', async () => {
 
 test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → tiếp tục sau khi tải lại', async () => {
   await page.getByRole('link', { name: 'Hôm nay', exact: true }).click();
-  await page.getByRole('button', { name: '▶ Bắt đầu buổi tập' }).click();
-  await expect(page.getByRole('heading', { name: '🔥 Khởi động' })).toBeVisible();
-  await page.getByRole('button', { name: '▶ Bắt đầu đếm giờ' }).click();
+  await page.getByRole('button', { name: 'Bắt đầu buổi tập' }).click();
+  await expect(page.getByRole('heading', { name: 'Khởi động', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Bắt đầu đếm giờ' }).click();
   await page.getByRole('checkbox').check();
   await shot(page, '08-warmup', 'Bước khởi động: đồng hồ đi bộ 10′ + khớp');
   await page.getByRole('button', { name: 'Tiếp →' }).click();
 
   await expect(page.getByRole('heading', { name: 'Máy kéo xô' })).toBeVisible();
   await shot(page, '09-intro', 'Màn giới thiệu bài 1/5 — hình, mục tiêu, coach note');
-  await page.getByRole('button', { name: '▶ Bắt đầu bài' }).click();
+  await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   await expect(page.getByText('Làm nóng 1', { exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'kg', exact: true })).toHaveValue('25');
   await shot(page, '10-set-warmup', 'Hiệp làm nóng 1 — 25kg × 10 (nút −/+ to)');
-  await page.getByRole('button', { name: '✓ XONG HIỆP' }).click();
+  await page.getByRole('button', { name: 'Xong hiệp' }).click();
   await expect(page.getByRole('timer', { name: 'Đồng hồ nghỉ' })).toBeVisible();
   await shot(page, '11-rest', 'Đồng hồ nghỉ toàn màn + xem trước hiệp tiếp');
   await skipRest(page);
@@ -112,7 +110,7 @@ test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → ti�
 
 test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sách', async () => {
   await expect(page.getByRole('heading', { name: 'Máy chèo tựa ngực' })).toBeVisible();
-  await page.getByRole('button', { name: '⇄ Đổi bài' }).click();
+  await page.getByRole('button', { name: 'Đổi bài', exact: true }).click();
   const dlg = page.getByRole('dialog');
   await dlg.getByLabel('Bài thay thế').fill('Máy chèo ngồi Impulse');
   await dlg.getByPlaceholder('vd. máy hỏng, đổi sang tạ đơn').fill('phòng không có máy tựa ngực');
@@ -121,19 +119,19 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await expect(page.getByRole('heading', { name: 'Máy chèo ngồi Impulse' })).toBeVisible();
   await expect(page.getByText(/Thay cho Máy chèo tựa ngực/)).toBeVisible();
   await shot(page, '14-provisional', 'Bài tạm đã thay — giữ số hiệp, kg từ mục tiêu');
-  await page.getByRole('button', { name: '⏭ Để sau' }).click();
+  await page.getByRole('button', { name: 'Để sau', exact: true }).click();
 
   await expect(page.getByRole('heading', { name: 'Kéo cáp ngồi' })).toBeVisible();
   await page.getByRole('button', { name: 'Danh sách bài' }).click();
   await shot(page, '15-overview', 'Danh sách bài: xong / đang / để sau / đã đổi');
   await page.getByRole('button', { name: 'Đóng' }).click();
 
-  await page.getByRole('button', { name: '✕ Bỏ bài' }).click();
+  await page.getByRole('button', { name: 'Bỏ bài', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Máy bận lâu' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Bỏ bài', exact: true }).click();
 
   await expect(page.getByRole('heading', { name: 'Face pull (cáp)' })).toBeVisible();
-  await page.getByRole('button', { name: '▶ Bắt đầu bài' }).click();
+  await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   await page.getByRole('button', { name: 'Vừa', exact: true }).click();
   await page.getByRole('button', { name: 'Ghi chú hiệp' }).click();
   await page.getByPlaceholder('Ghi chú hiệp (vd. đau vai trái)').fill('hơi mỏi vai sau');
@@ -142,17 +140,17 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await completeSet(page);
 
   await expect(page.getByRole('heading', { name: 'Máy cuốn tay trước' })).toBeVisible();
-  await page.getByRole('button', { name: '▶ Bắt đầu bài' }).click();
+  await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   for (let i = 0; i < 3; i++) await completeSet(page);
 
   // bài để sau quay lại cuối buổi
   await expect(page.getByRole('heading', { name: 'Máy chèo ngồi Impulse' })).toBeVisible();
-  await page.getByRole('button', { name: '▶ Bắt đầu bài' }).click();
+  await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   for (let i = 0; i < 5; i++) await completeSet(page);
 });
 
 test('06 tổng kết + chi tiết buổi', async () => {
-  await expect(page.getByRole('heading', { name: '🏁 Tổng kết buổi' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tổng kết buổi' })).toBeVisible();
   await expect(page.getByText(/Máy chèo tựa ngực → /)).toBeVisible();
   await expect(page.getByText(/kế hoạch 35kg → thực tế/)).toHaveCount(3);
   await shot(page, '16-summary', 'Tổng kết: bài đổi, kg khác kế hoạch, khối lượng');
@@ -175,7 +173,7 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   await page.getByLabel('Chọn bài').selectOption({ label: 'Máy kéo xô' });
   await shot(page, '18-training', 'Tập: tổng kết tuần, khối lượng theo bài, tạ vs mục tiêu, lịch sử');
 
-  await page.getByRole('button', { name: '✎ Ghi nhanh' }).click();
+  await page.getByRole('button', { name: 'Ghi nhanh', exact: true }).click();
   await page.getByLabel('Ghi chú buổi tập').fill(
     '24/10 legs\nwarm up 10p đi bộ 3.5-5\nđạp đùi\n2 set x 12 30kg\n3 set x 12 40kg\nmáy cuốn đùi\n3x12x20\nnhón gót máy cũ\n3 set x 15 40kg',
   );
@@ -246,7 +244,7 @@ test('09 ảnh tiến độ: camera, xoá EXIF, nén 1080px, so sánh', async ()
 
   await page.getByRole('link', { name: 'Cơ thể', exact: true }).click();
   await page.getByRole('button', { name: 'Ảnh tiến độ' }).click();
-  await page.getByRole('button', { name: '📸 Chụp bộ mới' }).click();
+  await page.getByRole('button', { name: 'Chụp bộ mới' }).click();
   await expect(page.locator('video')).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(800);
   await shot(page, '26-photo-capture', 'Chụp ảnh: camera + khung người hướng dẫn (camera giả lập)');

@@ -47,9 +47,9 @@ export function ExercisesPage() {
       </div>
       <div className="grid grid-cols-2 gap-3">
         {list.map((e) => (
-          <button key={e.id} onClick={() => nav(`/exercises/${e.slug}`)} className="rounded-2xl border border-line bg-card p-2 text-left active:bg-card-2">
+          <button key={e.id} onClick={() => nav(`/exercises/${e.slug}`)} className="glass rounded-card p-2 text-left transition">
             <ExerciseImg svg={e.illustration_svg} name={e.name_vi} />
-            <div className="mt-1.5 text-sm leading-tight font-semibold">{e.name_vi}</div>
+            <div className="mt-2 px-0.5 text-sm leading-tight font-semibold">{e.name_vi}</div>
             <div className="mt-1 flex flex-wrap gap-1">
               <Badge>{MUSCLE_LABEL[e.primary_muscle] ?? e.primary_muscle}</Badge>
               <Badge>{EQUIPMENT_LABEL[e.equipment] ?? e.equipment}</Badge>

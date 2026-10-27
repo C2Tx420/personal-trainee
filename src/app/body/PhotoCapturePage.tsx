@@ -118,7 +118,7 @@ export function PhotoCapturePage() {
           </span>
         ))}
       </div>
-      <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-2xl bg-black">
+      <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-ctl bg-black">
         {stream && <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 h-full w-full object-cover" />}
         {ghost && <img src={ghost} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
         {angle && <Silhouette angle={angle} />}
@@ -131,7 +131,7 @@ export function PhotoCapturePage() {
       {error && <Banner tone="bad">{error}</Banner>}
       {stream && (
         <Button variant="primary" size="xl" block disabled={busy || countdown !== null} onClick={shoot}>
-          {busy ? 'Đang xử lý…' : '📸 Chụp (đếm 5 giây)'}
+          {busy ? 'Đang xử lý…' : 'Chụp (đếm 5 giây)'}
         </Button>
       )}
       <Button block className="mt-2" disabled={busy} onClick={() => fileRef.current?.click()}>

@@ -54,7 +54,7 @@ export function ExercisePicker({
               key={e.id}
               type="button"
               onClick={() => pick(e)}
-              className={cx('rounded-full border px-3 py-1.5 text-sm', selectedId === e.id ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-card')}
+              className={cx('rounded-full border px-3 py-1.5 text-sm', selectedId === e.id ? 'border-accent/50 bg-accent-soft text-accent' : 'border-white/10 bg-white/[0.05]')}
             >
               {e.name_vi}
             </button>
@@ -62,9 +62,9 @@ export function ExercisePicker({
         </div>
       )}
       {text.trim() && (
-        <div className="mt-2 divide-y divide-line rounded-xl border border-line bg-card">
+        <div className="glass mt-2 divide-y divide-white/[0.06] overflow-hidden rounded-ctl">
           {results.map((e) => (
-            <button key={e.id} type="button" onClick={() => pick(e)} className="flex w-full items-center gap-3 px-3 py-2 text-left active:bg-card-2">
+            <button key={e.id} type="button" onClick={() => pick(e)} className="flex w-full items-center gap-3 px-3 py-2 text-left active:bg-white/5">
               <ExerciseImg svg={e.illustration_svg} name={e.name_vi} className="w-16 shrink-0" />
               <span className={cx('flex-1 text-sm', selectedId === e.id && 'font-semibold text-accent')}>
                 {e.name_vi}
@@ -75,7 +75,7 @@ export function ExercisePicker({
           ))}
           {!exactMatch(text, library) && (
             <div className="px-3 py-2 text-sm text-muted">
-              ➕ Dùng tên mới “<b className="text-fg">{text.trim()}</b>” — tạo bài tạm, Claude sẽ bổ sung hình + kỹ thuật ở lần review
+              Dùng tên mới “<b className="text-fg">{text.trim()}</b>” — tạo bài tạm, Claude sẽ bổ sung hình + kỹ thuật ở lần review
             </div>
           )}
         </div>

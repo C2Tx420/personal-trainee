@@ -22,10 +22,10 @@ export function PhotosPage() {
 
   return (
     <Page title="Ảnh tiến độ" back="/body">
-      <p className="mb-3 text-xs text-muted">🔒 Chỉ anh xem được. Không đưa vào báo cáo coach, không sao lưu mặc định, không chia sẻ.</p>
+      <p className="mb-3 text-xs text-muted">Chỉ anh xem được. Không đưa vào báo cáo coach, không sao lưu mặc định, không chia sẻ.</p>
       {due && <Banner tone="info">{last ? `Đã ${diffDays(last, todayVN())} ngày từ lần chụp trước — đến lượt chụp` : 'Chưa có ảnh nào — chụp bộ đầu tiên'}</Banner>}
       <div className="mb-3 grid grid-cols-2 gap-2">
-        <Button variant="primary" onClick={() => nav('/body/photos/capture')}>📸 Chụp bộ mới</Button>
+        <Button variant="primary" onClick={() => nav('/body/photos/capture')}>Chụp bộ mới</Button>
         <Button disabled={dates.length < 1} onClick={() => nav('/body/photos/compare')}>So sánh</Button>
       </div>
       {dates.length === 0 && <Empty>Chưa có ảnh</Empty>}

@@ -32,12 +32,12 @@ export function RestOverlay({
 
   const s = Math.ceil(left / 1000);
   return (
-    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-bg/97 p-6 backdrop-blur" role="timer" aria-label="Đồng hồ nghỉ">
-      <div className="mb-2 text-sm font-semibold tracking-wide text-muted uppercase">Nghỉ</div>
-      <div className="tabular mb-6 text-8xl font-bold">
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-[rgba(9,12,19,0.72)] p-6 backdrop-blur-2xl backdrop-saturate-150" role="timer" aria-label="Đồng hồ nghỉ">
+      <div className="mb-2 text-xs font-semibold tracking-[0.3em] text-muted uppercase">Nghỉ</div>
+      <div className="tabular text-accent mb-6 text-[104px] leading-none font-bold tracking-tight">
         {Math.floor(s / 60)}:{String(s % 60).padStart(2, '0')}
       </div>
-      <div className="mb-8 max-w-xs text-center text-sm text-muted">Tiếp theo: {next}</div>
+      <div className="glass-subtle mb-8 max-w-xs rounded-full px-4 py-2 text-center text-sm text-muted">Tiếp theo: {next}</div>
       <div className="flex w-full max-w-xs gap-3">
         <Button size="lg" block onClick={onAdd30}>
           +30s

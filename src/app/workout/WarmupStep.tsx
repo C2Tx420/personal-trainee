@@ -59,7 +59,7 @@ export function WarmupStep({
 
   return (
     <div>
-      <h2 className="mb-3 text-2xl font-bold">🔥 Khởi động</h2>
+      <h2 className="mb-3 text-[26px] font-bold tracking-tight">Khởi động</h2>
       {warmup?.cardio && (
         <Card>
           <ExerciseImg svg={cardioExercise?.illustration_svg} name={cardioExercise?.name_vi ?? ''} className="mb-3" />
@@ -67,16 +67,16 @@ export function WarmupStep({
           <div className="mb-3 text-sm text-muted">
             {plannedMin} phút · {String(warmup.cardio.speed_kmh_min).replace('.', ',')}–{warmup.cardio.speed_kmh_max} km/h
           </div>
-          <div className="tabular mb-3 text-center text-6xl font-bold" aria-label="Đồng hồ khởi động">
+          <div className="tabular text-accent mb-4 text-center text-7xl font-bold tracking-tight" aria-label="Đồng hồ khởi động">
             {String(mm).padStart(2, '0')}:{String(ss).padStart(2, '0')}
           </div>
           {endAt === null ? (
             <Button variant="primary" block size="lg" onClick={() => setEndAt(Date.now() + plannedMin * 60_000)}>
-              ▶ Bắt đầu đếm giờ
+              Bắt đầu đếm giờ
             </Button>
           ) : (
             <Button block onClick={() => setEndAt(null)}>
-              ↺ Đặt lại
+              Đặt lại
             </Button>
           )}
           <div className="mt-3 grid grid-cols-2 gap-3">
