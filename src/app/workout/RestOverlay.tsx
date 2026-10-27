@@ -3,8 +3,8 @@ import { beep, notifyLocal, useNow } from '@/lib/hooks';
 import { Button } from '@/ui/components';
 
 /**
- * Đồng hồ nghỉ toàn màn. Tính theo thời điểm kết thúc (không đếm bằng setInterval
- * thuần) nên khoá màn hình rồi mở lại vẫn đúng. Hết giờ: âm báo + thông báo.
+ * Full-screen rest timer. Based on the end timestamp (not a plain setInterval
+ * countdown), so it stays correct after locking and unlocking the screen. On finish: sound + notification.
  */
 export function RestOverlay({
   endsAt,

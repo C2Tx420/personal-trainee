@@ -9,7 +9,7 @@ import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 
 const num = (s: string) => (s.trim() === '' ? null : Number(s.replace(',', '.')));
 
-/** Anh tự sửa lộ trình → "Lưu & áp dụng" tạo phiên bản mới (§4.5). */
+/** Self-edit the plan → "Lưu & áp dụng" creates a new version (§4.5). */
 export function PlanEditPage() {
   const { id = '' } = useParams();
   const nav = useNavigate();

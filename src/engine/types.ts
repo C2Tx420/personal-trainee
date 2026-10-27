@@ -2,7 +2,7 @@ import type { IsoDate } from './dates';
 import type { PlanItem } from './plan-schema';
 import type { SessionKind } from './schedule';
 
-/** Kiểu dòng dữ liệu dùng chung giữa app, engine và script coach (khớp bảng Postgres). */
+/** Row types shared by the app, the engine and the coach scripts (match the Postgres tables). */
 
 export type ExerciseRow = {
   id: string;
@@ -76,7 +76,7 @@ export type SessionItemRow = {
   substitution_note: string | null;
   skip_reason: string | null;
   deferred: boolean;
-  /** item của lộ trình lúc bắt đầu (số hiệp, khoảng lần, kg mục tiêu, làm nóng). */
+  /** plan item at session start (sets, rep range, target kg, warm-up). */
   target: PlanItem;
   note: string | null;
   started_at: string | null;

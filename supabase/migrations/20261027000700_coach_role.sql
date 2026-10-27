@@ -1,9 +1,9 @@
 -- ============================================================================
--- Role cho Claude Code (plan v2.4 §7): chỉ SELECT trên đúng 11 bảng, và chỉ
--- ghi qua 2 hàm: coach_submit_draft (draft lộ trình) + coach_add_review_note.
--- KHÔNG có quyền trên progress_photos, app_lock, push_subscriptions,
+-- Role for Claude Code (plan v2.4 §7): SELECT on exactly 11 tables, and writes
+-- only through 2 functions: coach_submit_draft (plan draft) + coach_add_review_note.
+-- NO privileges on progress_photos, app_lock, push_subscriptions,
 -- notification_settings, review_notes, profiles, storage.
--- Mật khẩu KHÔNG nằm trong migration — đặt tay:
+-- The password is NOT in the migration — set it manually:
 --   alter role coach_readonly login password '…';
 -- ============================================================================
 
@@ -27,7 +27,7 @@ begin
   end loop;
 end $$;
 
--- Người dùng duy nhất của app
+-- The app's single user
 create or replace function public._owner_user_id() returns uuid
 language sql stable security definer set search_path = '' as $$
   select user_id from public.profiles order by created_at limit 1

@@ -44,7 +44,7 @@ export function inbodyDue(latest: IsoDate | null, today: IsoDate): { due: boolea
   return { due: daysSince >= INBODY_INTERVAL_DAYS, daysSince };
 }
 
-/** Lần đo có FFM gần nhất. */
+/** Latest scan that has FFM. */
 export function latestFfm(logs: InbodyLog[]): number | null {
   return [...logs].sort((a, b) => (a.measured_on < b.measured_on ? 1 : -1)).find((l) => l.ffm_kg !== null)?.ffm_kg ?? null;
 }

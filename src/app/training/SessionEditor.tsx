@@ -5,7 +5,7 @@ import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 export type EditorSet = { key: string; set_type: 'warmup' | 'working'; kg: number | null; reps: number | null; seconds: number | null };
 export type EditorItem = {
   key: string;
-  /** chữ anh gõ (ghi nhanh) — để hiện khi chưa khớp bài */
+  /** text the user typed (quick log) — shown while no exercise matches */
   rawName: string | null;
   pick: PickResult | null;
   templateItemPosition: number | null;
@@ -22,7 +22,7 @@ const toNum = (s: string) => {
   return Number.isNaN(n) ? null : n;
 };
 
-/** Bảng sửa bài + hiệp dùng cho Ghi bù và màn xem trước của Ghi nhanh. */
+/** Exercise + set editor shared by Backfill and the Quick log preview. */
 export function SessionEditor({
   items,
   onChange,

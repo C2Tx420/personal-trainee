@@ -21,7 +21,7 @@ import { WarmupStep } from './WarmupStep';
 
 const SKIP_REASONS = ['Hết giờ', 'Máy bận lâu', 'Đau / mỏi', 'Không muốn tập'];
 
-/** ▶ Luồng tập từng bước (§6.2). Trạng thái luôn tính lại từ DB. */
+/** ▶ Step-by-step workout flow (§6.2). State is always recomputed from the DB. */
 export function WorkoutFlowPage() {
   const { id = '' } = useParams();
   const nav = useNavigate();
@@ -75,7 +75,7 @@ export function WorkoutFlowPage() {
     [items, ex.byId, lastFor],
   );
 
-  // Bài xong hết hiệp → đánh dấu done
+  // Every set of the exercise is done → mark it done
   useEffect(() => {
     const ids = itemsToMarkDone(flowItems, sets);
     if (ids.length === 0) return;
@@ -90,7 +90,7 @@ export function WorkoutFlowPage() {
     return null;
   }
 
-  // ── bước hiện tại (có thể bị "nhảy tới bài" ghi đè)
+  // ── current step (may be overridden by "jump to exercise")
   let step: FlowStep = forceSummary ? { type: 'summary' } : nextStep(session, flowItems, sets);
   const ordered = orderedItems(flowItems).filter((f) => f.item.status !== 'skipped');
   if (!forceSummary && focusId && step.type !== 'warmup') {
@@ -107,7 +107,7 @@ export function WorkoutFlowPage() {
   const progress = flowProgress(flowItems, sets);
   const snapshot = session.template_snapshot as { name?: string; warmup?: TemplateWarmup } | null;
 
-  // ── đồng hồ nghỉ: tính từ hiệp vừa xong gần nhất
+  // ── rest timer: counted from the most recently completed set
   const lastDone = [...sets].filter((s) => s.completed && s.completed_at).sort((a, b) => (a.completed_at! < b.completed_at! ? 1 : -1))[0];
   const lastItem = lastDone ? items.find((i) => i.id === lastDone.session_item_id) : undefined;
   const restSec = lastItem ? (lastDone.set_type === 'warmup' ? Math.min(60, lastItem.target.rest_sec_min) : lastItem.target.rest_sec_min) : 0;
@@ -166,7 +166,7 @@ export function WorkoutFlowPage() {
     }
   }
 
-  // ── nội dung theo bước
+  // ── content per step
   let body: React.ReactNode;
   if (step.type === 'warmup') {
     body = (

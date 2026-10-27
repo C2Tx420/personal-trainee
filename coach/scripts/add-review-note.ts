@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { arg, connect } from './db';
 
 /**
- * Ghi nhận xét tuần (§7.5) — anh đọc trong app (Thêm → Nhận xét coach).
+ * Write the weekly review note (§7.5) — read in the app (More → Coach notes).
  *
  *   pnpm run add-review-note --week 2026-10-26 --file note.md [--plan <draft_id>]
  */

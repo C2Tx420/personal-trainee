@@ -23,7 +23,7 @@ export function weeklyWeights(logs: WeightLog[]): WeeklyWeight[] {
     }));
 }
 
-/** Tốc độ giảm (kg/tuần, số dương = đang giảm) bằng hồi quy trên `windowDays` ngày gần nhất. */
+/** Loss rate (kg/week, positive = losing) via regression over the last `windowDays` days. */
 export function lossTrendKgPerWeek(logs: WeightLog[], today: IsoDate, windowDays = 21): number | null {
   const from = addDays(today, -windowDays);
   const pts = logs.filter((l) => l.log_date >= from && l.log_date <= today);
@@ -42,8 +42,8 @@ export function lossRateVerdict(deltaKg: number, minKg = 0.5, maxKg = 0.7): Loss
 }
 
 /**
- * Số tuần liên tiếp (tính tới tuần gần nhất) mà trung bình tuần không giảm so
- * với tuần trước. ≥ 2 → cảnh báo chững.
+ * Consecutive weeks (up to the latest week) whose weekly average did not drop compared
+ * with the week before. ≥ 2 → plateau warning.
  */
 export function weeksWithoutLoss(weeks: WeeklyWeight[]): number {
   let n = 0;
@@ -57,12 +57,12 @@ export function weeksWithoutLoss(weeks: WeeklyWeight[]): number {
 export type CalorieSuggestion = {
   newCalories: number;
   reduction: number;
-  /** chạm sàn 1.700 → chỉ gợi ý tăng vận động */
+  /** hit the 1,700 floor → only suggest more activity */
   atFloor: boolean;
   tips: string[];
 };
 
-/** Gợi ý khi cân đứng 2 tuần: hạ calo tham khảo 100–150 kcal, không dưới 1.700. */
+/** Suggestion after a 2-week plateau: lower reference calories by 100–150 kcal, never below 1,700. */
 export function stallSuggestion(currentCalories: number, reduction = 150): CalorieSuggestion {
   const target = Math.max(CALORIES_FLOOR, currentCalories - reduction);
   const atFloor = target === currentCalories;

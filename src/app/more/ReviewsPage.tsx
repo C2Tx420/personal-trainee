@@ -12,7 +12,7 @@ export function ReviewsPage() {
   const invalidate = useInvalidate();
   const unread = (reviews.data ?? []).filter((r) => !r.is_read).map((r) => r.id).join();
 
-  // mở trang = đã đọc
+  // opening the page = read
   useEffect(() => {
     if (!unread) return;
     const t = setTimeout(() => {

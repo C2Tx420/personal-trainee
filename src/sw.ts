@@ -3,15 +3,15 @@ import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
 /**
- * Service worker: chỉ precache file tĩnh (JS/CSS/icon) để mở nhanh + phát hiện
- * bản mới, và nhận Web Push. KHÔNG cache dữ liệu Supabase (/rest, /auth, /storage
- * ở domain khác nên không bao giờ đi qua precache).
+ * Service worker: only precaches static files (JS/CSS/icons) for fast startup + detecting
+ * new versions, and receives Web Push. Supabase data is NEVER cached (/rest, /auth, /storage
+ * live on another domain so they never go through the precache).
  */
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: (string | { url: string; revision: string | null })[] };
 
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
-// SPA: mọi điều hướng trả về index.html đã precache → mất mạng vẫn hiện được màn "Cần kết nối mạng"
+// SPA: every navigation returns the precached index.html → the "Cần kết nối mạng" screen still shows when offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')));
 
 self.addEventListener('message', (event) => {

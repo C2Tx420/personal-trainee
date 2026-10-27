@@ -6,8 +6,8 @@ import { API_URL, E2E_PIN, psql, supabaseEnv } from './env';
 import { completeSet, enterPin, login, nav, reloadAndUnlock, SHOT_DIR, shot, shots, skipRest, unlock } from './helpers';
 
 /**
- * E2E toàn luồng app trên iPhone viewport, chạy tuần tự trên cùng 1 trang.
- * Mỗi bước chụp màn hình vào e2e/screenshots/ + trang index.html để review.
+ * Full-flow E2E on an iPhone viewport, run serially on a single page.
+ * Each step saves a screenshot to e2e/screenshots/ + an index.html page for review.
  */
 test.describe.configure({ mode: 'serial' });
 
@@ -87,9 +87,9 @@ test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → ti�
   await expect(page.getByRole('timer', { name: 'Đồng hồ nghỉ' })).toBeVisible();
   await shot(page, '11-rest', 'Đồng hồ nghỉ toàn màn + xem trước hiệp tiếp');
   await skipRest(page);
-  await completeSet(page); // làm nóng 2
+  await completeSet(page); // warm-up 2
 
-  // Tải lại giữa buổi → khoá PIN → mở lại đúng hiệp chính 1
+  // Reload mid-session → PIN lock → resumes at working set 1
   await page.reload();
   await enterPin(page, E2E_PIN);
   await expect(page.getByText('Hiệp chính 1/3', { exact: true })).toBeVisible({ timeout: 20_000 });
@@ -143,7 +143,7 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   for (let i = 0; i < 3; i++) await completeSet(page);
 
-  // bài để sau quay lại cuối buổi
+  // the deferred exercise comes back at the end of the session
   await expect(page.getByRole('heading', { name: 'Máy chèo ngồi Impulse' })).toBeVisible();
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   for (let i = 0; i < 5; i++) await completeSet(page);
@@ -159,7 +159,7 @@ test('06 tổng kết + chi tiết buổi', async () => {
   await shot(page, '17-session-detail', 'Chi tiết buổi đã lưu — sửa từng hiệp, xoá buổi');
 
   const n = psql("select count(*) from workout_sets s join workout_sessions w on w.id = s.session_id where w.session_date = '2026-10-27' and s.completed");
-  expect(Number(n)).toBe(16); // kéo xô 5 + face pull 3 + curl 3 + máy chèo Impulse 5
+  expect(Number(n)).toBe(16); // lat pulldown 5 + face pull 3 + curl 3 + Impulse row 5
   expect(psql("select count(*) from workout_sets where kg_change_reason = 'too_heavy'")).toBe('3');
   expect(psql("select substitution_reason || '|' || substitution_note from workout_session_items where substitution_reason is not null")).toBe(
     'unavailable|phòng không có máy tựa ngực',
@@ -180,7 +180,7 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   await shot(page, '19-quicklog-text', 'Ghi nhanh: dán ghi chú như tin nhắn');
   await page.getByRole('button', { name: 'Tách thành bài + hiệp →' }).click();
   await expect(page.getByText(/là làm nóng/)).toBeVisible();
-  // tên lạ "nhón gót máy cũ" chưa khớp → chọn bài
+  // unknown name "nhón gót máy cũ" has no match → pick an exercise
   await page.getByLabel('Chọn bài').fill('nhón');
   await page.getByRole('button', { name: /Máy nhón bắp chân/ }).click();
   await shot(page, '20-quicklog-preview', 'Ghi nhanh: xem trước — tự đánh dấu làm nóng, chọn bài cho tên lạ');
@@ -216,7 +216,7 @@ test('08 cơ thể: cân + số đo, InBody', async () => {
 });
 
 test('09 ảnh tiến độ: camera, xoá EXIF, nén 1080px, so sánh', async () => {
-  // JPEG 2000×1500 có chèn APP1/Exif để kiểm tra pipeline xoá metadata
+  // 2000×1500 JPEG with an APP1/Exif segment to test the metadata-stripping pipeline
   const b64 = await page.evaluate(() => {
     const c = document.createElement('canvas');
     c.width = 2000;
@@ -256,7 +256,7 @@ test('09 ảnh tiến độ: camera, xoá EXIF, nén 1080px, so sánh', async ()
   await expect(page.getByRole('img', { name: /Ảnh back/ })).toBeVisible();
   await shot(page, '27-photos', 'Ảnh tiến độ: 3 góc, chỉ xem qua signed URL');
 
-  // Kiểm tra file thật trên Storage: không còn EXIF, cạnh dài ≤ 1080
+  // Check the real file in Storage: no EXIF left, long edge ≤ 1080
   const { SERVICE_ROLE_KEY } = supabaseEnv();
   const pathInBucket = psql("select storage_path from progress_photos where angle = 'front'");
   const res = await fetch(`${API_URL}/storage/v1/object/progress-photos/${pathInBucket}`, {
@@ -297,7 +297,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'test-results', 'coach-report.json'), JSON.stringify(report, null, 2));
 
-  // Claude chỉnh: kéo xô 35→32,5kg; thêm ép ngực cáp; hoàn thiện bài tạm; calo 1.900→1.850
+  // Claude's changes: lat pulldown 35→32.5kg; add cable chest press; complete the provisional exercise; calories 1,900→1,850
   const content = report.active_plan.content;
   const pull = content.templates.find((t: { key: string }) => t.key === 'pull');
   pull.items[0].target_kg = 32.5;
@@ -334,7 +334,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   );
   execSync(`pnpm exec tsx scripts/add-review-note.ts --week 2026-10-26 --file "${noteFile}" --plan ${out.draft_id}`, { cwd: path.join(ROOT, 'coach'), env: COACH_ENV });
 
-  // Role coach không tự kích hoạt được
+  // The coach role cannot activate a plan
   expect(() => execSync(`psql "postgresql://coach_readonly:coach-local-only@127.0.0.1:54322/postgres" -c "update plan_versions set status='active'"`, { stdio: 'pipe' })).toThrow();
 
   await reloadAndUnlock(page, '/');

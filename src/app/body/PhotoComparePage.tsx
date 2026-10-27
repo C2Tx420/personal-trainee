@@ -4,7 +4,7 @@ import { formatVN } from '@/engine/dates';
 import { Chip, Empty, Page, Segmented, Spinner } from '@/ui/components';
 import { PhotoThumb } from './PhotoThumb';
 
-/** So sánh 2 ngày cùng một góc: cạnh nhau hoặc thanh trượt chồng ảnh. */
+/** Compare 2 dates at the same angle: side by side or an overlay slider. */
 export function PhotoComparePage() {
   const photos = usePhotos();
   const [angle, setAngle] = useState<'front' | 'side' | 'back'>('front');

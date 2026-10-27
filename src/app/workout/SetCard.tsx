@@ -8,8 +8,8 @@ import { IconNote } from '@/ui/icons';
 import { fmtKg } from '../shared';
 
 /**
- * Một hiệp đang tập: kg/lần (nút −/+), cảm giác, ghi chú, và — khi kg khác mục
- * tiêu — hàng chip lý do (④ §6.2). Dùng chung cho màn sửa hiệp đã ghi.
+ * The set being performed: kg/reps (−/+ buttons), effort, note, and — when kg differs from
+ * the target — a row of reason chips (④ §6.2). Also used to edit a logged set.
  */
 export function SetCard({
   item,
@@ -27,7 +27,7 @@ export function SetCard({
   planned: PlannedSet;
   workingTotal: number;
   initialKg: number | null;
-  /** lý do đổi kg mang sang từ hiệp trước (khi kg cũng mang sang) */
+  /** kg change reason carried over from the previous set (when the kg is carried over too) */
   initialReason?: KgChangeReason | null;
   existing?: SetRow;
   onSave: (s: SetInput) => Promise<void>;

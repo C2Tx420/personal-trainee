@@ -1,7 +1,7 @@
 -- ============================================================================
--- Schema: Sức khỏe & Tập luyện (plan v2.4 §5)
--- Mọi bảng có user_id (mặc định auth.uid()); RLS ở migration 0300.
--- Ngày logic là `date` theo giờ Việt Nam; thời điểm là timestamptz.
+-- Schema: Health & Training (plan v2.4 §5)
+-- Every table has user_id (defaults to auth.uid()); RLS lives in migration 0300.
+-- Logical dates are `date` in Vietnam time; points in time are timestamptz.
 -- ============================================================================
 
 create or replace function public.set_updated_at() returns trigger
@@ -16,13 +16,13 @@ language sql stable set search_path = '' as $$
   select (now() at time zone 'Asia/Ho_Chi_Minh')::date
 $$;
 
--- ── meta (version schema cho app kiểm tra tương thích, §15.5)
+-- ── meta (schema version for the app's compatibility check, §15.5)
 create table public.app_meta (
   key text primary key,
   value text not null
 );
 
--- ── hồ sơ
+-- ── profile
 create table public.profiles (
   user_id uuid primary key default auth.uid() references auth.users on delete cascade,
   display_name text,
@@ -35,7 +35,7 @@ create table public.profiles (
   updated_at timestamptz not null default now()
 );
 
--- ── khoá PIN: PIN nằm ở secret APP_PIN của Edge Function, bảng này chỉ đếm lần sai
+-- ── PIN lock: the PIN lives in the Edge Function's APP_PIN secret, this table only counts wrong attempts
 create table public.app_lock (
   user_id uuid primary key references auth.users on delete cascade,
   failed_attempts int not null default 0 check (failed_attempts between 0 and 5),
@@ -43,7 +43,7 @@ create table public.app_lock (
   updated_at timestamptz not null default now()
 );
 
--- ── mốc mục tiêu
+-- ── goals
 create table public.goals (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -63,7 +63,7 @@ create table public.goals (
   check (target_weight_min <= target_weight_max)
 );
 
--- ── phiên bản lộ trình (content JSON là nguồn sự thật)
+-- ── plan versions (content JSON is the source of truth)
 create table public.plan_versions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -87,7 +87,7 @@ create table public.plan_versions (
 create unique index plan_versions_one_active on public.plan_versions (user_id) where status = 'active';
 create index plan_versions_status on public.plan_versions (user_id, status);
 
--- Bất biến: content chỉ sửa được khi còn draft; không xoá version nào.
+-- Immutable: content can only change while still a draft; no version is ever deleted.
 create or replace function public.plan_versions_guard() returns trigger
 language plpgsql set search_path = '' as $$
 begin
@@ -102,7 +102,7 @@ end $$;
 create trigger plan_versions_guard before update or delete on public.plan_versions
   for each row execute function public.plan_versions_guard();
 
--- ── thư viện bài tập
+-- ── exercise library
 create table public.exercises (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -138,7 +138,7 @@ create table public.exercises (
   )
 );
 
--- ── template buổi (dựng lại từ content khi duyệt; id = template_version_id)
+-- ── session templates (rebuilt from content on approval; id = template_version_id)
 create table public.session_templates (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -174,7 +174,7 @@ create table public.session_template_items (
   check (target_kg_per_set is null or cardinality(target_kg_per_set) = sets)
 );
 
--- ── buổi tập
+-- ── workout sessions
 create table public.workout_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -247,7 +247,7 @@ create table public.workout_sets (
 );
 create index workout_sets_exercise on public.workout_sets (user_id, exercise_id, created_at desc);
 
--- ── cơ thể
+-- ── body
 create table public.weight_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -309,7 +309,7 @@ create table public.progress_photos (
   unique (user_id, taken_on, angle)
 );
 
--- ── nhắc nhở
+-- ── reminders
 create table public.notification_settings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -334,7 +334,7 @@ create table public.push_subscriptions (
   created_at timestamptz not null default now()
 );
 
--- ── nhận xét của Claude Code
+-- ── Claude Code review notes
 create table public.review_notes (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users on delete cascade,

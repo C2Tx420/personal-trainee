@@ -11,8 +11,8 @@ import { volumeKg, weeklyVolumeByExercise, weekSummary } from '../../src/engine/
 import { arg, connect } from './db';
 
 /**
- * Báo cáo tuần `coach-weekly/1` cho Claude Code (§7.4). Chỉ đọc qua role
- * coach_readonly. Mọi con số tính bằng chính src/engine của app.
+ * Weekly report `coach-weekly/1` for Claude Code (§7.4). Reads only through the
+ * coach_readonly role. Every number is computed with the app's own src/engine.
  *
  *   pnpm run report [--week 2026-10-26] > reports/2026-11-02.json
  */
@@ -55,7 +55,7 @@ const ibLogs = inbody.map((r) => ({
   visceral_fat_level: n(r.visceral_fat_level), whr: n(r.whr), ffm_kg: n(r.ffm_kg), bmr_kcal: n(r.bmr_kcal), inbody_score: n(r.inbody_score),
 })) as unknown as InbodyLog[];
 
-// ── cân nặng + mốc
+// ── weight + goals
 const lastW = wLogs.at(-1)?.weight_kg ?? 0;
 const trend = lossTrendKgPerWeek(wLogs, we);
 const ffm = latestFfm(ibLogs);
@@ -65,7 +65,7 @@ const goalRows: Goal[] = goals.map((g) => ({
   target_body_fat_min: n(g.target_body_fat_min), target_body_fat_max: n(g.target_body_fat_max),
 })) as unknown as Goal[];
 
-// ── tập luyện
+// ── training
 const weekSessions = sRows.filter((s) => s.session_date >= ws && s.session_date <= we && s.status === 'completed');
 const weekIds = new Set(weekSessions.map((s) => s.id));
 const ws4 = addDays(ws, -21);

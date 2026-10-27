@@ -1,9 +1,9 @@
 -- ============================================================================
--- Lịch chạy:
---  • 00:05 giờ VN mỗi ngày: kích hoạt lộ trình "scheduled" đã tới ngày.
---  • mỗi 15 phút: gọi Edge Function send-reminders.
--- URL function + secret lấy từ app_meta / Vault (đặt tay khi deploy, xem docs/setup.md);
--- chưa cấu hình thì bỏ qua, không lỗi.
+-- Schedule:
+--  • 00:05 Vietnam time daily: activate "scheduled" plans whose date has come.
+--  • every 15 minutes: call the send-reminders Edge Function.
+-- Function URL + secret come from app_meta / Vault (set manually at deploy time);
+-- if not configured, the job is skipped without errors.
 -- ============================================================================
 
 create or replace function public.trigger_reminders() returns void

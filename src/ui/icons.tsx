@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-/** Icon nét mảnh (stroke) dùng chung — kế thừa màu chữ qua currentColor. */
+/** Thin stroke icons shared across the app — inherit the text color via currentColor. */
 function Base({ children, ...p }: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden {...p}>

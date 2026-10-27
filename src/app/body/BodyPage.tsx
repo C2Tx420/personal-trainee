@@ -9,7 +9,7 @@ import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } fro
 import { SimpleLine } from '@/ui/charts';
 import { Badge, Banner, Button, Card, Empty, Field, Input, Page, SectionTitle, Segmented, Spinner } from '@/ui/components';
 
-/** điểm bắt đầu đường mục tiêu: lần cân InBody 26/10/2026 */
+/** start of the goal line: the InBody weigh-in on 26/10/2026 */
 const START: { date: IsoDate; kg: number } = { date: '2026-10-26', kg: 81.7 };
 
 export function BodyPage() {
@@ -42,7 +42,7 @@ export function BodyPage() {
   const delta = thisWeek && prevWeek ? round(thisWeek.last - prevWeek.last, 1) : null;
   const pendingDraft = (plans.data ?? []).some((p) => p.status === 'draft');
 
-  // đường mục tiêu: nội suy tuyến tính start → các mốc
+  // goal line: linear interpolation from start → each goal
   const anchors = [START, ...(goals.data ?? []).map((g) => ({ date: g.target_date, kg: g.target_weight_max }))];
   const targetAt = (d: IsoDate): number | null => {
     for (let i = 0; i < anchors.length - 1; i++) {

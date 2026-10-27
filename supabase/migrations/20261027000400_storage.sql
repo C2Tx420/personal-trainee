@@ -1,5 +1,5 @@
--- Ảnh tiến độ: bucket PRIVATE, chỉ JPEG ≤ 2MB, đường dẫn {user_id}/{yyyy-mm-dd}/{front|side|back}.jpg.
--- Chỉ chủ sở hữu thao tác được trong thư mục của mình; xem qua signed URL ngắn hạn.
+-- Progress photos: PRIVATE bucket, JPEG only ≤ 2MB, path {user_id}/{yyyy-mm-dd}/{front|side|back}.jpg.
+-- Only the owner can act inside their own folder; viewing goes through short-lived signed URLs.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('progress-photos', 'progress-photos', false, 2097152, array['image/jpeg'])
 on conflict (id) do nothing;

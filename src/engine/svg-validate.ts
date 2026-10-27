@@ -1,6 +1,6 @@
 /**
- * Kiểm tra an toàn hình minh hoạ SVG (§4.7). Cùng điều kiện với CHECK trong DB
- * và trong `coach_submit_draft`, để lỗi được bắt sớm nhất có thể.
+ * Safety check for SVG illustrations (§4.7). Same conditions as the DB CHECK
+ * and `coach_submit_draft`, so errors are caught as early as possible.
  */
 
 export const SVG_MAX_BYTES = 15_360;
@@ -15,7 +15,7 @@ const FORBIDDEN: [RegExp, string][] = [
   [/@import/i, 'không được @import trong style'],
 ];
 
-/** Regex dùng cho CHECK của Postgres — giữ đồng bộ với FORBIDDEN ở trên. */
+/** Regex used by the Postgres CHECK — keep in sync with FORBIDDEN above. */
 export const SVG_FORBIDDEN_PG_REGEX = "<script|\\son[a-z]+\\s*=|foreignObject|javascript:|<!ENTITY|@import";
 
 export function validateSvg(svg: string): string[] {
@@ -28,7 +28,7 @@ export function validateSvg(svg: string): string[] {
   return errors;
 }
 
-/** data URL để render qua <img> — trình duyệt không chạy script trong ảnh. */
+/** data URL rendered via <img> — browsers don't run scripts inside images. */
 export function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }

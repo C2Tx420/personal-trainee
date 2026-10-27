@@ -22,7 +22,7 @@ const BUILD_TIME = new Date().toISOString();
 const isRelease = process.env.APP_RELEASE === '1';
 const APP_VERSION = isRelease ? pkg.version : `${pkg.version}-dev+${SHA}`;
 
-/** Sinh dist/version.json (không cache) để app so sánh khi có bản mới (§15.3). */
+/** Emit dist/version.json (never cached) so the app can detect a new release (§15.3). */
 function versionJson(): Plugin {
   return {
     name: 'version-json',

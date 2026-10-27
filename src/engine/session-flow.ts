@@ -2,17 +2,17 @@ import type { SessionItemRow, SessionRow, SetRow } from './types';
 import { plannedSets, type PlannedSet } from './warmup';
 
 /**
- * Máy trạng thái của luồng tập "▶ Bắt đầu buổi tập".
+ * State machine for the "▶ Bắt đầu buổi tập" workout flow.
  *
- * Không lưu trạng thái riêng: bước hiện tại luôn được **tính lại từ dữ liệu DB**
- * (buổi, các bài trong buổi, các hiệp đã ghi). Nhờ vậy thoát app / hết pin rồi
- * mở lại vẫn quay về đúng bài, đúng hiệp.
+ * No separate state is stored: the current step is always **recomputed from DB data**
+ * (session, its exercises, logged sets). So closing the app / running out of battery and
+ * reopening always returns to the right exercise and set.
  */
 
 export type FlowItem = {
   item: SessionItemRow;
   loadStepKg: number;
-  /** kg hiệp chính lần trước — dùng tính tạ làm nóng khi chưa có target_kg. */
+  /** previous working-set kg — used for warm-up loads when there is no target_kg. */
   fallbackWorkingKg: number | null;
 };
 
@@ -29,7 +29,7 @@ export type FlowStep =
     }
   | { type: 'summary' };
 
-/** Thứ tự tập: bài chưa "để sau" theo vị trí, rồi bài "để sau" theo vị trí. */
+/** Workout order: non-deferred exercises by position, then deferred ones by position. */
 export function orderedItems<T extends { item: SessionItemRow }>(items: T[]): T[] {
   return [...items].sort(
     (a, b) => Number(a.item.deferred) - Number(b.item.deferred) || a.item.position - b.item.position,
@@ -46,7 +46,7 @@ function isDone(p: PlannedSet, sets: SetRow[], itemId: string): boolean {
   );
 }
 
-/** Các hiệp dự kiến chưa xong của một bài. */
+/** Planned sets of an exercise that are not done yet. */
 export function remainingSets(fi: FlowItem, sets: SetRow[]): PlannedSet[] {
   return plannedFor(fi).filter((p) => !isDone(p, sets, fi.item.id));
 }
@@ -72,7 +72,7 @@ export function nextStep(session: Pick<SessionRow, 'warmup' | 'is_backfill'>, it
   return { type: 'summary' };
 }
 
-/** Bài đã xong hết hiệp nhưng status chưa cập nhật → cần đánh dấu done. */
+/** Exercises with every set done but status not yet updated → need to be marked done. */
 export function itemsToMarkDone(items: FlowItem[], sets: SetRow[]): string[] {
   return items
     .filter((fi) => fi.item.status === 'in_progress' && remainingSets(fi, sets).length === 0)

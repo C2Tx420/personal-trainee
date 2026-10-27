@@ -14,7 +14,7 @@ const ANGLES = [
 ] as const;
 type Angle = (typeof ANGLES)[number]['key'];
 
-/** Khung người hướng dẫn chồng lên camera. */
+/** Body outline guide overlaid on the camera. */
 function Silhouette({ angle }: { angle: Angle }) {
   return (
     <svg viewBox="0 0 100 160" className="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid meet" aria-hidden>
@@ -62,7 +62,7 @@ export function PhotoCapturePage() {
     return () => s?.getTracks().forEach((t) => t.stop());
   }, []);
 
-  // ảnh mờ của lần trước cùng góc (ghost overlay)
+  // faded photo from the previous set at the same angle (ghost overlay)
   useEffect(() => {
     const prev = photos.data?.find((p) => p.angle === angle && p.taken_on !== today);
     let url: string | null = null;

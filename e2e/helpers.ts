@@ -5,11 +5,11 @@ import { E2E_EMAIL, E2E_PASSWORD, E2E_PIN } from './env';
 export const SHOT_DIR = path.resolve(import.meta.dirname, 'screenshots');
 export const shots: { file: string; title: string }[] = [];
 
-/** Chụp toàn trang để review; title dùng cho trang gallery. */
+/** Full-page screenshot for review; the title is used on the gallery page. */
 export async function shot(page: Page, file: string, title: string) {
   await page.waitForLoadState('networkidle').catch(() => undefined);
   await page.waitForTimeout(300);
-  // thanh tab cố định → đưa xuống cuối trang để ảnh toàn trang không bị che
+  // fixed tab bar → move it to the end of the page so it doesn't cover the full-page shot
   const style = await page.addStyleTag({ content: 'nav.fixed{position:static!important}' });
   await page.screenshot({ path: path.join(SHOT_DIR, `${file}.png`), fullPage: true });
   await style.evaluate((el) => (el as Element).remove());
@@ -33,21 +33,21 @@ export async function unlock(page: Page) {
   await expect(page.getByRole('heading', { name: /Hôm nay/ })).toBeVisible({ timeout: 20_000 });
 }
 
-/** Bỏ qua đồng hồ nghỉ nếu đang hiện. */
+/** Skip the rest timer if it is showing. */
 export async function skipRest(page: Page) {
   const timer = page.getByRole('timer', { name: 'Đồng hồ nghỉ' });
   if (await timer.isVisible().catch(() => false)) await timer.getByRole('button', { name: 'Bỏ qua' }).click();
   await expect(timer).toBeHidden();
 }
 
-/** Bấm XONG HIỆP rồi bỏ qua nghỉ. */
+/** Tap "Xong hiệp", then skip the rest. */
 export async function completeSet(page: Page) {
   await page.getByRole('button', { name: 'Xong hiệp' }).click();
   await expect(page.getByRole('button', { name: 'Đang lưu…' })).toBeHidden();
   await skipRest(page);
 }
 
-/** Điều hướng phía client (không tải lại trang → không bị khoá PIN). */
+/** Client-side navigation (no page reload → no PIN lock). */
 export async function nav(page: Page, to: string) {
   await page.evaluate((p) => {
     window.history.pushState({}, '', p);
@@ -55,7 +55,7 @@ export async function nav(page: Page, to: string) {
   }, to);
 }
 
-/** Tải lại trang (app tự khoá) rồi mở khoá bằng PIN. */
+/** Reload the page (the app locks) and unlock with the PIN. */
 export async function reloadAndUnlock(page: Page, to?: string) {
   if (to) await page.goto(to);
   else await page.reload();

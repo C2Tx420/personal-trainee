@@ -18,7 +18,7 @@ export function useAuth(): AuthCtx {
   return c;
 }
 
-/** Cổng vào app: chưa đăng nhập → Login; đăng nhập rồi → nhập PIN mỗi lần mở app. */
+/** App gate: not signed in → Login; signed in → enter the PIN every time the app opens. */
 export function AuthGate({ children }: { children: ReactNode }) {
   const online = useOnline();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -39,7 +39,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     setLocked(true);
   }, []);
 
-  // Bootstrap dữ liệu seed sau khi mở khoá lần đầu
+  // Bootstrap seed data after the first unlock
   useEffect(() => {
     if (!session || locked || booted) return;
     bootstrap()

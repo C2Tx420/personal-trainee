@@ -1,8 +1,8 @@
 /**
- * Tính nhắc nhở đến hạn (§6.10). TS thuần, không phụ thuộc gì — dùng chung cho
- * Edge Function `send-reminders` (Deno) và app/test (re-export ở src/engine/reminders.ts).
+ * Compute due reminders (§6.10). Pure TS with no dependencies — shared by the
+ * `send-reminders` Edge Function (Deno) and the app/tests (re-exported from src/engine/reminders.ts).
  *
- * Nội dung push luôn chung chung, KHÔNG chứa số liệu sức khỏe.
+ * Push content is always generic and NEVER contains health data.
  */
 
 export type ReminderKind =
@@ -18,7 +18,7 @@ export type ReminderKind =
 export type ReminderSetting = {
   kind: ReminderKind;
   enabled: boolean;
-  time_of_day: string | null; // "HH:MM" hoặc "HH:MM:SS"
+  time_of_day: string | null; // "HH:MM" or "HH:MM:SS"
   weekdays: number[] | null; // 1 = T2 … 7 = CN
   interval_min: number | null;
   window_start: string | null;
@@ -26,16 +26,16 @@ export type ReminderSetting = {
 };
 
 export type ReminderContext = {
-  /** Thời điểm hiện tại theo giờ VN: ngày ISO + phút trong ngày. */
+  /** Current time in Vietnam time: ISO date + minute of the day. */
   date: string;
   minuteOfDay: number;
   /** 1 = T2 … 7 = CN */
   isoWeekday: number;
-  /** Có buổi tập theo lịch hôm nay không (kind + giờ nhắc riêng nếu có). */
+  /** Whether there is a scheduled session today (kind + its own reminder time, if any). */
   todaySession: { kind: string; time: string } | null;
   daysSinceInbody: number | null;
   daysSincePhotos: number | null;
-  /** Số ngày tới các mốc goal chưa đạt. */
+  /** Days until each goal that is not yet reached. */
   goalDaysLeft: number[];
 };
 
@@ -68,7 +68,7 @@ export function toMinutes(hhmm: string): number {
   return h * 60 + (m || 0);
 }
 
-/** Cửa sổ chạy cron (mặc định 15 phút): nhắc đến hạn nếu giờ hẹn ∈ [now, now + window). */
+/** Cron window (15 minutes by default): a reminder is due if its time ∈ [now, now + window). */
 function inWindow(target: number, now: number, windowMin: number): boolean {
   return target >= now && target < now + windowMin;
 }
@@ -108,7 +108,7 @@ export function dueReminders(settings: ReminderSetting[], ctx: ReminderContext, 
   return out;
 }
 
-/** Cài đặt mặc định (§6.10, chốt ở v2.4). */
+/** Default settings (§6.10, settled in v2.4). */
 export const DEFAULT_REMINDERS: ReminderSetting[] = [
   { kind: 'workout', enabled: true, time_of_day: null, weekdays: null, interval_min: null, window_start: null, window_end: null },
   { kind: 'water', enabled: true, time_of_day: null, weekdays: null, interval_min: 120, window_start: '08:00', window_end: '20:00' },
@@ -120,7 +120,7 @@ export const DEFAULT_REMINDERS: ReminderSetting[] = [
   { kind: 'goal', enabled: true, time_of_day: '09:00', weekdays: null, interval_min: null, window_start: null, window_end: null },
 ];
 
-/** Giờ nhắc buổi tập theo loại (chốt: 17:30 tạ, 17:00 cầu lông, 10:30 CN). */
+/** Workout reminder time per kind (settled: 17:30 lifting, 17:00 badminton, 10:30 Sunday). */
 export function workoutReminderTime(kind: string): string {
   if (kind === 'badminton') return '17:00';
   if (kind === 'optional') return '10:30';

@@ -1,8 +1,8 @@
 /**
- * Vẽ hình minh hoạ bài tập theo quy chuẩn coach/svg-style.md:
- * viewBox 320×200, 2 khung "Bắt đầu → Kết thúc", người dạng khung xương,
- * nhóm cơ chính tô cam, nhóm cơ phụ tô cam nhạt, màu sáng/tối theo
- * prefers-color-scheme, mũi tên đứt nét chỉ đường đi của khớp chuyển động nhiều nhất.
+ * Draw exercise illustrations following coach/svg-style.md:
+ * viewBox 320×200, 2 panels "Bắt đầu → Kết thúc", stick-figure body,
+ * primary muscles in orange, secondary muscles in light orange, light/dark colors via
+ * prefers-color-scheme, dashed arrow tracing the path of the joint that moves most.
  */
 
 export type Pt = [number, number];
@@ -11,11 +11,11 @@ export type SidePose = {
   view?: 'side';
   head: Pt;
   s: Pt; // vai
-  e: Pt; // khuỷu
-  w: Pt; // cổ tay
-  p: Pt; // hông
-  k: Pt; // gối
-  f: Pt; // bàn chân
+  e: Pt; // elbow
+  w: Pt; // wrist
+  p: Pt; // hip
+  k: Pt; // knee
+  f: Pt; // foot
 };
 
 export type FrontPose = {
@@ -47,7 +47,7 @@ export type Drawing = {
   propsA?: Prop[];
   propsB?: Prop[];
   hold?: Hold;
-  /** Khớp để vẽ mũi tên chuyển động; mặc định tự chọn khớp dịch chuyển nhiều nhất. */
+  /** Joint used for the motion arrow; defaults to the joint that moves the most. */
   motion?: string | null;
 };
 

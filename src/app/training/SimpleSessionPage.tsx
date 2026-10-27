@@ -11,7 +11,7 @@ import { Banner, Button, Card, Chip, ErrorBox, Field, Input, Page } from '@/ui/c
 const INTENSITY_LABEL: Record<Intensity, string> = { light: 'Nhẹ', moderate: 'Vừa', hard: 'Nặng' };
 const DEFAULT_MIN: Record<string, number> = { badminton: 75, walk: 35, zone2: 30, core: 12 };
 
-/** Ghi cầu lông / đi bộ / zone 2 / core: thời lượng + cường độ, calo ước tính. */
+/** Log badminton / walk / zone 2 / core: duration + intensity, estimated calories. */
 export function SimpleSessionPage() {
   const { kind = 'badminton' } = useParams();
   const k = kind as SessionKind;

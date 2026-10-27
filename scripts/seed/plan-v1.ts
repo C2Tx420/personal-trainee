@@ -1,9 +1,9 @@
 import type { PlanContent } from '../../src/engine/plan-schema';
 
 /**
- * Lộ trình v1 — tuần 26/10–01/11/2026 (plan v2.4 §4.4). Lần chọn bài đầu tiên của
- * Claude Code: ưu tiên máy, 2 hiệp làm nóng + 3 hiệp chính cho bài đa khớp, tạ
- * mục tiêu ước tính từ chỉ số + buổi Push 26/10.
+ * Plan v1 — week of 26/10–01/11/2026 (plan v2.4 §4.4). Claude Code's first exercise
+ * selection: machines first, 2 warm-up sets + 3 working sets for compound lifts, target
+ * loads estimated from body metrics + the 26/10 Push session.
  */
 
 const pushPullWarmup = {

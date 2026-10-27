@@ -15,7 +15,7 @@ const DIFF_LABEL: Record<string, string> = {
   warmup_sets: 'Làm nóng', coach_note: 'Coach', exercise_new: 'Bài mới', exercise_edit: 'Sửa bài', warmup: 'Khởi động', nutrition: 'Calo', schedule: 'Lịch',
 };
 
-/** Xem một phiên bản lộ trình, diff với bản trước, Duyệt / Từ chối (§4.5–4.6). */
+/** View one plan version, diff against the previous one, Approve / Reject (§4.5–4.6). */
 export function PlanDetailPage() {
   const { id = '' } = useParams();
   const nav = useNavigate();
@@ -38,7 +38,7 @@ export function PlanDetailPage() {
   const active = plans.data!.find((x) => x.status === 'active');
   const base = plans.data!.find((x) => x.id === p.based_on_version_id) ?? (p.status === 'draft' ? active : undefined);
   const names = (s: string) => ex.bySlug.get(s)?.name_vi ?? p.content.exercise_upserts.find((e) => e.slug === s)?.name_vi ?? s;
-  // bài đã có trước khi duyệt bản này (bài do chính bản này tạo ra vẫn tính là "mới")
+  // exercises that existed before this version was approved (ones created by this version still count as "new")
   const createdByThis = (e: { created_at?: string; updated_by_plan_version_id?: string | null }) =>
     e.updated_by_plan_version_id === p.id && !!p.approved_at && !!e.created_at && e.created_at >= new Date(new Date(p.approved_at).getTime() - 5_000).toISOString();
   const existing = new Set(ex.list.filter((e) => !createdByThis(e)).map((e) => e.slug));

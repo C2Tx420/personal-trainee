@@ -17,8 +17,8 @@ import type {
 import { must, supabase } from '@/lib/supabase';
 
 /**
- * Mọi thao tác đọc/ghi Supabase của app. ID sinh ở client (crypto.randomUUID)
- * + upsert theo id → bấm lại / retry khi mạng chập chờn không tạo bản trùng.
+ * All of the app's Supabase reads/writes. IDs are generated on the client (crypto.randomUUID)
+ * + upsert by id → tapping again / retrying on a flaky network never creates duplicates.
  */
 
 export type PlanVersion = {
@@ -54,7 +54,7 @@ export type NotificationSetting = {
 
 const num = (v: unknown) => (v === null || v === undefined ? null : Number(v));
 
-// ───────────────────────── Đọc
+// ───────────────────────── Reads
 export async function fetchExercises(): Promise<ExerciseRow[]> {
   const rows = must(await supabase.from('exercises').select('*').order('name_vi'));
   return (rows as ExerciseRow[]).map((r) => ({ ...r, load_step_kg: Number(r.load_step_kg) }));
@@ -118,7 +118,7 @@ const setNum = (s: SetRow): SetRow => ({ ...s, weight_kg: num(s.weight_kg), targ
 
 export type TrainingData = { sessions: SessionRow[]; items: SessionItemRow[]; sets: SetRow[] };
 
-/** Toàn bộ buổi tập ~4 tháng gần nhất (1 người dùng → dữ liệu nhỏ, tải một lần). */
+/** Every session from roughly the last 4 months (single user → small data, loaded once). */
 export async function fetchTraining(days = 120): Promise<TrainingData> {
   const from = addDays(todayVN(), -days);
   const sessions = must(
@@ -146,7 +146,7 @@ export async function fetchInProgress(): Promise<SessionRow | null> {
   return must(await supabase.from('workout_sessions').select('*').eq('status', 'in_progress').maybeSingle()) as SessionRow | null;
 }
 
-/** Lịch sử các hiệp của một bài (để hiện "lần gần nhất" + bảng lịch sử). */
+/** Set history of one exercise (for "last time" + the history table). */
 export async function fetchExerciseHistory(exerciseIds: string[]): Promise<{ date: IsoDate; sessionId: string; sets: SetRow[] }[]> {
   if (exerciseIds.length === 0) return [];
   const sets = (must(
@@ -178,7 +178,7 @@ export async function fetchAppMeta(): Promise<Record<string, string>> {
   return Object.fromEntries(rows.map((r) => [r.key, r.value]));
 }
 
-// ───────────────────────── Khởi động app
+// ───────────────────────── App startup
 export async function bootstrap(): Promise<void> {
   must(await supabase.rpc('bootstrap_user'));
   await supabase.rpc('activate_my_due_plans');
@@ -190,7 +190,7 @@ export async function verifyPin(pin: string): Promise<{ ok: boolean; attempts_le
   return data;
 }
 
-// ───────────────────────── Buổi tập
+// ───────────────────────── Sessions
 export type StartArgs = {
   kind: SessionKind;
   date: IsoDate;
@@ -280,7 +280,7 @@ export async function deleteSet(id: string): Promise<void> {
   must(await supabase.from('workout_sets').delete().eq('id', id));
 }
 
-/** Tạo bài tạm khi anh gõ tên bài chưa có trong thư viện (§6.2 ⑤). */
+/** Create a provisional exercise when the user types a name not in the library (§6.2 ⑤). */
 export async function createProvisionalExercise(name: string, like: ExerciseRow | null, sessionId: string | null): Promise<ExerciseRow> {
   const slug = `user_${slugifyVi(name)}_${Math.random().toString(36).slice(2, 6)}`;
   const row = must(
@@ -383,7 +383,7 @@ export async function deleteSession(id: string): Promise<void> {
   must(await supabase.from('workout_sessions').delete().eq('id', id));
 }
 
-/** Buổi không theo template (cầu lông, đi bộ, zone 2, core). */
+/** Session without a template (badminton, walk, zone 2, core). */
 export async function logSimpleSession(args: {
   date: IsoDate;
   kind: SessionKind;
@@ -420,7 +420,7 @@ export type BackfillItem = {
   sets: { set_type: 'warmup' | 'working'; reps: number | null; seconds: number | null; weight_kg: number | null }[];
 };
 
-/** Ghi bù / ghi nhanh: tạo buổi đã hoàn thành kèm bài + hiệp (§6.2, §6.2a). */
+/** Backfill / quick log: create a completed session with its exercises + sets (§6.2, §6.2a). */
 export async function createBackfillSession(args: {
   date: IsoDate;
   kind: SessionKind;
@@ -482,7 +482,7 @@ export async function setExerciseAvailable(id: string, available: boolean): Prom
   must(await supabase.from('exercises').update({ available_at_gym: available, unavailable_note: available ? null : `Đánh dấu ${todayVN()}` }).eq('id', id));
 }
 
-// ───────────────────────── Cơ thể
+// ───────────────────────── Body
 export async function saveWeight(args: { date: IsoDate; weightKg: number; note: string | null; measurements: Record<string, number | null> }): Promise<void> {
   const id = crypto.randomUUID();
   must(await supabase.from('weight_logs').insert({ id, log_date: args.date, weight_kg: args.weightKg, note: args.note }));
@@ -499,7 +499,7 @@ export async function saveInbody(row: Omit<InbodyLog, never>): Promise<void> {
   must(await supabase.from('inbody_logs').insert(row));
 }
 
-// ───────────────────────── Lộ trình
+// ───────────────────────── Plans
 export async function createDraft(args: { content: PlanContent; changeNote: string; basedOn: string | null; createdBy?: 'user' | 'system' }): Promise<string> {
   const row = must(
     await supabase
@@ -523,7 +523,7 @@ export async function markReviewRead(id: string): Promise<void> {
   must(await supabase.from('review_notes').update({ is_read: true }).eq('id', id));
 }
 
-// ───────────────────────── Nhắc nhở
+// ───────────────────────── Reminders
 export async function updateNotification(id: string, patch: Partial<NotificationSetting>): Promise<void> {
   must(await supabase.from('notification_settings').update(patch).eq('id', id));
 }
@@ -560,7 +560,7 @@ export async function sendTestPush(): Promise<number> {
   return (data as { sent: number }).sent;
 }
 
-// ───────────────────────── Ảnh tiến độ (chỉ khi online, không cache)
+// ───────────────────────── Progress photos (online only, never cached)
 export async function uploadPhoto(args: { userId: string; date: IsoDate; angle: 'front' | 'side' | 'back'; blob: Blob; width: number; height: number }): Promise<void> {
   const path = `${args.userId}/${args.date}/${args.angle}.jpg`;
   const up = await supabase.storage.from('progress-photos').upload(path, args.blob, { contentType: 'image/jpeg', upsert: true, cacheControl: 'no-store' });
@@ -575,7 +575,7 @@ export async function uploadPhoto(args: { userId: string; date: IsoDate; angle: 
   );
 }
 
-/** Signed URL 60 giây → tải về blob (no-store) → blob URL; người gọi tự revoke. */
+/** 60-second signed URL → download as blob (no-store) → blob URL; the caller revokes it. */
 export async function photoObjectUrl(path: string): Promise<string> {
   const { data, error } = await supabase.storage.from('progress-photos').createSignedUrl(path, 60);
   if (error || !data) throw new Error(error?.message ?? 'Không tạo được link ảnh');

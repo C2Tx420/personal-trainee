@@ -5,7 +5,7 @@ import { IconLock } from '@/ui/icons';
 
 const LENGTH = 4;
 
-/** Màn khoá PIN 4 số — PIN được kiểm tra ở server (Edge Function verify-pin). */
+/** 4-digit PIN lock screen — the PIN is verified server-side (verify-pin Edge Function). */
 export function PinLock({ onUnlock, onLockedOut, email }: { onUnlock: () => void; onLockedOut: () => void; email: string }) {
   const [pin, setPin] = useState('');
   const [msg, setMsg] = useState<string | null>(null);

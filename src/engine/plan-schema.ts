@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { WEEKDAYS, type Weekday } from './dates';
 
 /**
- * Schema `plan-content/1` — nội dung đầy đủ của một phiên bản lộ trình.
+ * Schema `plan-content/1` — the full content of one plan version.
  *
- * Dùng chung cho app (validate trước khi lưu/duyệt), script coach (validate
- * trước khi gửi draft) và build-seed. JSON Schema cho coach được xuất từ đây.
+ * Shared by the app (validate before save/approve), the coach scripts (validate
+ * before submitting a draft) and build-seed. The coach's JSON Schema is exported from here.
  */
 
 export const CALORIES_FLOOR = 1700;
@@ -161,8 +161,8 @@ export type PlanContent = z.infer<typeof planContentSchema>;
 export type PlanIssue = { level: 'error' | 'warning'; message: string };
 
 /**
- * Kiểm tra ràng buộc nghiệp vụ ngoài schema: rule lịch, bài tham chiếu có tồn tại.
- * `knownSlugs` = slug trong thư viện hiện có (bài trong `exercise_upserts` được tính thêm).
+ * Business rules beyond the schema: schedule rules, referenced exercises exist.
+ * `knownSlugs` = slugs in the current library (exercises in `exercise_upserts` are added).
  */
 export function validatePlanRules(content: PlanContent, knownSlugs: Iterable<string>): PlanIssue[] {
   const issues: PlanIssue[] = [];
@@ -199,7 +199,7 @@ export function validatePlanRules(content: PlanContent, knownSlugs: Iterable<str
   return issues;
 }
 
-/** Các cặp (ngày Legs, ngày cầu lông) liền kề nhau, tính vòng tuần (CN liền T2). */
+/** (Legs day, badminton day) pairs that are adjacent, wrapping around the week (Sun next to Mon). */
 export function legsBadmintonAdjacency(schedule: PlanContent['schedule']): [Weekday, Weekday][] {
   const legs = WEEKDAYS.filter((d) => {
     const p = schedule[d];

@@ -7,10 +7,10 @@ export function cx(...xs: (string | false | null | undefined)[]): string {
   return xs.filter(Boolean).join(' ');
 }
 
-/** Lớp header kính dính trên cùng (dùng cho Page và luồng tập). */
+/** Sticky glass header class (used by Page and the workout flow). */
 export const GLASS_HEADER = 'glass-strong safe-top sticky top-0 z-20 -mx-4 border-x-0 border-t-0';
 
-// ───────────────────────── Bố cục trang
+// ───────────────────────── Page layout
 export function Page({
   title,
   back,
@@ -65,7 +65,7 @@ export function SectionTitle({ children, right }: { children: ReactNode; right?:
   );
 }
 
-// ───────────────────────── Nút
+// ───────────────────────── Buttons
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'ok';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -104,7 +104,7 @@ export function Field({ label, hint, children }: { label: string; hint?: ReactNo
   );
 }
 
-/** w-full mặc định, trừ khi className đã đặt độ rộng riêng (tránh 2 class width đè nhau). */
+/** w-full by default, unless className already sets a width (avoids 2 conflicting width classes). */
 const hasWidth = (c?: string) => !!c && /(^|\s)(max-|min-)?w-/.test(c);
 
 const FIELD = 'glass-input rounded-ctl text-base text-fg outline-none placeholder:text-muted/60 focus:border-accent/70';
@@ -117,7 +117,7 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return <textarea {...props} className={cx(FIELD, 'p-3.5', !hasWidth(props.className) && 'w-full', props.className)} />;
 }
 
-/** Ô số to có nút −/+ (dùng trong luồng tập). */
+/** Large number input with −/+ buttons (used in the workout flow). */
 export function Stepper({
   value,
   onChange,
@@ -282,7 +282,7 @@ export function ErrorBox({ error }: { error: unknown }) {
   return <Banner tone="bad">{error instanceof Error ? error.message : String(error)}</Banner>;
 }
 
-/** Bottom sheet kính. */
+/** Glass bottom sheet. */
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   useEffect(() => {
     if (!open) return;
@@ -360,14 +360,14 @@ export function Segmented<T extends string>({
 }
 
 /**
- * App chỉ có giao diện tối → bỏ điều kiện `@media (prefers-color-scheme:dark)`
- * trong SVG để luôn dùng màu tối, bất kể máy đang đặt sáng hay tối.
+ * The app is dark-only → drop the `@media (prefers-color-scheme:dark)` condition
+ * in the SVG so it always uses dark colors, whatever the device setting.
  */
 function forceDarkSvg(svg: string): string {
   return svg.replace(/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{([\s\S]*)\}\s*<\/style>/, '$1</style>');
 }
 
-/** Hình minh hoạ bài tập — render qua <img> nên script trong SVG không chạy. */
+/** Exercise illustration — rendered via <img>, so scripts inside the SVG never run. */
 export function ExerciseImg({ svg, name, className }: { svg: string | null | undefined; name: string; className?: string }) {
   const frame = 'rounded-ctl aspect-[8/5] ring-1 ring-line';
   if (!svg) {
