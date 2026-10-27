@@ -379,8 +379,3 @@ export function ExerciseImg({ svg, name, className }: { svg: string | null | und
   }
   return <img src={svgDataUrl(forceDarkSvg(svg))} alt={`Hình minh hoạ: ${name}`} className={cx(frame, hasWidth(className) ? '' : 'w-full', className)} />;
 }
-
-export function Kg({ v }: { v: number | null | undefined }) {
-  if (v === null || v === undefined) return <span className="text-muted">— kg</span>;
-  return <span className="tabular">{String(v).replace('.', ',')} kg</span>;
-}

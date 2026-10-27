@@ -1,4 +1,11 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git mv *)",
+      "Bash(echo \"=== typecheck exit: $? ===\")",
+      "Bash(npx vitest *)"
+    ]
+  },
   "enabledPlugins": {
     "expo@claude-plugins-official": true
   }

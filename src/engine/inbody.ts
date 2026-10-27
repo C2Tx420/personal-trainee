@@ -13,7 +13,7 @@ export type InbodyLog = {
   inbody_score: number | null;
 };
 
-export const INBODY_INTERVAL_DAYS = 30;
+const INBODY_INTERVAL_DAYS = 30;
 
 export type InbodyDelta = {
   weightKg: number;

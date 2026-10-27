@@ -3,7 +3,7 @@
  * and `coach_submit_draft`, so errors are caught as early as possible.
  */
 
-export const SVG_MAX_BYTES = 15_360;
+const SVG_MAX_BYTES = 15_360;
 
 const FORBIDDEN: [RegExp, string][] = [
   [/<script/i, 'không được có <script>'],
@@ -14,9 +14,6 @@ const FORBIDDEN: [RegExp, string][] = [
   [/<!ENTITY/i, 'không được khai báo ENTITY'],
   [/@import/i, 'không được @import trong style'],
 ];
-
-/** Regex used by the Postgres CHECK — keep in sync with FORBIDDEN above. */
-export const SVG_FORBIDDEN_PG_REGEX = "<script|\\son[a-z]+\\s*=|foreignObject|javascript:|<!ENTITY|@import";
 
 export function validateSvg(svg: string): string[] {
   const errors: string[] = [];

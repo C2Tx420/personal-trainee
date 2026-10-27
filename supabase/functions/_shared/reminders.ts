@@ -63,7 +63,7 @@ const TEXT: Record<ReminderKind, { title: string; body: string }> = {
   weekly_review: { title: 'Review tuần', body: 'Đến giờ review tuần — chạy trên máy tính' },
 };
 
-export function toMinutes(hhmm: string): number {
+function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number);
   return h * 60 + (m || 0);
 }

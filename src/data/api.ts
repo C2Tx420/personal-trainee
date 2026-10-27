@@ -276,10 +276,6 @@ export async function saveSet(s: SetInput): Promise<void> {
   );
 }
 
-export async function deleteSet(id: string): Promise<void> {
-  must(await supabase.from('workout_sets').delete().eq('id', id));
-}
-
 /** Create a provisional exercise when the user types a name not in the library (§6.2 ⑤). */
 export async function createProvisionalExercise(name: string, like: ExerciseRow | null, sessionId: string | null): Promise<ExerciseRow> {
   const slug = `user_${slugifyVi(name)}_${Math.random().toString(36).slice(2, 6)}`;
@@ -373,10 +369,6 @@ export async function finishSession(s: SessionRow, estKcal: number | null): Prom
       .update({ status: 'completed', ended_at: end.toISOString(), duration_min: duration, est_kcal: estKcal })
       .eq('id', s.id),
   );
-}
-
-export async function updateSession(id: string, patch: Partial<SessionRow>): Promise<void> {
-  must(await supabase.from('workout_sessions').update(patch).eq('id', id));
 }
 
 export async function deleteSession(id: string): Promise<void> {

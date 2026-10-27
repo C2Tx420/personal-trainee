@@ -79,7 +79,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return <Ctx.Provider value={{ userId: session.user.id, signOut }}>{children}</Ctx.Provider>;
 }
 
-export function OfflineScreen() {
+function OfflineScreen() {
   return (
     <div className="grid min-h-dvh place-items-center p-6 text-center">
       <div>

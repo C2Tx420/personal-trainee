@@ -5,8 +5,8 @@
  * date strings are converted to UTC 00:00 and shifted by whole days.
  */
 
-export const TIMEZONE = 'Asia/Ho_Chi_Minh';
-export const MS_PER_DAY = 86_400_000;
+const TIMEZONE = 'Asia/Ho_Chi_Minh';
+const MS_PER_DAY = 86_400_000;
 
 export type IsoDate = string;
 
@@ -23,12 +23,12 @@ export const WEEKDAY_LABEL: Record<Weekday, string> = {
   sun: 'Chủ nhật',
 };
 
-export function toUtcMs(date: IsoDate): number {
+function toUtcMs(date: IsoDate): number {
   const [y, m, d] = date.split('-').map(Number);
   return Date.UTC(y, m - 1, d);
 }
 
-export function fromUtcMs(ms: number): IsoDate {
+function fromUtcMs(ms: number): IsoDate {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
@@ -66,8 +66,4 @@ export function todayVN(now: Date = new Date()): IsoDate {
 export function formatVN(date: IsoDate, withYear = false): string {
   const [y, m, d] = date.split('-');
   return withYear ? `${d}/${m}/${y}` : `${d}/${m}`;
-}
-
-export function isIsoDate(s: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(toUtcMs(s));
 }
