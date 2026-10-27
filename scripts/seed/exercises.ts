@@ -1,8 +1,8 @@
 import type { ExerciseDef } from '../../src/engine/plan-schema';
 
 /**
- * Thư viện bài tập seed (~38 bài). Hình SVG sinh từ scripts/svg/poses.ts.
- * `aliases` = các cách anh hay gọi (dùng cho ô gõ bài thay thế + ghi nhanh bằng chữ).
+ * Seed exercise library (~38 exercises). SVG illustrations are generated from scripts/svg/poses.ts.
+ * `aliases` = names the user commonly uses (for the substitute input + free-text quick log).
  */
 type Def = Omit<ExerciseDef, 'illustration_svg'>;
 
@@ -212,7 +212,7 @@ export const EXERCISES: Def[] = [
     cues: ['Khuỷu dưới vai', 'Thân thẳng từ đầu tới gót', 'Siết bụng và mông'], common_mistakes: ['Võng hông', 'Chổng mông'],
   }),
 
-  // ───────── Cardio / core / khởi động
+  // ───────── Cardio / core / warm-up
   m({
     slug: 'treadmill_walk', name_vi: 'Đi bộ máy chạy', aliases: ['đi bộ máy', 'treadmill', 'máy chạy bộ', 'warm up đi bộ'],
     primary_muscle: 'cardio', movement_pattern: 'cardio', kind: 'cardio', equipment: 'cardio_machine', load_step_kg: 0, is_time_based: true,

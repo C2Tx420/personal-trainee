@@ -8,7 +8,7 @@ import { Button, Card, ErrorBox, Field, Input, Page } from '@/ui/components';
 import { type EditorItem, newKey, SessionEditor } from './SessionEditor';
 import { saveEditor } from './save-editor';
 
-/** + Ghi bù buổi đã tập: chọn ngày + loại buổi, điền hiệp, không có đồng hồ. */
+/** + Backfill a past session: pick date + session type, fill in sets, no timers. */
 export function BackfillPage() {
   const nav = useNavigate();
   const invalidate = useInvalidate();

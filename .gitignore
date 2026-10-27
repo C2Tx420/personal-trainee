@@ -6,7 +6,7 @@ dist/
 dev-dist/
 *.tsbuildinfo
 
-# env — chỉ commit file *.example
+# env — only *.example files are committed
 .env
 .env.*
 !.env.example
@@ -18,11 +18,11 @@ supabase/functions/.env
 /playwright-report/
 /e2e/.auth/
 
-# coach — báo cáo tuần chứa số liệu sức khoẻ
+# coach — weekly reports contain health data
 coach/reports/
 coach/node_modules/
 
-# plan tài liệu cá nhân (versioning bằng file, xem plan/README.md)
+# personal plan documents (versioned by file, see plan/README.md)
 /plan/
 
 # macOS / editor

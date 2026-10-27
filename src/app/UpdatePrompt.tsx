@@ -4,8 +4,8 @@ import { APP_VERSION } from '@/lib/version';
 import { Button } from '@/ui/components';
 
 /**
- * Có service worker mới → toast "Có phiên bản mới — Cập nhật" (§15.4).
- * Không tự reload; đang có buổi tập dở thì hoãn tới khi kết thúc buổi.
+ * New service worker → "Có phiên bản mới — Cập nhật" toast (§15.4).
+ * Never reloads on its own; while a workout is in progress it waits until the session ends.
  */
 export function UpdatePrompt({ blocked }: { blocked: boolean }) {
   const {

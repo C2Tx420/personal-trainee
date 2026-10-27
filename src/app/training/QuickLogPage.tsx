@@ -17,7 +17,7 @@ kéo xô
 face pull
 3x15x12.5`;
 
-/** ✎ Ghi nhanh bằng chữ (§6.2a): gõ/dán ghi chú → xem trước → lưu. */
+/** ✎ Free-text quick log (§6.2a): type/paste notes → preview → save. */
 export function QuickLogPage() {
   const nav = useNavigate();
   const invalidate = useInvalidate();

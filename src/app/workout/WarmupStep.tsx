@@ -5,7 +5,7 @@ import type { ExerciseRow } from '@/engine/types';
 import { beep, useNow } from '@/lib/hooks';
 import { Button, Card, ExerciseImg, Field, Input } from '@/ui/components';
 
-/** ② Khởi động: đồng hồ cardio nhẹ + checklist khớp (§4.8). */
+/** ② Warm-up: light cardio timer + joint checklist (§4.8). */
 export function WarmupStep({
   sessionId,
   warmup,

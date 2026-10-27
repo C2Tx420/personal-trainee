@@ -1,10 +1,10 @@
 -- ============================================================================
--- Hàm nghiệp vụ: duyệt/từ chối lộ trình, dựng template, bootstrap dữ liệu seed.
--- Tất cả RPC: security definer + search_path rỗng + tự kiểm tra chủ sở hữu.
--- Supabase mặc định cấp EXECUTE cho PUBLIC → revoke rồi grant lại đúng role.
+-- Business functions: approve/reject plans, build templates, bootstrap seed data.
+-- Every RPC: security definer + empty search_path + its own ownership check.
+-- Supabase grants EXECUTE to PUBLIC by default → revoke, then grant to the right roles.
 -- ============================================================================
 
--- ── version_no tự tăng theo user khi client tạo draft
+-- ── version_no auto-increments per user when the client creates a draft
 create or replace function public.plan_versions_assign_no() returns trigger
 language plpgsql set search_path = '' as $$
 begin
@@ -17,7 +17,7 @@ end $$;
 create trigger plan_versions_assign_no before insert on public.plan_versions
   for each row execute function public.plan_versions_assign_no();
 
--- ── upsert bài tập từ JSON (exercise_upserts / seed)
+-- ── upsert exercises from JSON (exercise_upserts / seed)
 create or replace function public._upsert_exercises(p_uid uuid, p_defs jsonb, p_plan_id uuid, p_overwrite boolean)
 returns int language plpgsql security definer set search_path = '' as $$
 declare
@@ -78,7 +78,7 @@ begin
   return n;
 end $$;
 
--- ── dựng session_templates từ content (idempotent)
+-- ── build session_templates from content (idempotent)
 create or replace function public._materialize_templates(p_plan_id uuid)
 returns void language plpgsql security definer set search_path = '' as $$
 declare
@@ -132,7 +132,7 @@ begin
   end loop;
 end $$;
 
--- ── chuyển một version thành active (archive bản active cũ)
+-- ── make a version active (archives the previous active one)
 create or replace function public._activate_plan(p_plan_id uuid)
 returns void language plpgsql security definer set search_path = '' as $$
 declare v_uid uuid;
@@ -144,7 +144,7 @@ begin
     where id = p_plan_id;
 end $$;
 
--- ── Duyệt draft: upsert bài tập → dựng template → active (hôm nay) hoặc scheduled (tương lai)
+-- ── Approve a draft: upsert exercises → build templates → active (today) or scheduled (future)
 create or replace function public.approve_plan_version(p_id uuid, p_effective_from date)
 returns text language plpgsql security definer set search_path = '' as $$
 declare
@@ -181,7 +181,7 @@ begin
   end if;
 end $$;
 
--- ── Kích hoạt các bản scheduled đã tới ngày (cron cho mọi user; client cho chính mình)
+-- ── Activate scheduled versions whose date has come (cron for every user; client for itself)
 create or replace function public.activate_due_plans_all()
 returns int language plpgsql security definer set search_path = '' as $$
 declare r record; n int := 0;
@@ -209,8 +209,8 @@ begin
   return 1;
 end $$;
 
--- ── Sau khi đăng nhập bằng mật khẩu: đặt lại bộ đếm PIN sai.
--- Chỉ cho phép khi phiên đăng nhập vừa tạo (< 5 phút) → không thể dùng để né khoá 5 lần.
+-- ── After a password sign-in: reset the wrong-PIN counter.
+-- Only allowed when the session was just created (< 5 minutes) → can't be used to dodge the 5-attempt lockout.
 create or replace function public.reset_pin_attempts()
 returns boolean language plpgsql security definer set search_path = '' as $$
 begin
@@ -226,7 +226,7 @@ begin
   return true;
 end $$;
 
--- ── Bootstrap: lần đăng nhập đầu tạo toàn bộ dữ liệu seed (idempotent)
+-- ── Bootstrap: the first sign-in creates all seed data (idempotent)
 create or replace function public.bootstrap_user()
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
@@ -296,7 +296,7 @@ begin
   from jsonb_array_elements(pl->'notifications') x
   on conflict (user_id, kind) do nothing;
 
-  -- Lịch sử ghi bù (buổi Push 26/10/2026 …)
+  -- Backfilled history (Push session 26/10/2026 …)
   for s in select * from jsonb_array_elements(pl->'history') loop
     if exists (select 1 from public.workout_sessions where id = (s->>'id')::uuid) then
       continue;
@@ -328,7 +328,7 @@ begin
   return created;
 end $$;
 
--- ── Quyền thực thi
+-- ── Execute privileges
 revoke execute on function public._upsert_exercises(uuid, jsonb, uuid, boolean) from public, anon, authenticated;
 revoke execute on function public._materialize_templates(uuid) from public, anon, authenticated;
 revoke execute on function public._activate_plan(uuid) from public, anon, authenticated;

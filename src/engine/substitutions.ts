@@ -7,9 +7,9 @@ type Ex = Pick<
 >;
 
 /**
- * Gợi ý bài thay thế: các bài trong `alternatives` (đúng thứ tự) trước, sau đó
- * bài cùng `movement_pattern` + cùng nhóm cơ chính. Bỏ bài phòng tập không có
- * và bài đã lưu trữ.
+ * Substitute suggestions: exercises in `alternatives` (in order) first, then
+ * exercises with the same `movement_pattern` + same primary muscle group. Excludes exercises the gym
+ * doesn't have and archived ones.
  */
 export function suggestSubstitutes<T extends Ex>(original: T, alternatives: string[], library: T[], limit = 6): T[] {
   const usable = library.filter((e) => e.id !== original.id && e.available_at_gym && !e.archived);
@@ -27,7 +27,7 @@ export function suggestSubstitutes<T extends Ex>(original: T, alternatives: stri
   return out.slice(0, limit);
 }
 
-/** Tìm bài theo chữ anh gõ (không dấu, khớp tên hoặc alias, chứa chuỗi con). */
+/** Find exercises from typed text (accent-insensitive, name or alias, substring match). */
 export function searchExercises<T extends Ex>(query: string, library: T[], limit = 8): T[] {
   const q = normalizeVi(query);
   if (!q) return [];
@@ -49,7 +49,7 @@ export function searchExercises<T extends Ex>(query: string, library: T[], limit
   return scored.slice(0, limit).map((x) => x.e);
 }
 
-/** Bài khớp chính xác tên/alias (dùng để quyết định có phải tạo bài tạm không). */
+/** Exercise matching a name/alias exactly (decides whether a provisional exercise is needed). */
 export function exactMatch<T extends Ex>(query: string, library: T[]): T | undefined {
   const q = normalizeVi(query);
   return library.find((e) => [e.name_vi, ...e.aliases].some((n) => normalizeVi(n) === q));

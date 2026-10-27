@@ -12,7 +12,7 @@ import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Sp
 import { fmtKg } from '../shared';
 import { SetCard } from '../workout/SetCard';
 
-/** Chi tiết buổi đã ghi: xem, sửa từng hiệp, xoá buổi. */
+/** Logged session detail: view, edit each set, delete the session. */
 export function SessionDetailPage() {
   const { id = '' } = useParams();
   const nav = useNavigate();

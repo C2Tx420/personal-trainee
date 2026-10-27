@@ -1,16 +1,16 @@
 @import 'tailwindcss';
 
 /*
- * Theme tối, một màu primary. Mọi lựa chọn hình ảnh là token: màu, độ mờ kính
- * (--blur = 0 → phẳng), bo góc, font chữ số. Đổi theme = đổi khối :root này.
- * Không gradient, không phát sáng.
+ * Dark theme, one primary color. Every visual choice is a token: colors, glass blur
+ * (--blur = 0 → flat), radii, numeric font. Changing the theme = changing this :root block.
+ * No gradients, no glow.
  */
 :root {
-  /* Theme chốt 27/10/2026: kiểu Crouton (Apple Design Award 2024) — than ấm + cam đất */
+  /* Theme chosen 27/10/2026: Crouton style (Apple Design Award 2024) — warm charcoal + burnt orange */
   --bg: #141211;
-  --surface: rgba(30, 27, 25, 0.84); /* thẻ */
+  --surface: rgba(30, 27, 25, 0.84); /* cards */
   --surface-strong: rgba(20, 18, 17, 0.9); /* header, thanh tab, sheet */
-  --surface-inset: rgba(255, 240, 230, 0.05); /* ô số liệu, nút phụ trong thẻ */
+  --surface-inset: rgba(255, 240, 230, 0.05); /* stat tiles, secondary buttons inside cards */
   --border: #2e2926;
   --fg: #f4efea;
   --muted: #a59c94;
@@ -22,7 +22,7 @@
   --radius-ctl: 14px;
   --font-num: inherit;
 
-  /* màu trạng thái dịu — chỉ cho nhãn và cảnh báo, không dùng làm màu nhấn */
+  /* muted status colors — for labels and warnings only, never as the accent */
   --ok: #8fd1a6;
   --ok-soft: rgba(143, 209, 166, 0.12);
   --warn: #e3b562;
@@ -55,7 +55,7 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* ── bề mặt */
+/* ── surfaces */
 @utility glass {
   background-color: var(--surface);
   -webkit-backdrop-filter: blur(var(--blur));

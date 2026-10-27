@@ -4,10 +4,10 @@ import { validateSvg } from '../../src/engine/svg-validate';
 import { arg, connect } from './db';
 
 /**
- * Gửi draft lộ trình cho anh duyệt (§7.5). Chỉ gọi được hàm coach_submit_draft —
- * draft luôn là status=draft, created_by=claude_code, không tự kích hoạt được.
+ * Submit a plan draft for approval (§7.5). Can only call coach_submit_draft —
+ * the draft is always status=draft, created_by=claude_code, and cannot activate itself.
  *
- *   pnpm run submit-draft --file draft.json --note "Lý do + số liệu…" [--based-on active|<uuid>]
+ *   pnpm run submit-draft --file draft.json --note "Reason + data…" [--based-on active|<uuid>]
  */
 const file = arg('file');
 const note = arg('note');

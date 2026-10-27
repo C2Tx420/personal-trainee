@@ -2,8 +2,8 @@ import { execSync } from 'node:child_process';
 import postgres from 'postgres';
 
 /**
- * Kết nối Postgres bằng role `coach_readonly` (plan v2.4 §7.2).
- * Connection string KHÔNG nằm trong repo: lấy từ env COACH_DATABASE_URL hoặc
+ * Postgres connection using the `coach_readonly` role (plan v2.4 §7.2).
+ * The connection string is NOT in the repo: read from env COACH_DATABASE_URL or
  * macOS Keychain (security add-generic-password -s pt-coach-db -a coach -w '<url>').
  */
 export function coachUrl(): string {

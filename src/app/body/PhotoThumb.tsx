@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { photoObjectUrl, type PhotoRow } from '@/data/api';
 import { cx } from '@/ui/components';
 
-/** Ảnh tải qua signed URL ngắn hạn → blob URL, thu hồi khi rời màn. Không cache. */
+/** Image loaded via a short-lived signed URL → blob URL, revoked on unmount. Never cached. */
 export function PhotoThumb({ photo, className }: { photo: PhotoRow | undefined; className?: string }) {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {

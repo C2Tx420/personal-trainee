@@ -21,24 +21,24 @@ export type GoalProgress = {
   goal: Goal;
   daysLeft: number;
   weeksLeft: number;
-  /** cân gần nhất − cận trên mục tiêu (dương = còn phải giảm). */
+  /** latest weight − upper bound of the goal (positive = still to lose). */
   gapKg: number;
-  /** kg/tuần cần giảm để kịp, 0 nếu đã đạt. */
+  /** kg/week needed to make it, 0 if already reached. */
   requiredKgPerWeek: number;
-  /** tốc độ cần > 0,7 kg/tuần. */
+  /** required rate > 0.7 kg/week. */
   unsafe: boolean;
   status: GoalStatus;
-  /** % mỡ ước tính tại mốc nếu giữ được FFM. */
+  /** estimated body fat % at the goal if FFM is kept. */
   estimatedBodyFatPct: number | null;
 };
 
-/** % mỡ ước tính tại cân nặng `weightKg` nếu giữ nguyên khối nạc `ffmKg`. */
+/** Estimated body fat % at `weightKg` if lean mass `ffmKg` stays the same. */
 export function estimateBodyFatPct(ffmKg: number, weightKg: number): number {
   return round((1 - ffmKg / weightKg) * 100, 1);
 }
 
 /**
- * @param trendKgPerWeek tốc độ giảm thực tế (số dương = đang giảm), null nếu chưa đủ dữ liệu.
+ * @param trendKgPerWeek actual loss rate (positive = losing), null if there isn't enough data.
  */
 export function goalProgress(
   goal: Goal,
@@ -76,7 +76,7 @@ export function goalProgress(
   };
 }
 
-/** Mốc chính trên trang Hôm nay: mốc đầu tiên (theo thứ tự) chưa đạt và chưa qua ngày. */
+/** Main goal on the Today screen: the first goal (in order) not yet reached and not yet past. */
 export function activeGoal(progress: GoalProgress[]): GoalProgress | undefined {
   return [...progress]
     .sort((a, b) => a.goal.ordinal - b.goal.ordinal)

@@ -2,7 +2,7 @@ import { addDays, todayVN } from '../../src/engine/dates';
 import { connect } from './db';
 
 /**
- * In đầy đủ một bài (kể cả SVG) + lịch sử từng hiệp 8 tuần — dùng khi sửa bài.
+ * Print one exercise in full (SVG included) + 8 weeks of per-set history — used when editing an exercise.
  *   pnpm run exercise <slug>
  */
 const slug = process.argv[2];

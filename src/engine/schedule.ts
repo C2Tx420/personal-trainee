@@ -1,7 +1,7 @@
 import { addDays, diffDays, weekdayOf, type IsoDate } from './dates';
 import type { DayPlan, PlanContent, PlanItem, PlanTemplate, TemplateKey } from './plan-schema';
 
-/** Buổi tập theo lịch của một ngày. */
+/** Scheduled session for a given date. */
 export function dayPlanFor(content: PlanContent, date: IsoDate): DayPlan {
   return content.schedule[weekdayOf(date)];
 }
@@ -10,7 +10,7 @@ export function templateFor(content: PlanContent, key: TemplateKey): PlanTemplat
   return content.templates.find((t) => t.key === key);
 }
 
-/** Chủ nhật gán Push/Pull: mỗi bài bớt 1 hiệp chính (tối thiểu 1). */
+/** Push/Pull on Sunday: one fewer working set per exercise (minimum 1). */
 export function lightenTemplate(t: PlanTemplate): PlanTemplate {
   return {
     ...t,
@@ -42,7 +42,7 @@ export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
   core: 'Core',
 };
 
-/** Template dùng cho một loại buổi (Push nhẹ → template push đã bớt hiệp). */
+/** Template for a session kind (light Push → push template with fewer sets). */
 export function templateForKind(content: PlanContent, kind: SessionKind): PlanTemplate | undefined {
   if (kind === 'push' || kind === 'pull' || kind === 'legs') return templateFor(content, kind);
   if (kind === 'push_light' || kind === 'pull_light') {
@@ -55,8 +55,8 @@ export function templateForKind(content: PlanContent, kind: SessionKind): PlanTe
 export type LoggedSession = { date: IsoDate; kind: string };
 
 /**
- * Cảnh báo Legs và cầu lông liền ngày trên **lịch thực tế**: buổi đã tập + buổi
- * dự kiến hôm nay. Trả về các cặp ngày vi phạm.
+ * Warn about Legs and badminton on consecutive days in the **actual schedule**: completed sessions + the session
+ * planned for today. Returns the offending date pairs.
  */
 export function actualLegsBadmintonConflicts(sessions: LoggedSession[]): { legs: IsoDate; badminton: IsoDate }[] {
   const legs = sessions.filter((s) => s.kind === 'legs');
@@ -70,7 +70,7 @@ export function actualLegsBadmintonConflicts(sessions: LoggedSession[]): { legs:
   return out;
 }
 
-/** Buổi theo lịch của hôm nay có gây xung đột Legs/cầu lông với hôm qua/ngày mai không. */
+/** Whether today's scheduled session clashes Legs/badminton with yesterday/tomorrow. */
 export function todayConflictWarning(
   content: PlanContent,
   today: IsoDate,

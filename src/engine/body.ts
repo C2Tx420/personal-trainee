@@ -16,7 +16,7 @@ export const MEASUREMENT_FIELDS = [
 export type MeasurementKey = (typeof MEASUREMENT_FIELDS)[number][0];
 export type Measurements = Partial<Record<MeasurementKey, number | null>>;
 
-/** Tỷ lệ eo/hông — chỉ khi có đủ cả hai số. */
+/** Waist-to-hip ratio — only when both numbers are present. */
 export function whr(m: Measurements): number | null {
   if (!m.waist_navel_cm || !m.hip_cm) return null;
   return round(m.waist_navel_cm / m.hip_cm, 2);

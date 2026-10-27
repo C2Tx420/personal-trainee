@@ -1,6 +1,6 @@
-// Gửi nhắc nhở Web Push (plan v2.4 §6.10). Gọi bởi pg_cron mỗi 15 phút với header x-cron-secret,
-// hoặc bởi app (JWT) với body {test:true} để gửi thông báo thử.
-// Nội dung push luôn chung chung — KHÔNG chứa số liệu sức khỏe.
+// Sends Web Push reminders (plan v2.4 §6.10). Called by pg_cron every 15 minutes with the x-cron-secret header,
+// or by the app (JWT) with body {test:true} to send a test notification.
+// Push content is always generic — it NEVER contains health data.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 import { corsHeaders, json } from '../_shared/cors.ts';

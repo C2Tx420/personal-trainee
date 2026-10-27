@@ -12,13 +12,13 @@ select public.bootstrap_user();
 insert into public.progress_photos (taken_on, angle, storage_path) values ('2026-10-27', 'front', '11111111-1111-4111-8111-111111111111/2026-10-27/front.jpg');
 reset role;
 
--- anon không đọc được gì
+-- anon can't read anything
 set local role anon;
 select throws_ok($$ select count(*) from public.weight_logs $$, '42501', null, 'anon không đọc weight_logs');
 select throws_ok($$ select count(*) from public.exercises $$, '42501', null, 'anon không đọc exercises');
 reset role;
 
--- user khác không thấy dữ liệu
+-- another user sees none of the data
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"22222222-2222-4222-8222-222222222222","role":"authenticated"}';
 select is((select count(*)::int from public.weight_logs), 0, 'user khác: 0 weight_logs');
@@ -30,9 +30,9 @@ select throws_ok(
   'P0001', null, 'không duyệt được lộ trình của người khác');
 reset role;
 
--- coach_readonly (cho phép user chạy test giả lập role này, rollback cuối file)
+-- coach_readonly (lets the test user impersonate this role, rolled back at the end of the file)
 grant coach_readonly to postgres;
-grant usage on schema extensions to coach_readonly; -- để gọi được hàm pgTAP
+grant usage on schema extensions to coach_readonly; -- so pgTAP functions can be called
 set local role coach_readonly;
 select ok((select count(*) from public.workout_sets) > 0, 'coach đọc được workout_sets');
 select ok((select count(*) from public.workout_session_items) > 0, 'coach đọc được workout_session_items');

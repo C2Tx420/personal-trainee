@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Banner, Button, Field, Input } from '@/ui/components';
 
-/** Đăng nhập một lần trên mỗi thiết bị (§3.1). Email/mật khẩu không nằm trong code hay .env. */
+/** Sign in once per device (§3.1). Email/password are never in code or .env. */
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +17,7 @@ export function LoginPage() {
     if (err) {
       setError(err.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu' : err.message);
     } else {
-      // đăng nhập lại bằng mật khẩu → đặt lại bộ đếm PIN sai
+      // signing in again with the password → reset the wrong-PIN counter
       await supabase.rpc('reset_pin_attempts');
     }
     setBusy(false);

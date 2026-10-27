@@ -15,7 +15,7 @@ export function useOnline(): boolean {
   return online;
 }
 
-/** Re-render mỗi `ms` (đồng hồ nghỉ, đếm ngược). */
+/** Re-render every `ms` (rest timer, countdowns). */
 export function useNow(ms = 1000): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -25,7 +25,7 @@ export function useNow(ms = 1000): number {
   return now;
 }
 
-/** Giữ màn hình sáng trong lúc tập (Wake Lock API). */
+/** Keep the screen on during a workout (Wake Lock API). */
 export function useWakeLock(active: boolean): void {
   const lock = useRef<WakeLockSentinel | null>(null);
   useEffect(() => {
@@ -35,7 +35,7 @@ export function useWakeLock(active: boolean): void {
       try {
         lock.current = await navigator.wakeLock.request('screen');
       } catch {
-        /* trình duyệt từ chối — bỏ qua */
+        /* rejected by the browser — ignore */
       }
     };
     void acquire();
@@ -63,7 +63,7 @@ export function beep(): void {
     o.start();
     o.stop(ctx.currentTime + 0.35);
   } catch {
-    /* không có âm thanh */
+    /* no audio available */
   }
   navigator.vibrate?.([200, 100, 200]);
 }

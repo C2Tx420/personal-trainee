@@ -1,8 +1,8 @@
 -- ============================================================================
--- RLS: mỗi bảng chỉ chủ sở hữu (auth.uid() = user_id) đọc/ghi.
--- Ngoại lệ: plan_versions (đọc + tạo draft; đổi trạng thái chỉ qua RPC),
--- template (chỉ đọc), review_notes (đọc + đánh dấu đã đọc), app_lock (không
--- policy nào cho client — chỉ Edge Function verify-pin dùng service role).
+-- RLS: every table is read/write for its owner only (auth.uid() = user_id).
+-- Exceptions: plan_versions (read + create drafts; status changes only via RPC),
+-- templates (read only), review_notes (read + mark as read), app_lock (no
+-- client policy at all — only the verify-pin Edge Function uses the service role).
 -- ============================================================================
 
 do $$
@@ -45,10 +45,10 @@ alter table public.app_lock enable row level security;
 alter table public.app_meta enable row level security;
 create policy read_meta on public.app_meta for select to authenticated using (true);
 
--- Hardening: anon không có quyền gì trên schema public
+-- Hardening: anon has no privileges on the public schema
 revoke all on all tables in schema public from anon;
 revoke all on all functions in schema public from anon;
 alter default privileges in schema public revoke all on tables from anon;
 alter default privileges in schema public revoke all on functions from anon;
--- client không bao giờ đọc/ghi app_lock (kể cả khi lỡ thêm policy sau này)
+-- the client never reads/writes app_lock (even if a policy is added by mistake later)
 revoke all on public.app_lock from authenticated;

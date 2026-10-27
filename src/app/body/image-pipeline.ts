@@ -1,7 +1,7 @@
 /**
- * Chuẩn bị ảnh tiến độ trước khi upload (§6.9): xoay theo EXIF, thu nhỏ cạnh
- * dài về 1080px, encode lại JPEG qua canvas → **toàn bộ EXIF (GPS, thiết bị,
- * thời gian) bị xoá** vì canvas không mang metadata.
+ * Prepare progress photos before upload (§6.9): rotate per EXIF, scale the long
+ * edge down to 1080px, re-encode JPEG via canvas → **all EXIF (GPS, device,
+ * timestamp) is removed** because canvas carries no metadata.
  */
 export const MAX_EDGE = 1080;
 
@@ -23,7 +23,7 @@ export async function prepareImage(src: Blob): Promise<{ blob: Blob; width: numb
   return { blob, width, height };
 }
 
-/** Kiểm tra blob JPEG có segment APP1/Exif không (dùng trong test). */
+/** Whether a JPEG blob has an APP1/Exif segment (used in tests). */
 export async function hasExif(blob: Blob): Promise<boolean> {
   const bytes = new Uint8Array(await blob.arrayBuffer());
   for (let i = 2; i < bytes.length - 10; ) {

@@ -7,14 +7,14 @@ if (!url || !anonKey) {
   throw new Error('Thiếu VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY — xem .env.example');
 }
 
-/** Chỉ anon key ở client. Phiên đăng nhập là thứ duy nhất được lưu trên máy. */
+/** Anon key only on the client. The auth session is the only thing stored on the device. */
 export const supabase = createClient(url, anonKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 });
 
 export class ApiError extends Error {}
 
-/** Ném lỗi tiếng Việt dễ hiểu nếu Supabase trả lỗi. */
+/** Throw a readable Vietnamese error if Supabase returns an error. */
 export function must<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new ApiError(res.error.message);
   return res.data as T;

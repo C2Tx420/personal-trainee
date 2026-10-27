@@ -1,6 +1,6 @@
-// Kiểm tra PIN mở khoá app (plan v2.4 §3.2).
-// PIN cố định ở secret APP_PIN (supabase secrets set APP_PIN=xxxx) — không bao giờ tới client.
-// Bộ đếm sai lưu ở public.app_lock (chỉ service role ghi được). Sai lần thứ 5 → thu hồi phiên đăng nhập.
+// Verifies the app unlock PIN (plan v2.4 §3.2).
+// The PIN is fixed in the APP_PIN secret (Dashboard → Edge Functions → Secrets) — it never reaches the client.
+// Wrong attempts are counted in public.app_lock (writable by the service role only). 5th wrong attempt → sessions revoked.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json } from '../_shared/cors.ts';
 
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
   await admin.from('app_lock').upsert({ user_id: user.id, failed_attempts: next, last_failed_at: new Date().toISOString() });
   const lockedOut = next >= MAX_ATTEMPTS;
   if (lockedOut) {
-    // thu hồi mọi refresh token → bắt đăng nhập lại bằng mật khẩu
+    // revoke every refresh token → force a new password sign-in
     await admin.auth.admin.signOut(jwt, 'global').catch(() => undefined);
   }
   return json({ ok: false, attempts_left: MAX_ATTEMPTS - next, locked_out: lockedOut });

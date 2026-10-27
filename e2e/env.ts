@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 
-/** Thông tin môi trường local (demo key của Supabase CLI, không phải bí mật thật). */
+/** Local environment info (Supabase CLI demo keys, not real secrets). */
 export const E2E_EMAIL = 'anh@local.test';
 export const E2E_PASSWORD = 'local-pass-123';
 export const E2E_PIN = '1234';

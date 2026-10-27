@@ -6,8 +6,8 @@ import { DRAWINGS } from './poses';
 import { renderSvg } from './render';
 
 /**
- * Sinh supabase/seed/exercises/<slug>.svg + <slug>.json từ thư viện seed,
- * và một trang gallery để xem nhanh toàn bộ hình (sáng + tối).
+ * Generate supabase/seed/exercises/<slug>.svg + <slug>.json from the seed library,
+ * plus a gallery page to quickly review every illustration (light + dark).
  */
 const OUT = path.resolve(import.meta.dirname, '../../supabase/seed/exercises');
 fs.mkdirSync(OUT, { recursive: true });

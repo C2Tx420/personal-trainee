@@ -5,7 +5,7 @@ import { type ExerciseRow, type SessionItemRow, SUBSTITUTION_LABEL, type Substit
 import { Banner, Button, Chip, Field, Input, Sheet } from '@/ui/components';
 import { ExercisePicker, type PickResult } from './ExercisePicker';
 
-/** ⑤ Đổi bài khi không có máy / máy bận — anh gõ bài sẽ tập thay (§6.2). */
+/** ⑤ Swap an exercise when the machine is missing / busy — the user types what they will do instead (§6.2). */
 export function SubstituteSheet({
   open,
   onClose,

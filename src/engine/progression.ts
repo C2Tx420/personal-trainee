@@ -5,7 +5,7 @@ import type { PlannedSet } from './warmup';
 
 export type PastSession = { date: IsoDate; sets: SetRow[] };
 
-/** Buổi gần nhất có hiệp chính đã xong của bài này (không tính buổi hiện tại). */
+/** Most recent session with completed working sets of this exercise (excluding the current one). */
 export function lastPerformance(history: PastSession[]): PastSession | null {
   const withWork = history
     .map((h) => ({ ...h, sets: h.sets.filter((s) => s.completed && s.set_type === 'working') }))
@@ -21,11 +21,11 @@ export function formatSet(s: Pick<SetRow, 'weight_kg' | 'reps' | 'seconds'>): st
 }
 
 /**
- * kg điền sẵn cho hiệp sắp tập.
+ * Pre-filled kg for the upcoming set.
  *
- * Hiệp chính: nếu một hiệp chính trước đó trong bài đã **đổi kg so với mục tiêu**
- * thì giữ kg mới; nếu không: kg mục tiêu → kg hiệp chính trước → hiệp chính
- * cuối của lần tập trước. Hiệp làm nóng: chỉ theo kg dự kiến.
+ * Working sets: if an earlier working set of this exercise **changed kg from the target**,
+ * keep the new kg; otherwise: target kg → previous working set's kg → last working
+ * set of the previous session. Warm-up sets: planned kg only.
  */
 export function prefillKg(planned: PlannedSet, doneThisItem: SetRow[], last: PastSession | null): number | null {
   if (planned.setType === 'warmup') return planned.targetKg;
@@ -45,8 +45,8 @@ export function kgDeviates(targetKg: number | null, actualKg: number | null): bo
 }
 
 /**
- * Gợi ý tăng tạ — chỉ khi lộ trình chưa đặt `target_kg` cho bài.
- * Hiệp chính cuối lần trước đạt `rep_max` → +1 bước tạ (bài giây: +5 giây).
+ * Load increase suggestion — only when the plan has no `target_kg` for the exercise.
+ * Last working set of the previous session hit `rep_max` → +1 load step (timed exercises: +5 seconds).
  */
 export function progressionHint(item: PlanItem, last: PastSession | null, loadStepKg: number): string | null {
   if (item.target_kg !== null || !last) return null;

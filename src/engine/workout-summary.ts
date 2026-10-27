@@ -3,7 +3,7 @@ import { round, sum } from './math';
 import type { PlanContent } from './plan-schema';
 import type { ExerciseRow, KgChangeReason, SessionItemRow, SessionRow, SetRow, SubstitutionReason } from './types';
 
-/** Khối lượng = Σ kg × lần, chỉ hiệp chính đã xong có kg (không tính làm nóng, bài giây, kg trống). */
+/** Volume = Σ kg × reps, only completed working sets with kg (excludes warm-ups, timed exercises, empty kg). */
 export function volumeKg(sets: SetRow[]): number {
   return sum(
     sets
@@ -77,7 +77,7 @@ export function sessionSummary(
 
 const STRENGTH_KINDS = new Set(['push', 'pull', 'legs', 'push_light', 'pull_light']);
 
-/** Số buổi theo kế hoạch trong tuần: buổi tạ + cầu lông (ngày nghỉ/tuỳ chọn không tính). */
+/** Planned sessions in a week: lifting + badminton (rest/optional days don't count). */
 export function plannedSessionsPerWeek(content: PlanContent): number {
   return WEEKDAYS.filter((d) => {
     const k = content.schedule[d].kind;
@@ -85,7 +85,7 @@ export function plannedSessionsPerWeek(content: PlanContent): number {
   }).length;
 }
 
-/** Calo tập ước tính — chỉ tham khảo, không ăn bù. */
+/** Estimated workout calories — reference only, not to be eaten back. */
 export function estimateSessionKcal(
   session: Pick<SessionRow, 'kind' | 'duration_min' | 'badminton_intensity'>,
   content: PlanContent,
@@ -142,7 +142,7 @@ export function weekSummary(
   };
 }
 
-/** Khối lượng mỗi tuần của một bài (gộp theo canonical id nếu có). */
+/** Weekly volume of one exercise (merged by canonical id if present). */
 export function weeklyVolumeByExercise(
   exerciseIds: Set<string>,
   sessions: SessionRow[],
@@ -160,7 +160,7 @@ export function weeklyVolumeByExercise(
   });
 }
 
-/** Tạ hiệp chính nặng nhất mỗi buổi của một bài + tạ mục tiêu lúc đó. */
+/** Heaviest working-set load per session of one exercise + the target load at the time. */
 export function topSetSeries(
   exerciseIds: Set<string>,
   sessions: SessionRow[],

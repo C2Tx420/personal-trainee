@@ -6,8 +6,8 @@ import { cx, ExerciseImg, Input } from '@/ui/components';
 export type PickResult = { exercise: ExerciseRow } | { newName: string };
 
 /**
- * Ô gõ tên bài + gợi ý từ thư viện (không dấu, theo tên/alias). Gõ tên chưa có →
- * kết quả { newName } để tạo bài tạm.
+ * Exercise name input + suggestions from the library (accent-insensitive, by name/alias). Typing a new name →
+ * result { newName } to create a provisional exercise.
  */
 export function ExercisePicker({
   library,

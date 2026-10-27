@@ -47,7 +47,7 @@ function diffTemplate(a: PlanTemplate | undefined, b: PlanTemplate | undefined, 
   const removed = ai.filter((i) => !bSlugs.includes(i.exercise));
   const added = bi.filter((i) => !aSlugs.includes(i.exercise));
 
-  // Cùng vị trí: 1 bài bớt + 1 bài thêm → "thay bài"
+  // Same position: 1 exercise removed + 1 added → "replaced"
   const replacedPairs: [PlanItem, PlanItem][] = [];
   for (const r of [...removed]) {
     const pos = ai.indexOf(r);
@@ -113,8 +113,8 @@ function diffExercises(a: ExerciseDef[], b: ExerciseDef[], knownBefore: Set<stri
 }
 
 /**
- * Diff hai phiên bản lộ trình. Bài được ghép theo slug trong cùng template
- * (không theo vị trí) nên đổi thứ tự không bị hiểu nhầm thành bớt + thêm.
+ * Diff two plan versions. Exercises are matched by slug within the same template
+ * (not by position), so reordering is not mistaken for remove + add.
  */
 export function diffPlans(
   a: PlanContent,

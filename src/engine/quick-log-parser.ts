@@ -3,8 +3,8 @@ import type { SessionKind } from './schedule';
 import { normalizeVi } from './text';
 
 /**
- * Ghi nhanh bằng chữ (§6.2a): tách ghi chú buổi tập anh gõ/dán thành bài + hiệp.
- * Rule-based, không AI. Kết quả luôn đi qua màn xem trước để anh sửa rồi mới lưu.
+ * Free-text quick log (§6.2a): split typed/pasted workout notes into exercises + sets.
+ * Rule-based, no AI. The result always goes through a preview screen to be corrected before saving.
  */
 
 export type ParsedSet = {
@@ -53,7 +53,7 @@ function parseDate(n: string, raw: string, today: IsoDate): IsoDate | null {
   }
   for (const [re, idx] of WEEKDAY_WORDS) {
     if (re.test(n)) {
-      // ngày gần nhất ≤ hôm nay có đúng thứ đó
+      // most recent date ≤ today that falls on that weekday
       for (let back = 0; back < 7; back++) {
         const d = addDays(today, -back);
         if (weekdayOf(d) === WEEKDAYS[idx]) return d;
@@ -65,7 +65,7 @@ function parseDate(n: string, raw: string, today: IsoDate): IsoDate | null {
 
 const num = (s: string) => Number(s.replace(',', '.'));
 
-/** Dòng hiệp: "3 set x 12 27kg", "2x12x20", "3 hiệp 12 lần 20 kg", "3 x 45s", "12 lần 20kg". */
+/** Set line: "3 set x 12 27kg", "2x12x20", "3 hiệp 12 lần 20 kg", "3 x 45s", "12 lần 20kg". */
 function parseSetLine(raw: string): ParsedSet | null {
   const n = normalizeVi(raw.replace(/(\d),(\d)/g, '$1.$2').replace(/(\d)\.(\d)/g, '$1d$2'))
     .replace(/(\d)d(\d)/g, '$1.$2');
@@ -134,7 +134,7 @@ export function parseQuickLog(text: string, today: IsoDate): ParsedLog {
         dateSet = true;
       }
     }
-    // dòng tiêu đề (ngày / loại buổi): bỏ phần ngày rồi xét chữ còn lại
+    // header line (date / session type): strip the date, then look at the remaining text
     const header = normalizeVi(raw.replace(/\b\d{1,2}\/\d{1,2}(?:\/\d{4})?\b/, ' '));
     if (!out.kind && !current) {
       const k = KIND_WORDS.find(([re]) => re.test(header));
@@ -159,7 +159,7 @@ export function parseQuickLog(text: string, today: IsoDate): ParsedLog {
       continue;
     }
     if (/hom qua|hom nay|hom kia/.test(n) && !/\d/.test(n)) continue;
-    // Dòng chữ không phải hiệp → tên bài mới (bỏ phần "quên kg" nếu có)
+    // Text line that isn't a set → new exercise name (minus a "quên kg" note if present)
     if (/quen|khong nho/.test(n) && current) {
       current.note = raw;
       for (const s of current.sets) s.kg = null;
@@ -173,8 +173,8 @@ export function parseQuickLog(text: string, today: IsoDate): ParsedLog {
 }
 
 /**
- * Mẫu "2 hiệp nhẹ đầu + 3 hiệp nặng" mà không ghi làm nóng → gợi ý đánh dấu
- * 2 hiệp đầu là làm nóng (anh xác nhận trên màn xem trước).
+ * Pattern "2 light sets first + 3 heavy sets" without a warm-up label → suggest marking
+ * the first 2 sets as warm-up (confirmed by the user on the preview screen).
  */
 export function suggestWarmup(ex: ParsedExercise): boolean {
   if (ex.sets.some((s) => s.warmup) || ex.sets.length < 2) return false;
@@ -189,7 +189,7 @@ export function suggestWarmup(ex: ParsedExercise): boolean {
   );
 }
 
-/** Trải các dòng "N set" thành từng hiệp riêng. */
+/** Expand "N set" lines into individual sets. */
 export function expandSets(ex: ParsedExercise): Omit<ParsedSet, 'count'>[] {
   return ex.sets.flatMap((s) => Array.from({ length: s.count }, () => ({ reps: s.reps, seconds: s.seconds, kg: s.kg, warmup: s.warmup })));
 }

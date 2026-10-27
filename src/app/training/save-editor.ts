@@ -7,7 +7,7 @@ import type { ExerciseRow, WarmupLog } from '@/engine/types';
 import { supabase } from '@/lib/supabase';
 import type { EditorItem } from './SessionEditor';
 
-/** Lưu kết quả Ghi bù / Ghi nhanh thành một buổi đã hoàn thành. */
+/** Save a Backfill / Quick log result as a completed session. */
 export async function saveEditor(args: {
   date: IsoDate;
   kind: SessionKind;
@@ -22,7 +22,7 @@ export async function saveEditor(args: {
   for (const it of args.items) {
     if (!it.pick) throw new Error('Còn bài chưa chọn — chọn bài cho các dòng màu vàng');
     const ex: ExerciseRow = 'exercise' in it.pick ? it.pick.exercise : await createProvisionalExercise(it.pick.newName, null, null);
-    // anh tự chọn bài cho một tên lạ → lưu tên đó thành alias cho lần sau
+    // the user picked an exercise for an unknown name → save that name as an alias for next time
     if (it.rawName && 'exercise' in it.pick && ![ex.name_vi, ...ex.aliases].some((n) => normalizeVi(n) === normalizeVi(it.rawName!))) {
       await supabase.from('exercises').update({ aliases: [...ex.aliases, it.rawName] }).eq('id', ex.id);
     }

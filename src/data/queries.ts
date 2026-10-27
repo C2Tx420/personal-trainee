@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { ExerciseRow } from '@/engine/types';
 import * as api from './api';
 
-/** Cache chỉ trong bộ nhớ (online-only, v2.1) — đóng app là mất. */
+/** In-memory cache only (online-only, v2.1) — gone when the app closes. */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: { staleTime: 30_000, retry: 2, refetchOnWindowFocus: true },
@@ -67,7 +67,7 @@ export function useExerciseMaps(): {
   }, [q.data, q.isLoading]);
 }
 
-/** Sau khi ghi: làm mới các query liên quan. */
+/** After a write: refresh the related queries. */
 export function useInvalidate() {
   const qc = useQueryClient();
   return (...keys: (readonly unknown[])[]) => Promise.all(keys.map((k) => qc.invalidateQueries({ queryKey: k })));

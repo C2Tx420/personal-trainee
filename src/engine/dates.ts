@@ -1,8 +1,8 @@
 /**
- * Ngày logic dạng chuỗi ISO `YYYY-MM-DD`, luôn theo giờ Việt Nam.
+ * Logical dates as ISO strings `YYYY-MM-DD`, always in Vietnam time.
  *
- * Mọi phép tính ngày trong engine đi qua đây để không dính timezone của máy:
- * chuỗi ngày được đổi sang mốc UTC 00:00 rồi cộng/trừ theo ngày nguyên.
+ * Every date calculation in the engine goes through here to avoid the device timezone:
+ * date strings are converted to UTC 00:00 and shifted by whole days.
  */
 
 export const TIMEZONE = 'Asia/Ho_Chi_Minh';
@@ -36,7 +36,7 @@ export function addDays(date: IsoDate, days: number): IsoDate {
   return fromUtcMs(toUtcMs(date) + days * MS_PER_DAY);
 }
 
-/** Số ngày từ `from` tới `to` (to − from). */
+/** Number of days from `from` to `to` (to − from). */
 export function diffDays(from: IsoDate, to: IsoDate): number {
   return Math.round((toUtcMs(to) - toUtcMs(from)) / MS_PER_DAY);
 }
@@ -47,12 +47,12 @@ export function weekdayOf(date: IsoDate): Weekday {
   return WEEKDAYS[(js + 6) % 7];
 }
 
-/** Thứ Hai của tuần chứa `date`. */
+/** Monday of the week containing `date`. */
 export function weekStart(date: IsoDate): IsoDate {
   return addDays(date, -WEEKDAYS.indexOf(weekdayOf(date)));
 }
 
-/** Ngày hôm nay theo giờ Việt Nam. */
+/** Today's date in Vietnam time. */
 export function todayVN(now: Date = new Date()): IsoDate {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: TIMEZONE,
@@ -62,7 +62,7 @@ export function todayVN(now: Date = new Date()): IsoDate {
   }).format(now);
 }
 
-/** "27/10" hoặc "27/10/2026". */
+/** "27/10" or "27/10/2026". */
 export function formatVN(date: IsoDate, withYear = false): string {
   const [y, m, d] = date.split('-');
   return withYear ? `${d}/${m}/${y}` : `${d}/${m}`;

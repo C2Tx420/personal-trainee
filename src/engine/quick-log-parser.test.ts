@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expandSets, parseQuickLog, suggestWarmup } from './quick-log-parser';
 
-// Đúng tin nhắn anh gửi ngày 27/10/2026 về buổi Push hôm trước (§5.4)
+// The exact message the user sent on 27/10/2026 about the previous day's Push session (§5.4)
 const MONDAY = `hôm qua anh tập push full máy
 
 đẩy ngực

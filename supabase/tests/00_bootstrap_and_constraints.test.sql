@@ -2,7 +2,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(19);
 
--- Người dùng giả lập
+-- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
 values ('11111111-1111-4111-8111-111111111111', 'owner@test.local', 'authenticated', 'authenticated', '00000000-0000-0000-0000-000000000000');
 
@@ -31,12 +31,12 @@ select throws_ok(
      from public.plan_versions where version_no = 1 $$,
   '23514', null, 'calo 1.699 bị CHECK chặn');
 
--- Không tạo được bản active trực tiếp
+-- Active versions cannot be created directly
 select throws_ok(
   $$ insert into public.plan_versions (status, content) select 'active', content from public.plan_versions where version_no = 1 $$,
   '42501', null, 'client không insert được status=active');
 
--- Draft hợp lệ + duyệt
+-- Valid draft + approval
 select lives_ok(
   $$ insert into public.plan_versions (status, content, change_note, based_on_version_id)
      select 'draft', jsonb_set(content, '{nutrition,calories_kcal}', '1800'), 'giảm 100', id
@@ -47,13 +47,13 @@ select is(public.approve_plan_version((select id from public.plan_versions where
 select is((select status from public.plan_versions where version_no = 1), 'archived', 'v1 chuyển archived');
 select is((select count(*)::int from public.plan_versions where status = 'active'), 1, 'chỉ 1 bản active');
 
--- Bất biến
+-- Immutability
 reset role;
 select throws_ok(
   $$ update public.plan_versions set content = jsonb_set(content, '{nutrition,protein_g}', '150') where version_no = 1 $$,
   'P0001', null, 'không sửa content bản đã duyệt');
 
--- SVG độc hại bị chặn
+-- Malicious SVG is rejected
 select throws_ok(
   $$ update public.exercises set illustration_svg = '<svg onload="alert(1)"></svg>' where slug = 'plank' $$,
   '23514', null, 'SVG có onload bị CHECK chặn');

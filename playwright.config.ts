@@ -1,8 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
 /**
- * E2E toàn luồng trên Supabase local (supabase start) + Edge Functions local.
- * Ảnh chụp từng màn lưu ở e2e/screenshots/ (gitignore — có số liệu sức khỏe).
+ * Full-flow E2E against local Supabase (supabase start) + local Edge Functions.
+ * Per-screen screenshots go to e2e/screenshots/ (gitignored — contains health data).
  */
 export default defineConfig({
   testDir: 'e2e',

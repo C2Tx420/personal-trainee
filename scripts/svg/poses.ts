@@ -1,11 +1,11 @@
 import type { Drawing, FrontPose, Prop, SidePose } from './render';
 
 /**
- * Tư thế bắt đầu/kết thúc của từng bài (mỗi khung rộng ~150, nền ở y=190).
- * Nhìn nghiêng: người quay mặt sang phải (x tăng = phía trước).
+ * Start/end pose of each exercise (each panel ~150 wide, floor at y=190).
+ * Side view: the figure faces right (larger x = forward).
  */
 
-// ── khung dùng chung
+// ── shared frames
 const seated = { head: [60, 50], s: [62, 70], p: [60, 124], k: [102, 126], f: [106, 186] } as const;
 const seatProps: Prop[] = [
   { t: 'rect', x: 40, y: 58, w: 9, h: 72 },

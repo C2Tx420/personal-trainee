@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 /**
- * Sao lưu JSON `pt-backup/1` (§6.11). Mọi bảng trừ app_lock và push_subscriptions.
- * Thứ tự bảng = thứ tự khoá ngoại để nhập lại (upsert theo id) không vỡ ràng buộc.
+ * JSON backup `pt-backup/1` (§6.11). Every table except app_lock and push_subscriptions.
+ * Table order = foreign key order, so re-importing (upsert by id) doesn't break constraints.
  */
 export const BACKUP_SCHEMA = 'pt-backup/1';
 
@@ -25,10 +25,10 @@ export const BACKUP_TABLES = [
 ] as const;
 export type BackupTable = (typeof BACKUP_TABLES)[number];
 
-/** Bảng client chỉ đọc (RLS) — không nhập lại được, sẽ được dựng lại khi duyệt lộ trình. */
+/** Tables that are read-only for the client (RLS) — not importable, rebuilt when a plan is approved. */
 export const READ_ONLY_TABLES: BackupTable[] = ['session_templates', 'session_template_items', 'review_notes'];
 
-/** Cột sinh tự động — bỏ đi khi nhập. */
+/** Generated columns — dropped on import. */
 const GENERATED: Partial<Record<BackupTable, string[]>> = { plan_versions: ['calories_kcal'] };
 
 export const backupSchema = z.object({
@@ -48,7 +48,7 @@ export function buildBackup(tables: Partial<Record<BackupTable, Record<string, u
 
 export type ImportPlan = { table: BackupTable; rows: Record<string, unknown>[] }[];
 
-/** Validate + sắp xếp dữ liệu để nhập. Ném lỗi tiếng Việt nếu sai định dạng. */
+/** Validate + order data for import. Throws a Vietnamese error message on bad format. */
 export function planImport(raw: unknown): { plan: ImportPlan; counts: Record<string, number>; skipped: string[] } {
   const parsed = backupSchema.safeParse(raw);
   if (!parsed.success) throw new Error('File sao lưu không đúng định dạng pt-backup/1');

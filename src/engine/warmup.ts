@@ -3,7 +3,7 @@ import type { PlanItem } from './plan-schema';
 
 export type PlannedSet = {
   setType: 'warmup' | 'working';
-  /** thứ tự trong nhóm (1-based): Làm nóng 1, 2 … / Hiệp chính 1, 2, 3 */
+  /** order within its group (1-based): Làm nóng 1, 2 … / Hiệp chính 1, 2, 3 */
   index: number;
   targetKg: number | null;
   repMin: number;
@@ -11,11 +11,11 @@ export type PlannedSet = {
 };
 
 /**
- * Danh sách hiệp dự kiến của một bài: hiệp làm nóng (theo `warmup_sets`) rồi hiệp chính.
+ * Planned sets of an exercise: warm-up sets (from `warmup_sets`), then working sets.
  *
- * Tạ làm nóng: `kg` cố định nếu có, nếu không thì `pct`% của tạ chính
- * (`target_kg`, chưa có thì `fallbackWorkingKg` = kg hiệp chính lần trước),
- * làm tròn theo bước tạ. Không có số nào để tính → null (anh tự nhập).
+ * Warm-up load: fixed `kg` if set, otherwise `pct`% of the working load
+ * (`target_kg`, or `fallbackWorkingKg` = previous working-set kg when absent),
+ * rounded to the load step. Nothing to compute from → null (entered manually).
  */
 export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingKg: number | null): PlannedSet[] {
   const workingKg = item.target_kg ?? fallbackWorkingKg;

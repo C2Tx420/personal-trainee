@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { API_URL, E2E_EMAIL, E2E_PASSWORD, psql, supabaseEnv } from './env';
 
-/** DB sạch → tạo tài khoản duy nhất → mật khẩu local cho role coach. */
+/** Clean DB → create the single account → local password for the coach role. */
 export default async function globalSetup() {
   execSync('supabase db reset', { stdio: 'ignore' });
   const { SERVICE_ROLE_KEY } = supabaseEnv();
