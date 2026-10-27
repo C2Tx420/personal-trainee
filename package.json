@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "functions:bundle": "for f in verify-pin send-reminders; do esbuild supabase/functions/$f/index.ts --bundle --format=esm --platform=neutral --external:\"npm:*\" --log-level=warning --outfile=dist/functions/$f.js; done",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
