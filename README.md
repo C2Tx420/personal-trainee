@@ -4,14 +4,17 @@ Personal single-user PWA for tracking training and body metrics: a fixed PPL + b
 
 React + Vite + `vite-plugin-pwa` · Supabase (Auth, Postgres + RLS, Storage, Edge Functions, pg_cron) · TanStack Query · Tailwind v4 · Recharts. Online-only, Vietnamese UI, mobile-first.
 
+No Supabase CLI or Docker required: the app talks to a hosted Supabase project, configured from the dashboard.
+
 ```bash
-npm install
-supabase start && supabase db reset
-npm run dev          # app
-npm test             # engine unit tests (Vitest)
-npm run db:test      # pgTAP: RLS, constraints, coach permissions
-npm run e2e          # full Playwright flow + screenshots in e2e/screenshots/
+pnpm install
+cp .env.example .env.local  # project URL, anon key, VAPID public key
+pnpm run dev                # app
+pnpm test                   # engine unit tests (Vitest)
+pnpm run functions:bundle   # one file per Edge Function → paste into the dashboard editor
 ```
+
+Migrations are applied in filename order with `psql` against the session pooler URL; `app_meta.schema_version` holds the latest applied version, so only newer files need to run. `pnpm run db:test` (pgTAP) and `pnpm run e2e` (Playwright) expect a local Supabase stack and are optional.
 
 ## Structure
 
