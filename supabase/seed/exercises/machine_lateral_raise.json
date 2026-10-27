@@ -1,0 +1,31 @@
+{
+  "aliases": [
+    "seated lateral raise",
+    "seated raise",
+    "máy nâng vai ngang",
+    "matrix lateral raise",
+    "lateral raise machine"
+  ],
+  "secondary_muscles": [
+    "rear_delt",
+    "traps"
+  ],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Chỉnh ghế để vai thẳng trục xoay của máy",
+    "Đệm tựa mặt ngoài khuỷu, nâng bằng khuỷu chứ không bằng tay",
+    "Nâng tới ngang vai, hạ chậm"
+  ],
+  "common_mistakes": [
+    "Nhún vai lên tai",
+    "Hạ thả rơi tạ"
+  ],
+  "slug": "machine_lateral_raise",
+  "name_vi": "Máy nâng vai ngang (ngồi)",
+  "primary_muscle": "side_delt",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "machine",
+  "reference_url": "https://johnsonfitness.co.nz/products/matrix-aura-lateral-raise"
+}

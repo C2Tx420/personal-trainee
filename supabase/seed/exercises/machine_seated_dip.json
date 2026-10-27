@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "seated dip",
+    "triceps press",
+    "máy dip ngồi",
+    "dip máy"
+  ],
+  "secondary_muscles": [
+    "chest",
+    "front_delt"
+  ],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Ngồi lưng áp đệm, tay cầm hai bên hông",
+    "Đẩy xuống tới khi duỗi gần thẳng tay",
+    "Khuỷu sát thân, về chậm tới ngang ngực"
+  ],
+  "common_mistakes": [
+    "Nhổm người khỏi ghế",
+    "Khuỷu bè rộng ra ngoài"
+  ],
+  "slug": "machine_seated_dip",
+  "name_vi": "Máy dip ngồi (tay sau)",
+  "primary_muscle": "triceps",
+  "movement_pattern": "isolation_push",
+  "kind": "compound",
+  "equipment": "machine"
+}

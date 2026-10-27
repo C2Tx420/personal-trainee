@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "leg extension",
+    "đá đùi",
+    "đá đùi trước",
+    "duỗi gối"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Gối thẳng trục xoay của máy, đệm ở trên cổ chân",
+    "Đá lên tới gần thẳng gối, siết đùi 1 giây",
+    "Hạ chậm, không thả rơi"
+  ],
+  "common_mistakes": [
+    "Nhấc mông khỏi ghế",
+    "Vung chân lấy đà"
+  ],
+  "slug": "leg_extension",
+  "name_vi": "Máy đá đùi trước",
+  "primary_muscle": "quads",
+  "movement_pattern": "isolation_legs",
+  "kind": "isolation",
+  "equipment": "machine"
+}

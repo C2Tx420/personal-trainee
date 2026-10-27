@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "hip abduction",
+    "abductor",
+    "dạng hông",
+    "mở đùi",
+    "máy dạng hông"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Đệm ở mặt ngoài gối",
+    "Mở rộng hết tầm, giữ 1 giây",
+    "Khép về chậm"
+  ],
+  "common_mistakes": [
+    "Đẩy người khỏi lưng ghế",
+    "Bật nhanh không kiểm soát"
+  ],
+  "slug": "hip_abduction_machine",
+  "name_vi": "Máy dạng hông (mông bên)",
+  "primary_muscle": "glutes",
+  "movement_pattern": "isolation_legs",
+  "kind": "isolation",
+  "equipment": "machine"
+}

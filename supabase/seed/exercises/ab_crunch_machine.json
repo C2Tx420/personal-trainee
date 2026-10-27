@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "ab crunch",
+    "abdominal crunch",
+    "gập bụng",
+    "máy bụng"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Cuộn người từ ngực xuống, không kéo bằng tay",
+    "Siết bụng 1 giây ở cuối",
+    "Về chậm, giữ căng bụng"
+  ],
+  "common_mistakes": [
+    "Dùng tay và hông kéo tạ",
+    "Bật nhanh lên"
+  ],
+  "slug": "ab_crunch_machine",
+  "name_vi": "Máy gập bụng",
+  "primary_muscle": "abs",
+  "movement_pattern": "core",
+  "kind": "core",
+  "equipment": "machine"
+}

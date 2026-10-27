@@ -57,7 +57,7 @@ const MUSCLE_SEGMENTS: Record<string, string[]> = {
   chest: ['torso'], upper_back: ['torso'], lats: ['torso'], lower_back: ['torso'], abs: ['torso'], obliques: ['torso'], traps: ['torso'],
   front_delt: ['shoulder'], side_delt: ['shoulder'], rear_delt: ['shoulder'],
   biceps: ['upperarm'], triceps: ['upperarm'], forearms: ['forearm'],
-  quads: ['thigh'], hamstrings: ['thigh'], glutes: ['thigh', 'hipjoint'], calves: ['shin'],
+  quads: ['thigh'], hamstrings: ['thigh'], adductors: ['thigh'], glutes: ['thigh', 'hipjoint'], calves: ['shin'],
   cardio: [],
 };
 

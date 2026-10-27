@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "hip adduction",
+    "adductor",
+    "khép đùi",
+    "đùi trong",
+    "máy khép đùi"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Đệm ở mặt trong gối",
+    "Bắt đầu ở độ mở thoải mái, không kéo căng quá",
+    "Khép hết tầm, mở ra chậm"
+  ],
+  "common_mistakes": [
+    "Mở quá rộng khi bắt đầu",
+    "Bật nhanh không kiểm soát"
+  ],
+  "slug": "hip_adduction_machine",
+  "name_vi": "Máy khép đùi (đùi trong)",
+  "primary_muscle": "adductors",
+  "movement_pattern": "isolation_legs",
+  "kind": "isolation",
+  "equipment": "machine"
+}

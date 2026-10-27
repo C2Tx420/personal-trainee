@@ -28,6 +28,9 @@ const frontSeat: Omit<FrontPose, 'le' | 're' | 'lw' | 'rw'> = {
   lk: [60, 146], rk: [90, 146], lf: [58, 188], rf: [92, 188],
 };
 const F = (base: typeof frontStand, arms: Pick<FrontPose, 'le' | 're' | 'lw' | 'rw'>): FrontPose => ({ ...base, ...arms });
+const seatFront: Prop[] = [{ t: 'rect', x: 58, y: 52, w: 34, h: 72 }, { t: 'rect', x: 52, y: 120, w: 46, h: 8 }];
+const handsAtSeat = { le: [54, 94], lw: [50, 118], re: [96, 94], rw: [100, 118] } as Pick<FrontPose, 'le' | 're' | 'lw' | 'rw'>;
+const kneesOpen = { lk: [36, 140], rk: [114, 140], lf: [30, 184], rf: [120, 184] } as Pick<FrontPose, 'lk' | 'rk' | 'lf' | 'rf'>;
 
 const lateralA = { le: [55, 86], lw: [52, 110], re: [95, 86], rw: [98, 110] } as Pick<FrontPose, 'le' | 're' | 'lw' | 'rw'>;
 const lateralB = { le: [36, 62], lw: [14, 64], re: [114, 62], rw: [136, 64] } as Pick<FrontPose, 'le' | 're' | 'lw' | 'rw'>;
@@ -301,5 +304,71 @@ export const DRAWINGS: Record<string, Drawing> = {
     a: S({ head: [118, 120], s: [106, 132], p: [62, 166], k: [38, 176], f: [14, 186], e: [104, 172], w: [118, 184] }),
     b: S({ head: [120, 112], s: [106, 126], p: [62, 146], k: [38, 166], f: [14, 186], e: [104, 172], w: [118, 184] }),
     motion: 'p',
+  },
+
+  // ───────────── Selectorized machines (Matrix)
+  machine_lateral_raise: {
+    props: seatFront,
+    a: F(frontSeat, { le: [54, 92], lw: [58, 116], re: [96, 92], rw: [92, 116] }),
+    b: F(frontSeat, { le: [34, 68], lw: [30, 94], re: [116, 68], rw: [120, 94] }),
+    hold: 'pad',
+    motion: 're',
+  },
+  machine_seated_dip: {
+    props: [...seatProps, stack],
+    a: SS({ e: [42, 92], w: [68, 96] }),
+    b: SS({ e: [60, 98], w: [60, 124] }),
+    hold: 'handle',
+    motion: 'w',
+  },
+  assisted_dip: {
+    props: [{ t: 'line', a: [50, 110], b: [100, 110], w: 6 }, { t: 'line', a: [96, 110], b: [96, 190] }, stack],
+    a: S({ head: [76, 66], s: [72, 84], p: [66, 132], k: [78, 164], f: [50, 168], e: [50, 100], w: [72, 110] }),
+    b: S({ head: [74, 42], s: [72, 60], p: [68, 110], k: [80, 142], f: [52, 146], e: [70, 86], w: [72, 110] }),
+    propsA: [{ t: 'rect', x: 44, y: 170, w: 42, h: 8 }],
+    propsB: [{ t: 'rect', x: 44, y: 148, w: 42, h: 8 }],
+    motion: 'head',
+  },
+  machine_lat_pulldown: {
+    props: [...seatProps, { t: 'rect', x: 86, y: 112, w: 26, h: 8 }, stack],
+    a: SS({ e: [74, 32], w: [78, 10], k: [102, 122] }),
+    b: SS({ e: [54, 98], w: [72, 72], k: [102, 122] }),
+    propsA: [{ t: 'line', a: [38, 44], b: [78, 10], w: 5 }],
+    propsB: [{ t: 'line', a: [38, 44], b: [72, 72], w: 5 }],
+    hold: 'handle',
+  },
+  leg_extension: {
+    props: [...seatProps, stack],
+    a: SS({ k: [102, 126], f: [104, 186] }),
+    b: SS({ k: [102, 126], f: [150, 112] }),
+    motion: 'f',
+  },
+  hip_abduction_machine: {
+    props: seatFront,
+    a: { ...frontSeat, ...handsAtSeat },
+    b: { ...frontSeat, ...handsAtSeat, ...kneesOpen },
+    hold: 'handle',
+    motion: 'rk',
+  },
+  hip_adduction_machine: {
+    props: seatFront,
+    a: { ...frontSeat, ...handsAtSeat, ...kneesOpen },
+    b: { ...frontSeat, ...handsAtSeat },
+    hold: 'handle',
+    motion: 'rk',
+  },
+  ab_crunch_machine: {
+    props: [...seatProps, stack],
+    a: SS({ e: [82, 82], w: [72, 58] }),
+    b: SS({ head: [108, 68], s: [95, 83], e: [112, 100], w: [102, 78] }),
+    hold: 'handle',
+    motion: 'head',
+  },
+  rotary_torso_machine: {
+    props: seatFront,
+    a: F(frontSeat, { le: [62, 94], lw: [82, 86], re: [88, 94], rw: [68, 86] }),
+    b: { ...frontSeat, head: [84, 44], ls: [74, 68], rs: [94, 64], le: [84, 94], lw: [104, 84], re: [104, 88], rw: [88, 80] } as FrontPose,
+    hold: 'pad',
+    motion: 'rs',
   },
 };

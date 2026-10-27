@@ -1,0 +1,28 @@
+{
+  "aliases": [
+    "rotary torso",
+    "xoay thân",
+    "xoay eo",
+    "máy xoay eo"
+  ],
+  "secondary_muscles": [
+    "abs"
+  ],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Hông và đùi cố định, chỉ xoay phần thân trên",
+    "Xoay chậm, có kiểm soát mỗi bên",
+    "Thở ra khi xoay"
+  ],
+  "common_mistakes": [
+    "Xoay bằng quán tính",
+    "Tạ quá nặng làm xoắn lưng dưới"
+  ],
+  "slug": "rotary_torso_machine",
+  "name_vi": "Máy xoay thân",
+  "primary_muscle": "obliques",
+  "movement_pattern": "core",
+  "kind": "core",
+  "equipment": "machine"
+}
