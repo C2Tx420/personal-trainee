@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "incline dumbbell press",
+    "đẩy ngực dốc",
+    "incline"
+  ],
+  "secondary_muscles": [
+    "front_delt",
+    "triceps"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Ghế dốc 30°",
+    "Hạ tạ ngang ngực trên",
+    "Đẩy chéo nhẹ vào giữa"
+  ],
+  "common_mistakes": [
+    "Ghế dốc quá cao thành bài vai"
+  ],
+  "slug": "incline_db_press",
+  "name_vi": "Đẩy ngực dốc tạ đơn",
+  "primary_muscle": "chest",
+  "movement_pattern": "horizontal_push",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

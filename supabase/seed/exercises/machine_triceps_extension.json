@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "tay sau",
+    "máy tay sau",
+    "triceps máy",
+    "máy duỗi tay sau ngồi",
+    "triceps extension"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu đặt cố định trên đệm",
+    "Duỗi thẳng tay, siết tay sau",
+    "Về chậm"
+  ],
+  "common_mistakes": [
+    "Nhấc khuỷu khỏi đệm",
+    "Dùng vai đẩy"
+  ],
+  "slug": "machine_triceps_extension",
+  "name_vi": "Máy duỗi tay sau",
+  "primary_muscle": "triceps",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "machine"
+}

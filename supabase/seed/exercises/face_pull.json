@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "face pull",
+    "kéo mặt"
+  ],
+  "secondary_muscles": [
+    "upper_back",
+    "traps"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Ròng rọc ngang mặt, dùng dây thừng",
+    "Kéo về mặt, tách hai tay ra hai bên",
+    "Khuỷu cao ngang vai"
+  ],
+  "common_mistakes": [
+    "Kéo bằng lưng dưới"
+  ],
+  "slug": "face_pull",
+  "name_vi": "Face pull (cáp)",
+  "primary_muscle": "rear_delt",
+  "movement_pattern": "isolation_pull",
+  "kind": "isolation",
+  "equipment": "cable"
+}

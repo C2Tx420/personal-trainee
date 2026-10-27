@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "đi bộ máy",
+    "treadmill",
+    "máy chạy bộ",
+    "warm up đi bộ"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 0,
+  "is_time_based": true,
+  "cues": [
+    "Tốc độ 3,5–5 km/h",
+    "Thở đều, có thể nói chuyện được"
+  ],
+  "common_mistakes": [
+    "Vịn tay vào máy"
+  ],
+  "slug": "treadmill_walk",
+  "name_vi": "Đi bộ máy chạy",
+  "primary_muscle": "cardio",
+  "movement_pattern": "cardio",
+  "kind": "cardio",
+  "equipment": "cardio_machine"
+}

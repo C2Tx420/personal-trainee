@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "back extension",
+    "duỗi lưng",
+    "hyperextension"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "hamstrings"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Đệm ngang xương hông",
+    "Gập từ hông, lưng thẳng",
+    "Lên tới thân thẳng hàng chân, không ưỡn quá"
+  ],
+  "common_mistakes": [
+    "Ưỡn lưng quá mức ở đỉnh"
+  ],
+  "slug": "back_extension_45",
+  "name_vi": "Máy duỗi lưng 45°",
+  "primary_muscle": "lower_back",
+  "movement_pattern": "hinge",
+  "kind": "isolation",
+  "equipment": "machine"
+}

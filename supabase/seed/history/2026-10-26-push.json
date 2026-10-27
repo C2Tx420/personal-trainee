@@ -1,0 +1,131 @@
+{
+  "id": "00000000-0000-4000-8000-000000000026",
+  "session_date": "2026-10-26",
+  "kind": "push",
+  "is_backfill": true,
+  "note": "Ghi bù — Push toàn máy, trước ngày bắt đầu lộ trình",
+  "warmup": {
+    "cardio": {
+      "exercise": "treadmill_walk",
+      "minutes": 10,
+      "speed_kmh_min": 3.5,
+      "speed_kmh_max": 5,
+      "done": true
+    },
+    "mobility_done": null
+  },
+  "items": [
+    {
+      "exercise": "machine_chest_press",
+      "template_item_position": 0,
+      "note": null,
+      "sets": [
+        {
+          "set_type": "warmup",
+          "set_index": 1,
+          "reps": 12,
+          "weight_kg": 20
+        },
+        {
+          "set_type": "warmup",
+          "set_index": 2,
+          "reps": 12,
+          "weight_kg": 20
+        },
+        {
+          "set_type": "working",
+          "set_index": 1,
+          "reps": 12,
+          "weight_kg": 27
+        },
+        {
+          "set_type": "working",
+          "set_index": 2,
+          "reps": 12,
+          "weight_kg": 27
+        },
+        {
+          "set_type": "working",
+          "set_index": 3,
+          "reps": 12,
+          "weight_kg": 27
+        }
+      ]
+    },
+    {
+      "exercise": "machine_shoulder_press",
+      "template_item_position": 1,
+      "note": null,
+      "sets": [
+        {
+          "set_type": "working",
+          "set_index": 1,
+          "reps": 8,
+          "weight_kg": 20
+        },
+        {
+          "set_type": "working",
+          "set_index": 2,
+          "reps": 8,
+          "weight_kg": 20
+        },
+        {
+          "set_type": "working",
+          "set_index": 3,
+          "reps": 8,
+          "weight_kg": 20
+        }
+      ]
+    },
+    {
+      "exercise": "machine_triceps_extension",
+      "template_item_position": 4,
+      "note": "Quên số kg",
+      "sets": [
+        {
+          "set_type": "working",
+          "set_index": 1,
+          "reps": 12,
+          "weight_kg": null
+        },
+        {
+          "set_type": "working",
+          "set_index": 2,
+          "reps": 12,
+          "weight_kg": null
+        },
+        {
+          "set_type": "working",
+          "set_index": 3,
+          "reps": 12,
+          "weight_kg": null
+        }
+      ]
+    },
+    {
+      "exercise": "pec_deck_fly",
+      "template_item_position": 2,
+      "note": "Quên số kg",
+      "sets": [
+        {
+          "set_type": "working",
+          "set_index": 1,
+          "reps": 12,
+          "weight_kg": null
+        },
+        {
+          "set_type": "working",
+          "set_index": 2,
+          "reps": 12,
+          "weight_kg": null
+        },
+        {
+          "set_type": "working",
+          "set_index": 3,
+          "reps": 12,
+          "weight_kg": null
+        }
+      ]
+    }
+  ]
+}

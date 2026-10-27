@@ -1,0 +1,30 @@
+{
+  "aliases": [
+    "fly chest",
+    "chest fly",
+    "pec deck",
+    "ép ngực",
+    "máy ép ngực",
+    "fly"
+  ],
+  "secondary_muscles": [
+    "front_delt"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu hơi cong, cố định góc khuỷu",
+    "Ép tay về giữa, siết ngực 1 giây",
+    "Mở ra chậm tới khi căng ngực"
+  ],
+  "common_mistakes": [
+    "Biến thành động tác đẩy",
+    "Mở quá rộng ra sau vai"
+  ],
+  "slug": "pec_deck_fly",
+  "name_vi": "Máy ép ngực (pec deck)",
+  "primary_muscle": "chest",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "machine"
+}

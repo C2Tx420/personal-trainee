@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "pull up",
+    "kéo xà",
+    "hít xà"
+  ],
+  "secondary_muscles": [
+    "biceps",
+    "upper_back"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Treo thẳng tay, siết bả vai",
+    "Kéo ngực về phía xà"
+  ],
+  "common_mistakes": [
+    "Đung đưa lấy đà"
+  ],
+  "slug": "pull_up",
+  "name_vi": "Kéo xà đơn",
+  "primary_muscle": "lats",
+  "movement_pattern": "vertical_pull",
+  "kind": "compound",
+  "equipment": "bodyweight"
+}

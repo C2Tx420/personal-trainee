@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "plank"
+  ],
+  "secondary_muscles": [
+    "obliques"
+  ],
+  "load_step_kg": 0,
+  "is_time_based": true,
+  "cues": [
+    "Khuỷu dưới vai",
+    "Thân thẳng từ đầu tới gót",
+    "Siết bụng và mông"
+  ],
+  "common_mistakes": [
+    "Võng hông",
+    "Chổng mông"
+  ],
+  "slug": "plank",
+  "name_vi": "Plank",
+  "primary_muscle": "abs",
+  "movement_pattern": "core",
+  "kind": "core",
+  "equipment": "bodyweight"
+}

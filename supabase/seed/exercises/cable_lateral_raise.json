@@ -1,0 +1,23 @@
+{
+  "aliases": [
+    "nâng vai cáp",
+    "cable lateral raise"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Đứng nghiêng, tay xa ròng rọc",
+    "Nâng tới ngang vai",
+    "Giữ căng cáp suốt hiệp"
+  ],
+  "common_mistakes": [
+    "Kéo bằng thân người"
+  ],
+  "slug": "cable_lateral_raise",
+  "name_vi": "Nâng vai bên cáp",
+  "primary_muscle": "side_delt",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "cable"
+}

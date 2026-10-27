@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "triceps pushdown",
+    "pushdown",
+    "đẩy cáp tay sau",
+    "tay sau cáp"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu sát hông, cố định",
+    "Đẩy xuống duỗi thẳng tay",
+    "Về tới ngang ngực"
+  ],
+  "common_mistakes": [
+    "Khuỷu chạy ra trước",
+    "Đổ người dồn trọng lượng"
+  ],
+  "slug": "triceps_pushdown",
+  "name_vi": "Đẩy cáp tay sau",
+  "primary_muscle": "triceps",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "cable"
+}

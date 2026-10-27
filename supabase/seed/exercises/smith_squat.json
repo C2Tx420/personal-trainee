@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "smith squat",
+    "squat smith"
+  ],
+  "secondary_muscles": [
+    "glutes"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Chân bước lên trước một chút",
+    "Xuống tới đùi song song"
+  ],
+  "common_mistakes": [
+    "Chân đặt quá sát thanh"
+  ],
+  "slug": "smith_squat",
+  "name_vi": "Smith squat",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "smith"
+}

@@ -1,0 +1,23 @@
+{
+  "aliases": [
+    "calf raise",
+    "nhón bắp chân",
+    "bắp chân"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Hạ gót sâu",
+    "Nhón cao, giữ 1 giây"
+  ],
+  "common_mistakes": [
+    "Nhún nhanh không hết tầm"
+  ],
+  "slug": "calf_raise",
+  "name_vi": "Máy nhón bắp chân",
+  "primary_muscle": "calves",
+  "movement_pattern": "isolation_legs",
+  "kind": "isolation",
+  "equipment": "machine"
+}

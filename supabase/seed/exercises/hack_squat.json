@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "hack squat",
+    "hack"
+  ],
+  "secondary_muscles": [
+    "glutes"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Lưng áp sát đệm",
+    "Xuống tới đùi song song",
+    "Gối theo hướng mũi chân"
+  ],
+  "common_mistakes": [
+    "Gót chân nhấc lên"
+  ],
+  "slug": "hack_squat",
+  "name_vi": "Máy hack squat",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "machine"
+}

@@ -1,0 +1,21 @@
+{
+  "aliases": [
+    "zone 2",
+    "zone2",
+    "đạp xe"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 0,
+  "is_time_based": true,
+  "cues": [
+    "Nhịp tim ~60–70% tối đa",
+    "Thở bằng mũi được"
+  ],
+  "common_mistakes": [],
+  "slug": "zone2_cardio",
+  "name_vi": "Cardio zone 2",
+  "primary_muscle": "cardio",
+  "movement_pattern": "cardio",
+  "kind": "cardio",
+  "equipment": "cardio_machine"
+}

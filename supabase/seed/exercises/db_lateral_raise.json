@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "nâng vai bên",
+    "lateral raise",
+    "dang tay",
+    "nâng tạ đơn bên"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 1,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu hơi cong",
+    "Nâng tới ngang vai, ngón út hơi cao",
+    "Hạ chậm"
+  ],
+  "common_mistakes": [
+    "Vung người lấy đà",
+    "Nhún vai"
+  ],
+  "slug": "db_lateral_raise",
+  "name_vi": "Nâng tạ đơn sang bên",
+  "primary_muscle": "side_delt",
+  "movement_pattern": "isolation_push",
+  "kind": "isolation",
+  "equipment": "dumbbell"
+}

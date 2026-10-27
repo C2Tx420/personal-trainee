@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "barbell row",
+    "chèo đòn"
+  ],
+  "secondary_muscles": [
+    "lats",
+    "biceps",
+    "lower_back"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Gập hông ~45°, lưng thẳng",
+    "Kéo đòn về rốn"
+  ],
+  "common_mistakes": [
+    "Cong lưng dưới"
+  ],
+  "slug": "barbell_row",
+  "name_vi": "Chèo tạ đòn",
+  "primary_muscle": "upper_back",
+  "movement_pattern": "horizontal_pull",
+  "kind": "compound",
+  "equipment": "barbell"
+}

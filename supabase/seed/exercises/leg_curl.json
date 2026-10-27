@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "leg curl",
+    "cuốn đùi",
+    "đùi sau"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Gối thẳng trục máy",
+    "Cuốn hết tầm, siết 1 giây",
+    "Về chậm"
+  ],
+  "common_mistakes": [
+    "Nhấc hông lên"
+  ],
+  "slug": "leg_curl",
+  "name_vi": "Máy cuốn đùi sau",
+  "primary_muscle": "hamstrings",
+  "movement_pattern": "isolation_legs",
+  "kind": "isolation",
+  "equipment": "machine"
+}

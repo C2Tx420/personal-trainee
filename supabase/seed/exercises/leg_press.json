@@ -1,0 +1,28 @@
+{
+  "aliases": [
+    "leg press",
+    "đạp đùi",
+    "đạp chân"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "hamstrings"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Chân rộng bằng vai giữa bàn đạp",
+    "Hạ tới gối ~90°, lưng dưới không rời đệm",
+    "Đẩy bằng cả bàn chân, không khoá gối"
+  ],
+  "common_mistakes": [
+    "Hạ quá sâu làm cong lưng dưới",
+    "Khoá gối khi duỗi"
+  ],
+  "slug": "leg_press",
+  "name_vi": "Máy đạp đùi",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "machine"
+}
