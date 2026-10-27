@@ -11,19 +11,19 @@ import { WEEKDAYS, type Weekday } from './dates';
 export const CALORIES_FLOOR = 1700;
 export const MAX_SAFE_LOSS_KG_PER_WEEK = 0.7;
 
-export const slugSchema = z.string().regex(/^[a-z0-9_]+$/, 'slug chỉ gồm a-z, 0-9, _');
+const slugSchema = z.string().regex(/^[a-z0-9_]+$/, 'slug chỉ gồm a-z, 0-9, _');
 
-export const MUSCLES = [
+const MUSCLES = [
   'chest', 'front_delt', 'side_delt', 'rear_delt', 'lats', 'upper_back', 'traps',
   'biceps', 'triceps', 'forearms', 'quads', 'hamstrings', 'glutes', 'calves',
   'abs', 'obliques', 'lower_back', 'cardio',
 ] as const;
-export const MOVEMENT_PATTERNS = [
+const MOVEMENT_PATTERNS = [
   'horizontal_push', 'vertical_push', 'horizontal_pull', 'vertical_pull', 'squat', 'hinge',
   'isolation_push', 'isolation_pull', 'isolation_legs', 'core', 'cardio',
 ] as const;
-export const EXERCISE_KINDS = ['compound', 'isolation', 'core', 'cardio'] as const;
-export const EQUIPMENT = ['machine', 'cable', 'dumbbell', 'barbell', 'bodyweight', 'smith', 'cardio_machine', 'none'] as const;
+const EXERCISE_KINDS = ['compound', 'isolation', 'core', 'cardio'] as const;
+const EQUIPMENT = ['machine', 'cable', 'dumbbell', 'barbell', 'bodyweight', 'smith', 'cardio_machine', 'none'] as const;
 
 export const exerciseDefSchema = z.object({
   slug: slugSchema,
@@ -46,7 +46,7 @@ export const exerciseDefSchema = z.object({
 });
 export type ExerciseDef = z.infer<typeof exerciseDefSchema>;
 
-export const warmupSetSchema = z
+const warmupSetSchema = z
   .object({
     pct: z.number().min(10).max(100).optional(),
     kg: z.number().nonnegative().optional(),
@@ -79,7 +79,7 @@ export const planItemSchema = z
   );
 export type PlanItem = z.infer<typeof planItemSchema>;
 
-export const cardioWarmupSchema = z.object({
+const cardioWarmupSchema = z.object({
   exercise: slugSchema,
   minutes: z.number().positive(),
   speed_kmh_min: z.number().positive().nullable().default(null),

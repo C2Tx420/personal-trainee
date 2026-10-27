@@ -78,7 +78,7 @@ export function sessionSummary(
 const STRENGTH_KINDS = new Set(['push', 'pull', 'legs', 'push_light', 'pull_light']);
 
 /** Planned sessions in a week: lifting + badminton (rest/optional days don't count). */
-export function plannedSessionsPerWeek(content: PlanContent): number {
+function plannedSessionsPerWeek(content: PlanContent): number {
   return WEEKDAYS.filter((d) => {
     const k = content.schedule[d].kind;
     return k === 'session' || k === 'badminton';

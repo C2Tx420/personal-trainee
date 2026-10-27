@@ -6,10 +6,6 @@ export function avg(xs: number[]): number {
   return xs.length === 0 ? 0 : sum(xs) / xs.length;
 }
 
-export function clamp(v: number, lo: number, hi: number): number {
-  return Math.min(hi, Math.max(lo, v));
-}
-
 export function round(v: number, digits = 1): number {
   const f = 10 ** digits;
   return Math.round(v * f) / f;
@@ -19,11 +15,6 @@ export function round(v: number, digits = 1): number {
 export function roundToStep(kg: number, step: number): number {
   if (step <= 0) return round(kg, 1);
   return Math.max(0, Math.round(kg / step) * step);
-}
-
-/** Epley: 1RM ≈ kg × (1 + reps/30). */
-export function e1rm(kg: number, reps: number): number {
-  return kg * (1 + reps / 30);
 }
 
 /** Linear regression y = a + b·x, returns the slope b (units of y / units of x). */

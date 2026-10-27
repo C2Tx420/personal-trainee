@@ -4,7 +4,7 @@ import { z } from 'zod';
  * JSON backup `pt-backup/1` (§6.11). Every table except app_lock and push_subscriptions.
  * Table order = foreign key order, so re-importing (upsert by id) doesn't break constraints.
  */
-export const BACKUP_SCHEMA = 'pt-backup/1';
+const BACKUP_SCHEMA = 'pt-backup/1';
 
 export const BACKUP_TABLES = [
   'profiles',
@@ -26,12 +26,12 @@ export const BACKUP_TABLES = [
 export type BackupTable = (typeof BACKUP_TABLES)[number];
 
 /** Tables that are read-only for the client (RLS) — not importable, rebuilt when a plan is approved. */
-export const READ_ONLY_TABLES: BackupTable[] = ['session_templates', 'session_template_items', 'review_notes'];
+const READ_ONLY_TABLES: BackupTable[] = ['session_templates', 'session_template_items', 'review_notes'];
 
 /** Generated columns — dropped on import. */
 const GENERATED: Partial<Record<BackupTable, string[]>> = { plan_versions: ['calories_kcal'] };
 
-export const backupSchema = z.object({
+const backupSchema = z.object({
   schema: z.literal(BACKUP_SCHEMA),
   exported_at: z.string(),
   app_version: z.string(),

@@ -1,7 +1,7 @@
 import type { PlanVersion } from '@/data/api';
 import { Badge } from '@/ui/components';
 
-export const STATUS_LABEL: Record<PlanVersion['status'], string> = {
+const STATUS_LABEL: Record<PlanVersion['status'], string> = {
   draft: 'Chờ duyệt',
   scheduled: 'Hẹn ngày',
   active: 'Đang dùng',

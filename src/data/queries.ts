@@ -29,7 +29,7 @@ export const qk = {
   history: (ids: string[]) => ['history', ...ids] as const,
 };
 
-export const useExercises = () => useQuery({ queryKey: qk.exercises, queryFn: api.fetchExercises });
+const useExercises = () => useQuery({ queryKey: qk.exercises, queryFn: api.fetchExercises });
 export const useActivePlan = () => useQuery({ queryKey: qk.activePlan, queryFn: api.fetchActivePlan });
 export const usePlans = () => useQuery({ queryKey: qk.plans, queryFn: api.fetchPlans });
 export const useGoals = () => useQuery({ queryKey: qk.goals, queryFn: api.fetchGoals });

@@ -9,7 +9,7 @@
   /* Theme chosen 27/10/2026: Crouton style (Apple Design Award 2024) — warm charcoal + burnt orange */
   --bg: #141211;
   --surface: rgba(30, 27, 25, 0.84); /* cards */
-  --surface-strong: rgba(20, 18, 17, 0.9); /* header, thanh tab, sheet */
+  --surface-strong: rgba(20, 18, 17, 0.9); /* header, tab bar, sheets */
   --surface-inset: rgba(255, 240, 230, 0.05); /* stat tiles, secondary buttons inside cards */
   --border: #2e2926;
   --fg: #f4efea;
@@ -35,7 +35,6 @@
 }
 
 @theme inline {
-  --color-bg: var(--bg);
   --color-card: var(--surface);
   --color-card-2: var(--surface-inset);
   --color-fg: var(--fg);

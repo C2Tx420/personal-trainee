@@ -3,7 +3,7 @@
  * edge down to 1080px, re-encode JPEG via canvas → **all EXIF (GPS, device,
  * timestamp) is removed** because canvas carries no metadata.
  */
-export const MAX_EDGE = 1080;
+const MAX_EDGE = 1080;
 
 export async function prepareImage(src: Blob): Promise<{ blob: Blob; width: number; height: number }> {
   const bitmap = await createImageBitmap(src, { imageOrientation: 'from-image' });
@@ -21,18 +21,4 @@ export async function prepareImage(src: Blob): Promise<{ blob: Blob; width: numb
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Không nén được ảnh'))), 'image/jpeg', 0.82),
   );
   return { blob, width, height };
-}
-
-/** Whether a JPEG blob has an APP1/Exif segment (used in tests). */
-export async function hasExif(blob: Blob): Promise<boolean> {
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  for (let i = 2; i < bytes.length - 10; ) {
-    if (bytes[i] !== 0xff) break;
-    const marker = bytes[i + 1];
-    const len = (bytes[i + 2] << 8) | bytes[i + 3];
-    if (marker === 0xe1 && String.fromCharCode(...bytes.slice(i + 4, i + 8)) === 'Exif') return true;
-    if (marker === 0xda) break;
-    i += 2 + len;
-  }
-  return false;
 }

@@ -12,7 +12,7 @@ export const supabase = createClient(url, anonKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 });
 
-export class ApiError extends Error {}
+class ApiError extends Error {}
 
 /** Throw a readable Vietnamese error if Supabase returns an error. */
 export function must<T>(res: { data: T | null; error: { message: string } | null }): T {
