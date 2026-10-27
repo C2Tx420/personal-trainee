@@ -1,13 +1,11 @@
 import { useNavigate } from 'react-router';
-import { useAuth } from '@/auth/AuthGate';
 import { usePlans, useReviews } from '@/data/queries';
 import { APP_VERSION } from '@/lib/version';
 import { Badge, Card, Page } from '@/ui/components';
-import { IconArchive, IconBell, IconChat, IconInfo, IconLayers, IconLock } from '@/ui/icons';
+import { IconArchive, IconBell, IconChat, IconInfo, IconLayers } from '@/ui/icons';
 
 export function MorePage() {
   const nav = useNavigate();
-  const { lock } = useAuth();
   const plans = usePlans();
   const reviews = useReviews();
   const drafts = (plans.data ?? []).filter((p) => p.status === 'draft').length;
@@ -34,12 +32,6 @@ export function MorePage() {
           </div>
         </Card>
       ))}
-      <Card onClick={lock}>
-        <div className="flex items-center gap-3">
-          <span className="glass-subtle rounded-ctl grid size-10 place-items-center text-accent"><IconLock className="size-5" /></span>
-          <div className="font-semibold">Khoá app ngay</div>
-        </div>
-      </Card>
     </Page>
   );
 }

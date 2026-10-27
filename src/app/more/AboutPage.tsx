@@ -5,7 +5,7 @@ import { APP_VERSION, BUILD_TIME, GIT_SHA, PLAN_DOC_VERSION } from '@/lib/versio
 import { Button, Card, Page, SectionTitle } from '@/ui/components';
 
 export function AboutPage() {
-  const { lock, signOut } = useAuth();
+  const { signOut } = useAuth();
   const meta = useAppMeta();
   const built = new Date(BUILD_TIME).toLocaleDateString('vi-VN');
   return (
@@ -16,11 +16,9 @@ export function AboutPage() {
           Phiên bản {APP_VERSION} ({GIT_SHA}) · build {built} · Plan {PLAN_DOC_VERSION} · DB {meta.data?.schema_version ?? '…'}
         </div>
       </Card>
-      <div className="grid grid-cols-2 gap-2">
-        <Button onClick={lock}>Khoá ngay</Button>
-        <Button variant="danger" onClick={() => void signOut()}>Đăng xuất</Button>
-      </div>
-      <p className="mt-2 text-xs text-muted">Tự khoá sau 5 phút không thao tác. Đổi PIN: chạy `supabase secrets set APP_PIN=…` trên máy tính.</p>
+      <Button variant="danger" block onClick={() => void signOut()}>
+        Đăng xuất
+      </Button>
       <SectionTitle>Có gì mới</SectionTitle>
       <Card>
         <pre className="text-xs leading-relaxed whitespace-pre-wrap">{changelog}</pre>

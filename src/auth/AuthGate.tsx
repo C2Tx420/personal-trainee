@@ -1,5 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { bootstrap } from '@/data/api';
 import { queryClient } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
@@ -9,9 +9,7 @@ import { IconWifiOff } from '@/ui/icons';
 import { LoginPage } from './LoginPage';
 import { PinLock } from './PinLock';
 
-const IDLE_MS = 5 * 60_000;
-
-type AuthCtx = { userId: string; lock: () => void; signOut: () => Promise<void> };
+type AuthCtx = { userId: string; signOut: () => Promise<void> };
 const Ctx = createContext<AuthCtx | null>(null);
 
 export function useAuth(): AuthCtx {
@@ -20,18 +18,13 @@ export function useAuth(): AuthCtx {
   return c;
 }
 
-/**
- * Cổng vào app: chưa đăng nhập → Login; đăng nhập rồi → luôn khoá PIN khi mở app,
- * sau 5 phút không thao tác, hoặc khi app ở nền > 5 phút (§3).
- */
+/** Cổng vào app: chưa đăng nhập → Login; đăng nhập rồi → nhập PIN mỗi lần mở app. */
 export function AuthGate({ children }: { children: ReactNode }) {
   const online = useOnline();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [locked, setLocked] = useState(true);
   const [booted, setBooted] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);
-  const lastActive = useRef(Date.now());
-  const hiddenAt = useRef<number | null>(null);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -39,35 +32,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const lock = useCallback(() => setLocked(true), []);
-
   const signOut = useCallback(async () => {
     await supabase.auth.signOut({ scope: 'global' }).catch(() => supabase.auth.signOut({ scope: 'local' }));
     queryClient.clear();
     setBooted(false);
     setLocked(true);
   }, []);
-
-  // Tự khoá: không thao tác 5 phút / ở nền quá 5 phút
-  useEffect(() => {
-    if (locked) return;
-    const touch = () => (lastActive.current = Date.now());
-    const events = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const;
-    events.forEach((e) => window.addEventListener(e, touch, { passive: true }));
-    const timer = setInterval(() => {
-      if (Date.now() - lastActive.current > IDLE_MS) setLocked(true);
-    }, 5_000);
-    const onVis = () => {
-      if (document.visibilityState === 'hidden') hiddenAt.current = Date.now();
-      else if (hiddenAt.current && Date.now() - hiddenAt.current > IDLE_MS) setLocked(true);
-    };
-    document.addEventListener('visibilitychange', onVis);
-    return () => {
-      events.forEach((e) => window.removeEventListener(e, touch));
-      clearInterval(timer);
-      document.removeEventListener('visibilitychange', onVis);
-    };
-  }, [locked]);
 
   // Bootstrap dữ liệu seed sau khi mở khoá lần đầu
   useEffect(() => {
@@ -86,10 +56,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (locked) {
     return (
       <PinLock
-        onUnlock={() => {
-          lastActive.current = Date.now();
-          setLocked(false);
-        }}
+        onUnlock={() => setLocked(false)}
         onLockedOut={signOut}
         email={session.user.email ?? ''}
       />
@@ -109,7 +76,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     );
   }
   if (!booted) return <Spinner label="Đang chuẩn bị dữ liệu…" />;
-  return <Ctx.Provider value={{ userId: session.user.id, lock, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ userId: session.user.id, signOut }}>{children}</Ctx.Provider>;
 }
 
 export function OfflineScreen() {
