@@ -4,6 +4,7 @@ import { kgDeviates } from '@/engine/progression';
 import { type ExerciseRow, type Feel, FEEL_LABEL, KG_CHANGE_LABEL, type KgChangeReason, type SessionItemRow, type SetRow } from '@/engine/types';
 import { type PlannedSet, setLabel } from '@/engine/warmup';
 import { Button, Chip, cx, Input, Stepper } from '@/ui/components';
+import { IconNote } from '@/ui/icons';
 import { fmtKg } from '../shared';
 
 /**
@@ -19,7 +20,7 @@ export function SetCard({
   initialReason = null,
   existing,
   onSave,
-  saveLabel = '✓ XONG HIỆP',
+  saveLabel = 'Xong hiệp',
 }: {
   item: SessionItemRow;
   exercise: ExerciseRow;
@@ -77,9 +78,9 @@ export function SetCard({
   }
 
   return (
-    <div className={cx('rounded-2xl border-2 bg-card p-4', planned.setType === 'warmup' ? 'border-line' : 'border-accent')}>
+    <div className={cx('glass rounded-card p-4', planned.setType === 'working' && 'border-accent/45')}>
       <div className="mb-3 flex items-baseline justify-between">
-        <div className={cx('text-lg font-bold', planned.setType === 'warmup' && 'text-muted')}>
+        <div className={cx('text-lg font-bold tracking-tight', planned.setType === 'warmup' ? 'text-muted' : 'text-accent')}>
           {setLabel(planned, workingTotal)}
         </div>
         <div className="tabular text-sm text-muted">
@@ -95,7 +96,7 @@ export function SetCard({
       </div>
 
       {deviates && (
-        <div className="mt-3 rounded-xl bg-warn-soft p-3" data-testid="kg-change">
+        <div className="mt-3 rounded-ctl border border-warn/25 bg-warn-soft p-3" data-testid="kg-change">
           <div className="mb-2 text-sm font-semibold text-warn">
             Mục tiêu {fmtKg(planned.targetKg)}kg → thực tế {fmtKg(kg)}kg · vì sao?
           </div>
@@ -119,12 +120,12 @@ export function SetCard({
             {FEEL_LABEL[f]}
           </Chip>
         ))}
-        <button type="button" aria-label="Ghi chú hiệp" onClick={() => setShowNote((v) => !v)} className="ml-auto grid size-10 place-items-center rounded-full bg-card-2">
-          📝
+        <button type="button" aria-label="Ghi chú hiệp" onClick={() => setShowNote((v) => !v)} className="glass-subtle ml-auto grid size-10 place-items-center rounded-full">
+          <IconNote className="size-[18px]" />
         </button>
       </div>
       {showNote && <Input className="mt-2" placeholder="Ghi chú hiệp (vd. đau vai trái)" value={note} onChange={(e) => setNote(e.target.value)} />}
-      {error && <p className="mt-2 rounded-lg bg-bad-soft p-2 text-sm text-bad">⚠️ {error}</p>}
+      {error && <p className="mt-2 rounded-ctl border border-bad/25 bg-bad-soft p-2.5 text-sm text-bad">{error}</p>}
       <Button variant={planned.setType === 'warmup' ? 'secondary' : 'primary'} size="xl" block className="mt-4" disabled={busy} onClick={() => void save()}>
         {busy ? 'Đang lưu…' : saveLabel}
       </Button>

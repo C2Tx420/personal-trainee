@@ -5,6 +5,7 @@ import { queryClient } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
 import { supabase } from '@/lib/supabase';
 import { Banner, Button, Spinner } from '@/ui/components';
+import { IconWifiOff } from '@/ui/icons';
 import { LoginPage } from './LoginPage';
 import { PinLock } from './PinLock';
 
@@ -115,7 +116,7 @@ export function OfflineScreen() {
   return (
     <div className="grid min-h-dvh place-items-center p-6 text-center">
       <div>
-        <div className="mb-3 text-5xl">📡</div>
+        <IconWifiOff className="mx-auto mb-3 size-10 text-muted" />
         <h1 className="mb-2 text-xl font-semibold">Cần kết nối mạng</h1>
         <p className="mb-5 text-sm text-muted">App lưu dữ liệu trên Supabase và không hỗ trợ dùng offline. Bật Wi-Fi hoặc 4G rồi thử lại.</p>
         <Button variant="primary" onClick={() => location.reload()}>

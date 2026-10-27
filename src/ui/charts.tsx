@@ -2,7 +2,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, Responsiv
 
 const axis = { stroke: 'var(--muted)', fontSize: 11, tickLine: false, axisLine: false } as const;
 const tooltip = {
-  contentStyle: { background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, fontSize: 12, color: 'var(--fg)' },
+  contentStyle: { background: 'var(--surface-strong)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12, color: 'var(--fg)' },
   labelStyle: { color: 'var(--muted)' },
 };
 
@@ -41,7 +41,7 @@ export function SimpleLine({
               dataKey={l.key}
               name={l.name}
               stroke={l.color ?? 'var(--accent)'}
-              strokeWidth={2}
+              strokeWidth={2.5}
               strokeDasharray={l.dashed ? '5 4' : undefined}
               dot={{ r: 3 }}
               connectNulls
@@ -62,8 +62,8 @@ export function SimpleBars({ data, dataKey, name, height = 180, unit }: { data: 
           <CartesianGrid stroke="var(--line)" vertical={false} />
           <XAxis dataKey="label" {...axis} />
           <YAxis {...axis} width={40} unit={unit} />
-          <Tooltip {...tooltip} cursor={{ fill: 'var(--card-2)' }} />
-          <Bar dataKey={dataKey} name={name} fill="var(--accent)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+          <Tooltip {...tooltip} cursor={{ fill: 'var(--surface-inset)' }} />
+          <Bar dataKey={dataKey} name={name} fill="var(--accent)" radius={[8, 8, 0, 0]} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>

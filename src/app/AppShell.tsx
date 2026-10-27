@@ -5,14 +5,15 @@ import { useAppMeta, useInProgress } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
 import { MIN_SCHEMA_VERSION } from '@/lib/version';
 import { Banner, cx } from '@/ui/components';
+import { IconBook, IconDumbbell, IconLock, IconMore, IconPulse, IconToday } from '@/ui/icons';
 import { UpdatePrompt } from './UpdatePrompt';
 
 const TABS = [
-  { to: '/', label: 'Hôm nay', icon: '☀︎', end: true },
-  { to: '/training', label: 'Tập', icon: '🏋︎' },
-  { to: '/exercises', label: 'Bài tập', icon: '📖' },
-  { to: '/body', label: 'Cơ thể', icon: '⚖︎' },
-  { to: '/more', label: 'Thêm', icon: '☰' },
+  { to: '/', label: 'Hôm nay', Icon: IconToday, end: true },
+  { to: '/training', label: 'Tập', Icon: IconDumbbell },
+  { to: '/exercises', label: 'Bài tập', Icon: IconBook },
+  { to: '/body', label: 'Cơ thể', Icon: IconPulse },
+  { to: '/more', label: 'Thêm', Icon: IconMore },
 ];
 
 export function AppShell() {
@@ -32,16 +33,16 @@ export function AppShell() {
   return (
     <div className="min-h-dvh">
       {!online && (
-        <div className="sticky top-0 z-40 bg-warn px-4 py-1.5 text-center text-sm font-semibold text-white" role="alert">
+        <div className="sticky top-0 z-40 bg-warn/90 px-4 py-1.5 text-center text-sm font-semibold text-black backdrop-blur" role="alert">
           Mất kết nối — không lưu được cho tới khi có mạng
         </div>
       )}
       <button
         aria-label="Khoá app"
         onClick={lock}
-        className="fixed top-[max(env(safe-area-inset-top),0px)] right-3 z-30 mt-2 grid size-10 place-items-center rounded-full text-lg text-muted active:bg-card-2"
+        className="glass-subtle fixed top-[max(env(safe-area-inset-top),0px)] right-3 z-30 mt-2.5 grid size-9 place-items-center rounded-full text-muted transition"
       >
-        🔒
+        <IconLock className="size-[18px]" />
       </button>
       <div className="mx-auto max-w-xl px-4 pt-2 empty:hidden">
         {dbOutdated && <Banner tone="bad">Database cần chạy migration mới ({meta.data?.schema_version} &lt; {MIN_SCHEMA_VERSION})</Banner>}
@@ -53,21 +54,26 @@ export function AppShell() {
       </div>
       <Outlet />
       <UpdatePrompt blocked={!!inProgress.data} />
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-xl">
-          {TABS.map((t) => (
+      <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(env(safe-area-inset-bottom),12px)]">
+        <div className="glass-strong mx-auto flex max-w-xl gap-1 rounded-[26px] p-1.5">
+          {TABS.map(({ to, label, Icon, end }) => (
             <NavLink
-              key={t.to}
-              to={t.to}
-              end={t.end}
+              key={to}
+              to={to}
+              end={end}
               className={({ isActive }) =>
-                cx('flex flex-1 flex-col items-center gap-0.5 pt-2 pb-1 text-[11px] font-medium', isActive ? 'text-accent' : 'text-muted')
+                cx(
+                  'flex flex-1 flex-col items-center gap-0.5 rounded-[20px] pt-2 pb-1.5 text-[11px] font-semibold transition',
+                  isActive ? 'bg-white/[0.1] text-fg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]' : 'text-muted',
+                )
               }
             >
-              <span className="text-xl leading-none" aria-hidden>
-                {t.icon}
-              </span>
-              {t.label}
+              {({ isActive }) => (
+                <>
+                  <Icon className={cx('size-[22px]', isActive && 'text-accent')} />
+                  {label}
+                </>
+              )}
             </NavLink>
           ))}
         </div>

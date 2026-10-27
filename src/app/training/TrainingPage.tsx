@@ -43,7 +43,7 @@ export function TrainingPage() {
     <Page title="Tập">
       <div className="mb-3 grid grid-cols-2 gap-2">
         <Button onClick={() => nav('/training/backfill')}>+ Ghi bù</Button>
-        <Button onClick={() => nav('/training/quick')}>✎ Ghi nhanh</Button>
+        <Button onClick={() => nav('/training/quick')}>Ghi nhanh</Button>
       </div>
 
       {week && (

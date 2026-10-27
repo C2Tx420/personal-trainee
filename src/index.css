@@ -1,77 +1,46 @@
 @import 'tailwindcss';
 
+/*
+ * Theme tối, một màu primary. Mọi lựa chọn hình ảnh là token: màu, độ mờ kính
+ * (--blur = 0 → phẳng), bo góc, font chữ số. Đổi theme = đổi khối :root này.
+ * Không gradient, không phát sáng.
+ */
 :root {
-  --bg: #f4f5f7;
-  --card: #ffffff;
-  --card-2: #f0f2f5;
-  --fg: #151a21;
-  --muted: #5d6774;
-  --line: #e1e5ea;
-  --accent: #e8590c;
-  --accent-fg: #ffffff;
-  --accent-soft: #fff1e8;
-  --ok: #2b8a3e;
-  --ok-soft: #e9f7ec;
-  --warn: #c76a00;
-  --warn-soft: #fff6e0;
-  --bad: #d6336c;
-  --bad-soft: #fdecf2;
-  --info: #1c7ed6;
-  --info-soft: #e7f1fc;
-  color-scheme: light;
-}
+  /* Theme chốt 27/10/2026: kiểu Crouton (Apple Design Award 2024) — than ấm + cam đất */
+  --bg: #141211;
+  --surface: rgba(30, 27, 25, 0.84); /* thẻ */
+  --surface-strong: rgba(20, 18, 17, 0.9); /* header, thanh tab, sheet */
+  --surface-inset: rgba(255, 240, 230, 0.05); /* ô số liệu, nút phụ trong thẻ */
+  --border: #2e2926;
+  --fg: #f4efea;
+  --muted: #a59c94;
+  --accent: #f2783a;
+  --accent-fg: #1a0a03;
+  --accent-soft: rgba(242, 120, 58, 0.14);
+  --blur: 14px;
+  --radius-card: 20px;
+  --radius-ctl: 14px;
+  --font-num: inherit;
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #0f1216;
-    --card: #181c22;
-    --card-2: #20252c;
-    --fg: #e8ecf0;
-    --muted: #98a2ad;
-    --line: #2b313a;
-    --accent: #ff7a2e;
-    --accent-fg: #1a0e06;
-    --accent-soft: #2a1a10;
-    --ok: #51cf66;
-    --ok-soft: #12261a;
-    --warn: #fcc419;
-    --warn-soft: #2a2410;
-    --bad: #f783ac;
-    --bad-soft: #2b1520;
-    --info: #74c0fc;
-    --info-soft: #11202e;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme='dark'] {
-  --bg: #0f1216;
-  --card: #181c22;
-  --card-2: #20252c;
-  --fg: #e8ecf0;
-  --muted: #98a2ad;
-  --line: #2b313a;
-  --accent: #ff7a2e;
-  --accent-fg: #1a0e06;
-  --accent-soft: #2a1a10;
-  --ok: #51cf66;
-  --ok-soft: #12261a;
-  --warn: #fcc419;
-  --warn-soft: #2a2410;
-  --bad: #f783ac;
-  --bad-soft: #2b1520;
-  --info: #74c0fc;
-  --info-soft: #11202e;
+  /* màu trạng thái dịu — chỉ cho nhãn và cảnh báo, không dùng làm màu nhấn */
+  --ok: #8fd1a6;
+  --ok-soft: rgba(143, 209, 166, 0.12);
+  --warn: #e3b562;
+  --warn-soft: rgba(227, 181, 98, 0.12);
+  --bad: #ec8b8b;
+  --bad-soft: rgba(236, 139, 139, 0.12);
+  --info: #aab3c0;
+  --info-soft: rgba(170, 179, 192, 0.1);
   color-scheme: dark;
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-card: var(--card);
-  --color-card-2: var(--card-2);
+  --color-card: var(--surface);
+  --color-card-2: var(--surface-inset);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
-  --color-line: var(--line);
+  --color-line: var(--border);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
@@ -83,7 +52,40 @@
   --color-bad-soft: var(--bad-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ── bề mặt */
+@utility glass {
+  background-color: var(--surface);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border);
+}
+
+@utility glass-strong {
+  background-color: var(--surface-strong);
+  -webkit-backdrop-filter: blur(calc(var(--blur) * 1.4));
+  backdrop-filter: blur(calc(var(--blur) * 1.4));
+  border: 1px solid var(--border);
+}
+
+@utility glass-subtle {
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+}
+
+@utility glass-input {
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border);
+}
+
+@utility rounded-card {
+  border-radius: var(--radius-card);
+}
+
+@utility rounded-ctl {
+  border-radius: var(--radius-ctl);
 }
 
 html,
@@ -98,10 +100,26 @@ body {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+select {
+  appearance: none;
+  background-color: var(--surface-inset);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-ctl) !important;
+  padding-right: 2rem !important;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-num);
 }
 
 .safe-bottom {

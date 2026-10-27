@@ -1,10 +1,14 @@
 import { type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { svgDataUrl } from '@/engine/svg-validate';
+import { IconBack, IconClose } from './icons';
 
 export function cx(...xs: (string | false | null | undefined)[]): string {
   return xs.filter(Boolean).join(' ');
 }
+
+/** Lớp header kính dính trên cùng (dùng cho Page và luồng tập). */
+export const GLASS_HEADER = 'glass-strong safe-top sticky top-0 z-20 -mx-4 border-x-0 border-t-0';
 
 // ───────────────────────── Bố cục trang
 export function Page({
@@ -22,18 +26,18 @@ export function Page({
 }) {
   const nav = useNavigate();
   return (
-    <div className={cx('mx-auto w-full px-4 pb-28', wide ? 'max-w-3xl' : 'max-w-xl')}>
-      <header className="safe-top sticky top-0 z-20 -mx-4 mb-3 flex min-h-14 items-center gap-2 border-b border-line bg-bg/95 px-4 backdrop-blur">
+    <div className={cx('mx-auto w-full px-4 pb-32', wide ? 'max-w-3xl' : 'max-w-xl')}>
+      <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-14 items-center gap-2 pr-14 pl-4')}>
         {back && (
           <button
             aria-label="Quay lại"
-            className="-ml-2 grid size-10 place-items-center rounded-full text-2xl text-muted active:bg-card-2"
+            className="glass-subtle -ml-1 grid size-9 place-items-center rounded-full text-fg"
             onClick={() => (back === true ? nav(-1) : nav(back))}
           >
-            ‹
+            <IconBack className="size-5" />
           </button>
         )}
-        <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-[19px] font-bold tracking-tight">{title}</h1>
         {right}
       </header>
       {children}
@@ -45,7 +49,7 @@ export function Card({ children, className, onClick }: { children: ReactNode; cl
   return (
     <section
       onClick={onClick}
-      className={cx('mb-3 rounded-2xl border border-line bg-card p-4', onClick && 'cursor-pointer active:bg-card-2', className)}
+      className={cx('glass rounded-card mb-3 p-4', onClick && 'cursor-pointer active:bg-white/[0.04]', className)}
     >
       {children}
     </section>
@@ -54,8 +58,8 @@ export function Card({ children, className, onClick }: { children: ReactNode; cl
 
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
-    <div className="mt-5 mb-2 flex items-end justify-between px-1">
-      <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">{children}</h2>
+    <div className="mt-6 mb-2 flex items-end justify-between px-1">
+      <h2 className="text-[11px] font-semibold tracking-[0.14em] text-muted uppercase">{children}</h2>
       {right}
     </div>
   );
@@ -73,16 +77,15 @@ export function Button({ variant = 'secondary', size = 'md', block, className, .
     <button
       {...rest}
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition select-none disabled:opacity-40',
+        'rounded-ctl inline-flex items-center justify-center gap-2 font-semibold transition select-none disabled:opacity-40',
         size === 'sm' && 'h-9 px-3 text-sm',
         size === 'md' && 'h-11 px-4',
         size === 'lg' && 'h-13 px-5 text-lg',
         size === 'xl' && 'h-16 px-6 text-xl',
-        variant === 'primary' && 'bg-accent text-accent-fg active:brightness-95',
-        variant === 'secondary' && 'border border-line bg-card text-fg active:bg-card-2',
-        variant === 'ghost' && 'text-muted active:bg-card-2',
-        variant === 'danger' && 'bg-bad-soft text-bad active:brightness-95',
-        variant === 'ok' && 'bg-ok text-white active:brightness-95',
+        (variant === 'primary' || variant === 'ok') && 'bg-accent text-accent-fg active:brightness-95',
+        variant === 'secondary' && 'glass-subtle text-fg active:bg-white/[0.08]',
+        variant === 'ghost' && 'text-muted active:bg-white/5',
+        variant === 'danger' && 'border border-bad/25 bg-bad-soft text-bad',
         block && 'w-full',
         className,
       )}
@@ -94,7 +97,7 @@ export function Button({ variant = 'secondary', size = 'md', block, className, .
 export function Field({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {
   return (
     <label className="mb-3 block">
-      <span className="mb-1 block text-sm font-medium text-muted">{label}</span>
+      <span className="mb-1.5 block text-[13px] font-medium text-muted">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
     </label>
@@ -104,26 +107,14 @@ export function Field({ label, hint, children }: { label: string; hint?: ReactNo
 /** w-full mặc định, trừ khi className đã đặt độ rộng riêng (tránh 2 class width đè nhau). */
 const hasWidth = (c?: string) => !!c && /(^|\s)(max-|min-)?w-/.test(c);
 
+const FIELD = 'glass-input rounded-ctl text-base text-fg outline-none placeholder:text-muted/60 focus:border-accent/70';
+
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className={cx(
-        'h-11 rounded-xl border border-line bg-card px-3 text-base outline-none focus:border-accent',
-        !hasWidth(props.className) && 'w-full',
-        props.className,
-      )}
-    />
-  );
+  return <input {...props} className={cx(FIELD, 'h-11 px-3.5', !hasWidth(props.className) && 'w-full', props.className)} />;
 }
 
 export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      {...props}
-      className={cx('rounded-xl border border-line bg-card p-3 text-base outline-none focus:border-accent', !hasWidth(props.className) && 'w-full', props.className)}
-    />
-  );
+  return <textarea {...props} className={cx(FIELD, 'p-3.5', !hasWidth(props.className) && 'w-full', props.className)} />;
 }
 
 /** Ô số to có nút −/+ (dùng trong luồng tập). */
@@ -145,21 +136,17 @@ export function Stepper({
   min?: number;
 }) {
   const fmt = (v: number) => String(Math.round(v * 100) / 100);
+  const btn = 'glass-subtle rounded-ctl grid size-14 shrink-0 place-items-center text-3xl font-light text-fg active:bg-white/[0.08]';
   return (
     <div className="flex items-center gap-2" aria-label={label}>
-      <button
-        type="button"
-        aria-label={`Giảm ${label}`}
-        className="grid size-14 place-items-center rounded-2xl bg-card-2 text-3xl font-semibold active:brightness-95"
-        onClick={() => onChange(Math.max(min, (value ?? 0) - step))}
-      >
+      <button type="button" aria-label={`Giảm ${label}`} className={btn} onClick={() => onChange(Math.max(min, (value ?? 0) - step))}>
         −
       </button>
-      <div className="flex min-w-0 flex-1 items-baseline justify-center gap-1 rounded-2xl border border-line bg-card px-2 py-1">
+      <div className="glass-input rounded-ctl flex h-14 min-w-0 flex-1 items-baseline justify-center gap-1 px-2 pt-2.5">
         <input
           inputMode="decimal"
           aria-label={label}
-          className="tabular w-full min-w-0 bg-transparent text-center text-3xl font-bold outline-none"
+          className="tabular w-full min-w-0 bg-transparent text-center text-[32px] leading-none font-bold tracking-tight outline-none"
           value={value === null ? '' : fmt(value)}
           placeholder={allowEmpty ? '—' : '0'}
           onChange={(e) => {
@@ -171,12 +158,7 @@ export function Stepper({
         />
         <span className="shrink-0 text-sm text-muted">{unit}</span>
       </div>
-      <button
-        type="button"
-        aria-label={`Tăng ${label}`}
-        className="grid size-14 place-items-center rounded-2xl bg-card-2 text-3xl font-semibold active:brightness-95"
-        onClick={() => onChange((value ?? 0) + step)}
-      >
+      <button type="button" aria-label={`Tăng ${label}`} className={btn} onClick={() => onChange((value ?? 0) + step)}>
         +
       </button>
     </div>
@@ -195,17 +177,20 @@ export function Chip({
   tone?: 'accent' | 'ok' | 'warn' | 'bad';
 }) {
   const on = {
-    accent: 'border-accent bg-accent-soft text-accent',
-    ok: 'border-ok bg-ok-soft text-ok',
-    warn: 'border-warn bg-warn-soft text-warn',
-    bad: 'border-bad bg-bad-soft text-bad',
+    accent: 'border-accent/60 bg-accent-soft text-accent',
+    ok: 'border-ok/45 bg-ok-soft text-ok',
+    warn: 'border-warn/45 bg-warn-soft text-warn',
+    bad: 'border-bad/45 bg-bad-soft text-bad',
   }[tone];
   return (
     <button
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={cx('h-10 shrink-0 rounded-full border px-4 text-sm font-medium whitespace-nowrap', active ? on : 'border-line bg-card text-fg active:bg-card-2')}
+      className={cx(
+        'h-10 shrink-0 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition',
+        active ? on : 'border-line bg-card-2 text-fg active:bg-white/[0.08]',
+      )}
     >
       {children}
     </button>
@@ -214,14 +199,16 @@ export function Chip({
 
 export function Badge({ children, tone = 'muted' }: { children: ReactNode; tone?: 'muted' | 'ok' | 'warn' | 'bad' | 'accent' | 'info' }) {
   const cls = {
-    muted: 'bg-card-2 text-muted',
+    muted: 'bg-white/[0.07] text-muted',
     ok: 'bg-ok-soft text-ok',
     warn: 'bg-warn-soft text-warn',
     bad: 'bg-bad-soft text-bad',
     accent: 'bg-accent-soft text-accent',
     info: 'bg-info-soft text-info',
   }[tone];
-  return <span className={cx('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold', cls)}>{children}</span>;
+  return (
+    <span className={cx('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-white/[0.06] ring-inset', cls)}>{children}</span>
+  );
 }
 
 export function Banner({
@@ -236,17 +223,21 @@ export function Banner({
   onClick?: () => void;
 }) {
   const cls = {
-    info: 'bg-info-soft text-info',
-    warn: 'bg-warn-soft text-warn',
-    bad: 'bg-bad-soft text-bad',
-    ok: 'bg-ok-soft text-ok',
-    accent: 'bg-accent-soft text-accent',
+    info: 'bg-info-soft text-info border-info/20',
+    warn: 'bg-warn-soft text-warn border-warn/20',
+    bad: 'bg-bad-soft text-bad border-bad/20',
+    ok: 'bg-ok-soft text-ok border-ok/20',
+    accent: 'bg-accent-soft text-accent border-accent/25',
   }[tone];
   return (
     <div
       role={onClick ? 'button' : 'status'}
       onClick={onClick}
-      className={cx('mb-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium', cls, onClick && 'cursor-pointer')}
+      className={cx(
+        'rounded-ctl mb-2 flex items-center gap-3 border px-3.5 py-3 text-sm font-medium',
+        cls,
+        onClick && 'cursor-pointer',
+      )}
     >
       <div className="min-w-0 flex-1">{children}</div>
       {action}
@@ -258,24 +249,24 @@ export function ProgressBar({ value, max, tone = 'accent' }: { value: number; ma
   const pct = max <= 0 ? 0 : Math.min(100, (value / max) * 100);
   const c = { accent: 'bg-accent', ok: 'bg-ok', warn: 'bg-warn' }[tone];
   return (
-    <div className="h-2 overflow-hidden rounded-full bg-card-2" role="progressbar" aria-valuenow={value} aria-valuemax={max}>
-      <div className={cx('h-full rounded-full transition-all', c)} style={{ width: `${pct}%` }} />
+    <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={value} aria-valuemax={max}>
+      <div className={cx('h-full rounded-full transition-all duration-500', c)} style={{ width: `${pct}%` }} />
     </div>
   );
 }
 
 export function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) {
   return (
-    <div className="rounded-xl bg-card-2 px-3 py-2">
-      <div className="text-xs text-muted">{label}</div>
-      <div className="tabular text-lg font-bold">{value}</div>
+    <div className="rounded-ctl border border-line bg-card-2 px-3 py-2.5">
+      <div className="text-[11px] font-medium tracking-wide text-muted uppercase">{label}</div>
+      <div className="tabular mt-0.5 text-xl font-bold tracking-tight">{value}</div>
       {sub && <div className="text-xs text-muted">{sub}</div>}
     </div>
   );
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <div className="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-muted">{children}</div>;
+  return <div className="rounded-card border border-dashed border-line p-6 text-center text-sm text-muted">{children}</div>;
 }
 
 export function Spinner({ label = 'Đang tải…' }: { label?: string }) {
@@ -291,7 +282,7 @@ export function ErrorBox({ error }: { error: unknown }) {
   return <Banner tone="bad">{error instanceof Error ? error.message : String(error)}</Banner>;
 }
 
-/** Bottom sheet modal. */
+/** Bottom sheet kính. */
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   useEffect(() => {
     if (!open) return;
@@ -301,18 +292,18 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 backdrop-blur-sm" onClick={onClose}>
       <div
         role="dialog"
         aria-label={title}
-        className="safe-bottom max-h-[88vh] w-full max-w-xl overflow-y-auto rounded-t-3xl bg-bg p-4"
+        className="glass-strong safe-bottom max-h-[88vh] w-full max-w-xl overflow-y-auto rounded-t-[calc(var(--radius-card)+6px)] border-b-0 p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line" />
+        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/20" />
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <button aria-label="Đóng" onClick={onClose} className="grid size-9 place-items-center rounded-full text-muted active:bg-card-2">
-            ✕
+          <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+          <button aria-label="Đóng" onClick={onClose} className="glass-subtle grid size-9 place-items-center rounded-full text-muted">
+            <IconClose className="size-4" />
           </button>
         </div>
         {children}
@@ -329,9 +320,12 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={cx('relative h-7 w-12 shrink-0 rounded-full transition', checked ? 'bg-accent' : 'bg-line')}
+      className={cx(
+        'relative h-7 w-12 shrink-0 rounded-full transition',
+        checked ? 'bg-accent' : 'bg-white/[0.12]',
+      )}
     >
-      <span className={cx('absolute top-0.5 size-6 rounded-full bg-white shadow transition-all', checked ? 'left-5.5' : 'left-0.5')} />
+      <span className={cx('absolute top-0.5 size-6 rounded-full bg-white shadow-md transition-all', checked ? 'left-5.5' : 'left-0.5')} />
     </button>
   );
 }
@@ -346,14 +340,17 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="mb-3 flex rounded-xl bg-card-2 p-1" role="tablist">
+    <div className="glass-subtle rounded-ctl mb-3 flex p-1" role="tablist">
       {options.map((o) => (
         <button
           key={o.value}
           role="tab"
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
-          className={cx('h-9 flex-1 rounded-lg text-sm font-semibold', value === o.value ? 'bg-card shadow-sm' : 'text-muted')}
+          className={cx(
+            'h-9 flex-1 rounded-[calc(var(--radius-ctl)-4px)] text-sm font-semibold transition',
+            value === o.value ? 'bg-white/[0.1] text-fg' : 'text-muted',
+          )}
         >
           {o.label}
         </button>
@@ -362,17 +359,25 @@ export function Segmented<T extends string>({
   );
 }
 
+/**
+ * App chỉ có giao diện tối → bỏ điều kiện `@media (prefers-color-scheme:dark)`
+ * trong SVG để luôn dùng màu tối, bất kể máy đang đặt sáng hay tối.
+ */
+function forceDarkSvg(svg: string): string {
+  return svg.replace(/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{([\s\S]*)\}\s*<\/style>/, '$1</style>');
+}
+
 /** Hình minh hoạ bài tập — render qua <img> nên script trong SVG không chạy. */
 export function ExerciseImg({ svg, name, className }: { svg: string | null | undefined; name: string; className?: string }) {
+  const frame = 'rounded-ctl aspect-[8/5] ring-1 ring-line';
   if (!svg) {
     return (
-      <div className={cx('grid aspect-[8/5] place-items-center rounded-xl bg-card-2 text-xs text-muted', className && /(^|\s)w-/.test(className) ? '' : 'w-full', className)}>
+      <div className={cx('grid place-items-center bg-white/[0.04] text-xs text-muted', frame, hasWidth(className) ? '' : 'w-full', className)}>
         Chưa có hình
       </div>
     );
   }
-  const width = className && /(^|\s)(max-)?w-/.test(className) ? '' : 'w-full';
-  return <img src={svgDataUrl(svg)} alt={`Hình minh hoạ: ${name}`} className={cx('aspect-[8/5] rounded-xl', width, className)} />;
+  return <img src={svgDataUrl(forceDarkSvg(svg))} alt={`Hình minh hoạ: ${name}`} className={cx(frame, hasWidth(className) ? '' : 'w-full', className)} />;
 }
 
 export function Kg({ v }: { v: number | null | undefined }) {

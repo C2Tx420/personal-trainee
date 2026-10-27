@@ -83,11 +83,11 @@ export function TodayPage() {
   const startButton = (kind: SessionKind) =>
     inProgress.data ? (
       <Button variant="primary" size="lg" block onClick={() => nav(`/workout/${inProgress.data!.id}`)}>
-        ▶ Tiếp tục buổi tập
+        Tiếp tục buổi tập
       </Button>
     ) : (
       <Button variant="primary" size="lg" block disabled={starting} onClick={() => void start(kind)}>
-        {starting ? 'Đang tạo buổi…' : '▶ Bắt đầu buổi tập'}
+        {starting ? 'Đang tạo buổi…' : 'Bắt đầu buổi tập'}
       </Button>
     );
 
@@ -106,7 +106,7 @@ export function TodayPage() {
       {isMonday && !reviewedThisWeek && drafts.length === 0 && new Date().getHours() >= 10 && (
         <Banner tone="warn">Chưa review tuần này — chạy review với Claude Code trên máy tính</Banner>
       )}
-      {conflict && <Banner tone="warn">⚠️ {conflict}</Banner>}
+      {conflict && <Banner tone="warn">{conflict}</Banner>}
       {inb.due && <Banner tone="info" onClick={() => nav('/body/inbody')}>Đến hạn đo InBody (đã {inb.daysSince ?? '—'} ngày)</Banner>}
       {photoDue && <Banner tone="info" onClick={() => nav('/body/photos/capture')}>Đến lượt chụp ảnh tiến độ (2 tuần/lần)</Banner>}
       {error ? <ErrorBox error={error} /> : null}
@@ -114,7 +114,7 @@ export function TodayPage() {
       {goal && (
         <Card>
           <div className="mb-1 flex items-center justify-between">
-            <div className="font-semibold">🎯 {goal.goal.name} · {formatVN(goal.goal.target_date)}</div>
+            <div className="font-semibold">{goal.goal.name} · {formatVN(goal.goal.target_date)}</div>
             <Badge tone={goal.status === 'behind' ? 'warn' : 'ok'}>{GOAL_STATUS_LABEL[goal.status]}</Badge>
           </div>
           <div className="tabular mb-2 text-sm text-muted">
@@ -142,11 +142,11 @@ export function TodayPage() {
           <Card>
             <div className="mb-1 flex items-center justify-between">
               <h3 className="text-xl font-bold">{tmpl.name}</h3>
-              {done && <Badge tone="ok">Đã tập ✓</Badge>}
+              {done && <Badge tone="ok">Đã tập</Badge>}
             </div>
             {tmpl.warmup.cardio && (
               <p className="mb-2 text-sm text-muted">
-                🔥 Khởi động: {ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name_vi} {tmpl.warmup.cardio.minutes}' · {String(tmpl.warmup.cardio.speed_kmh_min).replace('.', ',')}–
+                Khởi động: {ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name_vi} {tmpl.warmup.cardio.minutes}' · {String(tmpl.warmup.cardio.speed_kmh_min).replace('.', ',')}–
                 {tmpl.warmup.cardio.speed_kmh_max} km/h
               </p>
             )}
@@ -166,11 +166,11 @@ export function TodayPage() {
 
       {day.kind === 'badminton' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">🏸 Cầu lông</h3>
+          <h3 className="mb-1 text-xl font-bold">Cầu lông</h3>
           <p className="mb-2 text-sm text-muted">{day.minutes_min}–{day.minutes_max} phút, nhẹ nhàng</p>
-          {day.warmup && <p className="mb-3 text-sm">🔥 Khởi động {day.warmup.minutes}': {day.warmup.mobility.join(' · ')}</p>}
+          {day.warmup && <p className="mb-3 text-sm">Khởi động {day.warmup.minutes}′: {day.warmup.mobility.join(' · ')}</p>}
           {doneToday.some((s) => s.kind === 'badminton') ? (
-            <Badge tone="ok">Đã ghi ✓</Badge>
+            <Badge tone="ok">Đã ghi</Badge>
           ) : (
             <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>Ghi buổi cầu lông</Button>
           )}
@@ -179,7 +179,7 @@ export function TodayPage() {
 
       {day.kind === 'rest' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">😌 Nghỉ</h3>
+          <h3 className="mb-1 text-xl font-bold">Nghỉ</h3>
           <p className="mb-3 text-sm text-muted">Gợi ý: đi bộ 20–30 phút, mục tiêu ≥ {formatNumberVN(content.activity.rest_day_steps_max)} bước.</p>
           <Button block onClick={() => nav('/training/simple/walk')}>Ghi đi bộ</Button>
         </Card>
@@ -187,13 +187,13 @@ export function TodayPage() {
 
       {day.kind === 'optional' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">☀️ Chủ nhật — tuỳ chọn (trưa, nhẹ)</h3>
+          <h3 className="mb-1 text-xl font-bold">Chủ nhật · tuỳ chọn</h3>
           <p className="mb-3 text-sm text-muted">Chọn một: Push/Pull nhẹ = mỗi bài bớt 1 hiệp. Không gán Legs.</p>
           <div className="grid gap-2">
             {day.options.map((o) =>
               o === 'push_light' || o === 'pull_light' ? (
                 <Button key={o} variant="secondary" disabled={starting || !!inProgress.data} onClick={() => void start(o)}>
-                  ▶ {SUNDAY_LABEL[o]}
+                  {SUNDAY_LABEL[o]}
                 </Button>
               ) : (
                 <Button key={o} variant="secondary" onClick={() => nav(`/training/simple/${o}`)}>

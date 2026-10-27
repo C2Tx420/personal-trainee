@@ -17,7 +17,7 @@ export function AboutPage() {
         </div>
       </Card>
       <div className="grid grid-cols-2 gap-2">
-        <Button onClick={lock}>🔒 Khoá ngay</Button>
+        <Button onClick={lock}>Khoá ngay</Button>
         <Button variant="danger" onClick={() => void signOut()}>Đăng xuất</Button>
       </div>
       <p className="mt-2 text-xs text-muted">Tự khoá sau 5 phút không thao tác. Đổi PIN: chạy `supabase secrets set APP_PIN=…` trên máy tính.</p>

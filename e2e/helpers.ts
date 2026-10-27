@@ -42,7 +42,7 @@ export async function skipRest(page: Page) {
 
 /** Bấm XONG HIỆP rồi bỏ qua nghỉ. */
 export async function completeSet(page: Page) {
-  await page.getByRole('button', { name: '✓ XONG HIỆP' }).click();
+  await page.getByRole('button', { name: 'Xong hiệp' }).click();
   await expect(page.getByRole('button', { name: 'Đang lưu…' })).toBeHidden();
   await skipRest(page);
 }

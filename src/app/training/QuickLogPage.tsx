@@ -86,7 +86,7 @@ export function QuickLogPage() {
   }
 
   return (
-    <Page title="✎ Ghi nhanh bằng chữ" back="/training">
+    <Page title="Ghi nhanh bằng chữ" back="/training">
       {!parsed ? (
         <>
           <p className="mb-2 text-sm text-muted">Gõ hoặc dán ghi chú buổi tập y như khi nhắn tin. App tự tách bài + hiệp, anh xem lại rồi mới lưu.</p>
@@ -111,7 +111,7 @@ export function QuickLogPage() {
               </Field>
             </div>
             <div className="text-sm text-muted">
-              {formatVN(date, true)} · {parsed.warmup ? `🔥 khởi động ${parsed.warmup.minutes}′${parsed.warmup.speedMin ? ` · ${String(parsed.warmup.speedMin).replace('.', ',')}–${parsed.warmup.speedMax} km/h` : ''}` : 'không ghi khởi động'}
+              {formatVN(date, true)} · {parsed.warmup ? `khởi động ${parsed.warmup.minutes}′${parsed.warmup.speedMin ? ` · ${String(parsed.warmup.speedMin).replace('.', ',')}–${parsed.warmup.speedMax} km/h` : ''}` : 'không ghi khởi động'}
             </div>
           </Card>
           {warmupMarked.length > 0 && (

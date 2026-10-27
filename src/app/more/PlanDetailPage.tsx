@@ -10,9 +10,9 @@ import { Badge, Banner, Button, Card, Chip, Empty, ErrorBox, ExerciseImg, Field,
 import { ExerciseLine } from '../shared';
 import { CREATED_BY_LABEL, StatusBadge } from './plan-ui';
 
-const DIFF_ICON: Record<string, string> = {
-  added: '➕', removed: '➖', replaced: '🔁', sets: '🔢', reps: '↔️', rest: '⏱', order: '↕️', target_kg: '🏋️',
-  warmup_sets: '🔥', coach_note: '💬', exercise_new: '🆕', exercise_edit: '✏️', warmup: '🔥', nutrition: '🍚', schedule: '📅',
+const DIFF_LABEL: Record<string, string> = {
+  added: 'Thêm', removed: 'Bớt', replaced: 'Thay', sets: 'Hiệp', reps: 'Lần', rest: 'Nghỉ', order: 'Thứ tự', target_kg: 'Tạ',
+  warmup_sets: 'Làm nóng', coach_note: 'Coach', exercise_new: 'Bài mới', exercise_edit: 'Sửa bài', warmup: 'Khởi động', nutrition: 'Calo', schedule: 'Lịch',
 };
 
 /** Xem một phiên bản lộ trình, diff với bản trước, Duyệt / Từ chối (§4.5–4.6). */
@@ -86,7 +86,7 @@ export function PlanDetailPage() {
         {p.rejected_reason && <Banner tone="bad">Lý do từ chối: {p.rejected_reason}</Banner>}
       </Card>
       {result && <Banner tone="ok">{result}</Banner>}
-      {issues.filter((i) => i.level === 'error').map((i) => <Banner key={i.message} tone="bad">⚠️ {i.message}</Banner>)}
+      {issues.filter((i) => i.level === 'error').map((i) => <Banner key={i.message} tone="bad">{i.message}</Banner>)}
       {error ? <ErrorBox error={error} /> : null}
 
       {p.status === 'draft' && (
@@ -95,7 +95,7 @@ export function PlanDetailPage() {
           <Button variant="ok" onClick={() => setApproveOpen(true)} disabled={issues.some((i) => i.level === 'error')}>Duyệt</Button>
         </div>
       )}
-      {p.status === 'active' && <Button block className="mb-3" onClick={() => nav(`/more/plans/${p.id}/edit`)}>✏️ Sửa → tạo phiên bản mới</Button>}
+      {p.status === 'active' && <Button block className="mb-3" onClick={() => nav(`/more/plans/${p.id}/edit`)}>Sửa → tạo phiên bản mới</Button>}
 
       <Segmented value={tab} onChange={setTab} options={[{ value: 'diff', label: base ? `Thay đổi so với v${base.version_no}` : 'Thay đổi' }, { value: 'content', label: 'Nội dung đầy đủ' }]} />
 
@@ -106,11 +106,11 @@ export function PlanDetailPage() {
           <Card>
             {diff.map((d, i) => (
               <div key={i} className="flex gap-2 border-b border-line py-2 text-sm last:border-0">
-                <span>{DIFF_ICON[d.kind]}</span>
+                <span className="w-[68px] shrink-0"><Badge tone={d.kind === 'removed' ? 'bad' : d.kind === 'added' || d.kind === 'exercise_new' ? 'accent' : 'muted'}>{DIFF_LABEL[d.kind]}</Badge></span>
                 <span className="min-w-0 flex-1">
                   <span className="text-muted">{d.scope}: </span>
                   {d.text}
-                  {d.warning && <span className="block text-bad">⚠️ {d.warning}</span>}
+                  {d.warning && <span className="block text-bad">{d.warning}</span>}
                   {(d.kind === 'exercise_new' || d.kind === 'exercise_edit') && d.slug && (
                     <span className="mt-2 grid grid-cols-2 gap-2">
                       {d.kind === 'exercise_edit' && p.status === 'draft' && <span><span className="text-xs text-muted">Hình cũ</span><ExerciseImg svg={ex.bySlug.get(d.slug)?.illustration_svg} name="cũ" /></span>}
@@ -142,7 +142,7 @@ export function PlanDetailPage() {
             <div key={t.key}>
               <SectionTitle>{t.name}</SectionTitle>
               <Card>
-                {t.warmup.cardio && <p className="mb-1 text-sm text-muted">🔥 {names(t.warmup.cardio.exercise)} {t.warmup.cardio.minutes}′ · {t.warmup.mobility.join(' · ')}</p>}
+                {t.warmup.cardio && <p className="mb-1 text-sm text-muted">Khởi động: {names(t.warmup.cardio.exercise)} {t.warmup.cardio.minutes}′ · {t.warmup.mobility.join(' · ')}</p>}
                 <div className="divide-y divide-line">
                   {t.items.map((it) => (
                     <div key={it.exercise}>
