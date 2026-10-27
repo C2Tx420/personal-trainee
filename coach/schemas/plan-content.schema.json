@@ -1,0 +1,1709 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "plan-content/1"
+    },
+    "schedule": {
+      "type": "object",
+      "properties": {
+        "mon": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "tue": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "wed": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "thu": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "fri": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "sat": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        },
+        "sun": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "session"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": [
+                    "push",
+                    "pull",
+                    "legs"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "template"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "badminton"
+                },
+                "minutes_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "minutes_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "intensity": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "moderate",
+                    "hard"
+                  ]
+                },
+                "warmup": {
+                  "type": "object",
+                  "properties": {
+                    "cardio": {
+                      "default": null,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "exercise": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_]+$"
+                            },
+                            "minutes": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "speed_kmh_min": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "speed_kmh_max": {
+                              "default": null,
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "exercise",
+                            "minutes"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "mobility": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minutes": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "minutes_min",
+                "minutes_max",
+                "intensity"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "optional"
+                },
+                "options": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "walk",
+                      "zone2",
+                      "core",
+                      "push_light",
+                      "pull_light"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "options"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ]
+    },
+    "templates": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "push",
+              "pull",
+              "legs"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "warmup": {
+            "type": "object",
+            "properties": {
+              "cardio": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "exercise": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9_]+$"
+                      },
+                      "minutes": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "speed_kmh_min": {
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "speed_kmh_max": {
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "exercise",
+                      "minutes"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "mobility": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "minutes": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "items": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "exercise": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]+$"
+                },
+                "alternatives": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_]+$"
+                  }
+                },
+                "sets": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                },
+                "warmup_sets": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pct": {
+                        "type": "number",
+                        "minimum": 10,
+                        "maximum": 100
+                      },
+                      "kg": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "reps": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "string",
+                            "const": "same"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "reps"
+                    ]
+                  }
+                },
+                "rep_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "rep_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "unit": {
+                  "default": "reps",
+                  "type": "string",
+                  "enum": [
+                    "reps",
+                    "seconds"
+                  ]
+                },
+                "rest_sec_min": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "rest_sec_max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "target_kg": {
+                  "default": null,
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "target_kg_per_set": {
+                  "default": null,
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "coach_note": {
+                  "default": "",
+                  "type": "string"
+                },
+                "note": {
+                  "default": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "exercise",
+                "sets",
+                "rep_min",
+                "rep_max",
+                "rest_sec_min",
+                "rest_sec_max"
+              ]
+            }
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "warmup",
+          "items"
+        ]
+      }
+    },
+    "exercise_upserts": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "name_vi": {
+            "type": "string",
+            "minLength": 2
+          },
+          "aliases": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "primary_muscle": {
+            "type": "string",
+            "enum": [
+              "chest",
+              "front_delt",
+              "side_delt",
+              "rear_delt",
+              "lats",
+              "upper_back",
+              "traps",
+              "biceps",
+              "triceps",
+              "forearms",
+              "quads",
+              "hamstrings",
+              "glutes",
+              "calves",
+              "abs",
+              "obliques",
+              "lower_back",
+              "cardio"
+            ]
+          },
+          "secondary_muscles": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "chest",
+                "front_delt",
+                "side_delt",
+                "rear_delt",
+                "lats",
+                "upper_back",
+                "traps",
+                "biceps",
+                "triceps",
+                "forearms",
+                "quads",
+                "hamstrings",
+                "glutes",
+                "calves",
+                "abs",
+                "obliques",
+                "lower_back",
+                "cardio"
+              ]
+            }
+          },
+          "movement_pattern": {
+            "type": "string",
+            "enum": [
+              "horizontal_push",
+              "vertical_push",
+              "horizontal_pull",
+              "vertical_pull",
+              "squat",
+              "hinge",
+              "isolation_push",
+              "isolation_pull",
+              "isolation_legs",
+              "core",
+              "cardio"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "compound",
+              "isolation",
+              "core",
+              "cardio"
+            ]
+          },
+          "equipment": {
+            "type": "string",
+            "enum": [
+              "machine",
+              "cable",
+              "dumbbell",
+              "barbell",
+              "bodyweight",
+              "smith",
+              "cardio_machine",
+              "none"
+            ]
+          },
+          "load_step_kg": {
+            "default": 2.5,
+            "type": "number",
+            "minimum": 0
+          },
+          "is_time_based": {
+            "default": false,
+            "type": "boolean"
+          },
+          "cues": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "common_mistakes": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "illustration_svg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reference_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "available_at_gym": {
+            "type": "boolean"
+          },
+          "canonical_slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z0-9_]+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "name_vi",
+          "primary_muscle",
+          "movement_pattern",
+          "kind",
+          "equipment"
+        ]
+      }
+    },
+    "nutrition": {
+      "type": "object",
+      "properties": {
+        "calories_kcal": {
+          "type": "integer",
+          "minimum": 1700,
+          "maximum": 9007199254740991
+        },
+        "protein_g": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "carb_g": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "fat_g": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "calories_kcal",
+        "protein_g",
+        "carb_g",
+        "fat_g"
+      ]
+    },
+    "hydration": {
+      "type": "object",
+      "properties": {
+        "water_ml_min": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "water_ml_max": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "water_ml_min",
+        "water_ml_max"
+      ]
+    },
+    "activity": {
+      "type": "object",
+      "properties": {
+        "steps_min": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "steps_max": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "rest_day_steps_min": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "rest_day_steps_max": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "steps_min",
+        "steps_max",
+        "rest_day_steps_min",
+        "rest_day_steps_max"
+      ]
+    },
+    "sleep": {
+      "type": "object",
+      "properties": {
+        "hours_min": {
+          "type": "number"
+        },
+        "hours_max": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "hours_min",
+        "hours_max"
+      ]
+    },
+    "weight_loss": {
+      "type": "object",
+      "properties": {
+        "kg_per_week_min": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "kg_per_week_max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.7
+        }
+      },
+      "required": [
+        "kg_per_week_min",
+        "kg_per_week_max"
+      ]
+    },
+    "badminton": {
+      "type": "object",
+      "properties": {
+        "kcal_per_30min": {
+          "type": "object",
+          "properties": {
+            "light": {
+              "type": "number"
+            },
+            "moderate": {
+              "type": "number"
+            },
+            "hard": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "light",
+            "moderate",
+            "hard"
+          ]
+        }
+      },
+      "required": [
+        "kcal_per_30min"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "schedule",
+    "templates",
+    "nutrition",
+    "hydration",
+    "activity",
+    "sleep",
+    "weight_loss",
+    "badminton"
+  ]
+}
