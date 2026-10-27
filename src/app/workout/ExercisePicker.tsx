@@ -7,7 +7,8 @@ export type PickResult = { exercise: ExerciseRow } | { newName: string };
 
 /**
  * Exercise name input + suggestions from the library (accent-insensitive, by name/alias). Typing a new name →
- * result { newName } to create a provisional exercise.
+ * result { newName } to create a provisional exercise. `exclude` (the exercise being swapped out) is never
+ * suggested, and typing its name/alias does not create a provisional duplicate of it.
  */
 export function ExercisePicker({
   library,
@@ -15,15 +16,19 @@ export function ExercisePicker({
   value,
   onChange,
   label = 'Bài thay thế',
+  exclude,
 }: {
   library: ExerciseRow[];
   quick: ExerciseRow[];
   value: PickResult | null;
   onChange: (v: PickResult | null) => void;
   label?: string;
+  exclude?: ExerciseRow;
 }) {
   const [text, setText] = useState(value && 'exercise' in value ? value.exercise.name_vi : value?.newName ?? '');
-  const results = useMemo(() => searchExercises(text, library, 6), [text, library]);
+  const results = useMemo(() => searchExercises(text, library, 7).filter((e) => e.id !== exclude?.id).slice(0, 6), [text, library, exclude]);
+  const exact = exactMatch(text, library);
+  const isExcluded = !!exact && exact.id === exclude?.id;
   const selectedId = value && 'exercise' in value ? value.exercise.id : null;
 
   const pick = (e: ExerciseRow) => {
@@ -43,8 +48,9 @@ export function ExercisePicker({
         onChange={(e) => {
           const t = e.target.value;
           setText(t);
-          const exact = exactMatch(t, library);
-          onChange(t.trim() ? (exact ? { exercise: exact } : { newName: t.trim() }) : null);
+          const match = exactMatch(t, library);
+          if (!t.trim() || (match && match.id === exclude?.id)) onChange(null);
+          else onChange(match ? { exercise: match } : { newName: t.trim() });
         }}
       />
       {quick.length > 0 && (
@@ -73,7 +79,12 @@ export function ExercisePicker({
               </span>
             </button>
           ))}
-          {!exactMatch(text, library) && (
+          {isExcluded && (
+            <div className="px-3 py-2 text-sm text-warn">
+              “{text.trim()}” chính là bài đang đổi ({exclude?.name_vi}) — gõ tên máy / bài khác anh sẽ tập
+            </div>
+          )}
+          {!exact && (
             <div className="px-3 py-2 text-sm text-muted">
               Dùng tên mới “<b className="text-fg">{text.trim()}</b>” — tạo bài tạm, Claude sẽ bổ sung hình + kỹ thuật ở lần review
             </div>
