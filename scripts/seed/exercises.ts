@@ -1,7 +1,7 @@
 import type { ExerciseDef } from '../../src/engine/plan-schema';
 
 /**
- * Seed exercise library (~44 exercises). SVG illustrations are generated from scripts/svg/poses.ts.
+ * Seed exercise library (~53 exercises). SVG illustrations are generated from scripts/svg/poses.ts.
  * `aliases` = names the user commonly uses (for the substitute input + free-text quick log).
  */
 type Def = Omit<ExerciseDef, 'illustration_svg'>;
@@ -96,6 +96,25 @@ export const EXERCISES: Def[] = [
     cues: ['Khuỷu sát hông, cố định', 'Đẩy xuống duỗi thẳng tay', 'Về tới ngang ngực'],
     common_mistakes: ['Khuỷu chạy ra trước', 'Đổ người dồn trọng lượng'],
   }),
+  m({
+    slug: 'machine_lateral_raise', name_vi: 'Máy nâng vai ngang (ngồi)', aliases: ['seated lateral raise', 'seated raise', 'máy nâng vai ngang', 'matrix lateral raise', 'lateral raise machine'],
+    primary_muscle: 'side_delt', secondary_muscles: ['rear_delt', 'traps'], movement_pattern: 'isolation_push', kind: 'isolation', equipment: 'machine', load_step_kg: 4.5,
+    reference_url: 'https://johnsonfitness.co.nz/products/matrix-aura-lateral-raise',
+    cues: ['Chỉnh ghế để vai thẳng trục xoay của máy', 'Đệm tựa mặt ngoài khuỷu, nâng bằng khuỷu chứ không bằng tay', 'Nâng tới ngang vai, hạ chậm'],
+    common_mistakes: ['Nhún vai lên tai', 'Hạ thả rơi tạ'],
+  }),
+  m({
+    slug: 'machine_seated_dip', name_vi: 'Máy dip ngồi (tay sau)', aliases: ['seated dip', 'triceps press', 'máy dip ngồi', 'dip máy'],
+    primary_muscle: 'triceps', secondary_muscles: ['chest', 'front_delt'], movement_pattern: 'isolation_push', kind: 'compound', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Ngồi lưng áp đệm, tay cầm hai bên hông', 'Đẩy xuống tới khi duỗi gần thẳng tay', 'Khuỷu sát thân, về chậm tới ngang ngực'],
+    common_mistakes: ['Nhổm người khỏi ghế', 'Khuỷu bè rộng ra ngoài'],
+  }),
+  m({
+    slug: 'assisted_dip', name_vi: 'Máy dip có trợ lực', aliases: ['assisted dip', 'dip trợ lực', 'máy dip trợ lực', 'assisted push up', 'assisted pushup', 'đẩy người trợ lực'],
+    primary_muscle: 'triceps', secondary_muscles: ['chest', 'front_delt'], movement_pattern: 'vertical_push', kind: 'compound', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Kg càng cao càng nhẹ (trợ lực)', 'Quỳ lên đệm, hạ tới khi vai ngang khuỷu', 'Đẩy lên duỗi tay, không khoá khuỷu'],
+    common_mistakes: ['Hạ quá sâu làm đau vai', 'Thả người rơi nhanh khi xuống'],
+  }),
 
   // ───────── Pull
   m({
@@ -111,16 +130,22 @@ export const EXERCISES: Def[] = [
     common_mistakes: ['Đung đưa lấy đà'],
   }),
   m({
-    slug: 'assisted_pull_up', name_vi: 'Máy kéo xà có trợ lực', aliases: ['assisted pull up', 'kéo xà trợ lực'],
+    slug: 'assisted_pull_up', name_vi: 'Máy kéo xà có trợ lực', aliases: ['assisted pull up', 'kéo xà trợ lực', 'assisted chin', 'assisted chin up', 'chin up trợ lực', 'máy kéo xà trợ lực'],
     primary_muscle: 'lats', secondary_muscles: ['biceps'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'machine',
     cues: ['Kg càng cao càng nhẹ (trợ lực)', 'Quỳ lên đệm, kéo ngực về xà'],
     common_mistakes: ['Thả người rơi nhanh khi xuống'],
   }),
   m({
-    slug: 'chest_supported_machine_row', name_vi: 'Máy chèo tựa ngực', aliases: ['chest supported row', 'máy chèo', 'row máy', 'chèo tựa ngực', 't-bar máy'],
+    slug: 'chest_supported_machine_row', name_vi: 'Máy chèo tựa ngực', aliases: ['chest supported row', 'máy chèo', 'row máy', 'chèo tựa ngực', 't-bar máy', 'máy chèo ngồi', 'seated row machine'],
     primary_muscle: 'upper_back', secondary_muscles: ['lats', 'biceps', 'rear_delt'], movement_pattern: 'horizontal_pull', kind: 'compound', equipment: 'machine',
     cues: ['Ngực áp sát đệm suốt hiệp', 'Kéo khuỷu ra sau, siết bả vai', 'Duỗi tay hết khi về'],
     common_mistakes: ['Nhấc ngực khỏi đệm để giật tạ'],
+  }),
+  m({
+    slug: 'machine_lat_pulldown', name_vi: 'Máy kéo xô', aliases: ['máy kéo xô', 'lat pulldown machine', 'machine pulldown'],
+    primary_muscle: 'lats', secondary_muscles: ['biceps', 'upper_back'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Chỉnh đệm đùi kẹp chặt', 'Kéo tay cầm xuống ngang ngực trên, khuỷu xuống và ra sau', 'Về chậm tới khi duỗi hết tay'],
+    common_mistakes: ['Ngả người ra sau để kéo', 'Thả tạ bật lên'],
   }),
   m({
     slug: 'barbell_row', name_vi: 'Chèo tạ đòn', aliases: ['barbell row', 'chèo đòn'],
@@ -135,7 +160,7 @@ export const EXERCISES: Def[] = [
     common_mistakes: ['Xoay người để kéo'],
   }),
   m({
-    slug: 'seated_cable_row', name_vi: 'Kéo cáp ngồi', aliases: ['seated cable row', 'kéo cáp ngồi', 'chèo cáp'],
+    slug: 'seated_cable_row', name_vi: 'Kéo cáp ngồi', aliases: ['seated cable row', 'kéo cáp ngồi', 'chèo cáp', 'seated row', 'seatle row'],
     primary_muscle: 'upper_back', secondary_muscles: ['lats', 'biceps'], movement_pattern: 'horizontal_pull', kind: 'compound', equipment: 'cable', load_step_kg: 5,
     cues: ['Ngồi thẳng, gối hơi cong', 'Kéo tay cầm về bụng, siết bả vai', 'Không ngả người ra sau'],
     common_mistakes: ['Đung đưa thân người'],
@@ -232,6 +257,24 @@ export const EXERCISES: Def[] = [
     cues: ['Gối thẳng trục máy', 'Cuốn hết tầm, siết 1 giây', 'Về chậm'], common_mistakes: ['Nhấc hông lên'],
   }),
   m({
+    slug: 'leg_extension', name_vi: 'Máy đá đùi trước', aliases: ['leg extension', 'đá đùi', 'đá đùi trước', 'duỗi gối'],
+    primary_muscle: 'quads', movement_pattern: 'isolation_legs', kind: 'isolation', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Gối thẳng trục xoay của máy, đệm ở trên cổ chân', 'Đá lên tới gần thẳng gối, siết đùi 1 giây', 'Hạ chậm, không thả rơi'],
+    common_mistakes: ['Nhấc mông khỏi ghế', 'Vung chân lấy đà'],
+  }),
+  m({
+    slug: 'hip_abduction_machine', name_vi: 'Máy dạng hông (mông bên)', aliases: ['hip abduction', 'abductor', 'dạng hông', 'mở đùi', 'máy dạng hông'],
+    primary_muscle: 'glutes', movement_pattern: 'isolation_legs', kind: 'isolation', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Đệm ở mặt ngoài gối', 'Mở rộng hết tầm, giữ 1 giây', 'Khép về chậm'],
+    common_mistakes: ['Đẩy người khỏi lưng ghế', 'Bật nhanh không kiểm soát'],
+  }),
+  m({
+    slug: 'hip_adduction_machine', name_vi: 'Máy khép đùi (đùi trong)', aliases: ['hip adduction', 'adductor', 'khép đùi', 'đùi trong', 'máy khép đùi'],
+    primary_muscle: 'adductors', movement_pattern: 'isolation_legs', kind: 'isolation', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Đệm ở mặt trong gối', 'Bắt đầu ở độ mở thoải mái, không kéo căng quá', 'Khép hết tầm, mở ra chậm'],
+    common_mistakes: ['Mở quá rộng khi bắt đầu', 'Bật nhanh không kiểm soát'],
+  }),
+  m({
     slug: 'back_extension_45', name_vi: 'Máy duỗi lưng 45°', aliases: ['back extension', 'duỗi lưng', 'hyperextension'],
     primary_muscle: 'lower_back', secondary_muscles: ['glutes', 'hamstrings'], movement_pattern: 'hinge', kind: 'isolation', equipment: 'machine', load_step_kg: 5,
     cues: ['Đệm ngang xương hông', 'Gập từ hông, lưng thẳng', 'Lên tới thân thẳng hàng chân, không ưỡn quá'],
@@ -268,6 +311,18 @@ export const EXERCISES: Def[] = [
     slug: 'dead_bug', name_vi: 'Dead bug', aliases: ['dead bug'],
     primary_muscle: 'abs', movement_pattern: 'core', kind: 'core', equipment: 'bodyweight', load_step_kg: 0,
     cues: ['Lưng dưới áp sàn', 'Duỗi tay chân đối nhau chậm'], common_mistakes: ['Lưng dưới bật khỏi sàn'],
+  }),
+  m({
+    slug: 'ab_crunch_machine', name_vi: 'Máy gập bụng', aliases: ['ab crunch', 'abdominal crunch', 'gập bụng', 'máy bụng'],
+    primary_muscle: 'abs', movement_pattern: 'core', kind: 'core', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Cuộn người từ ngực xuống, không kéo bằng tay', 'Siết bụng 1 giây ở cuối', 'Về chậm, giữ căng bụng'],
+    common_mistakes: ['Dùng tay và hông kéo tạ', 'Bật nhanh lên'],
+  }),
+  m({
+    slug: 'rotary_torso_machine', name_vi: 'Máy xoay thân', aliases: ['rotary torso', 'xoay thân', 'xoay eo', 'máy xoay eo'],
+    primary_muscle: 'obliques', secondary_muscles: ['abs'], movement_pattern: 'core', kind: 'core', equipment: 'machine', load_step_kg: 4.5,
+    cues: ['Hông và đùi cố định, chỉ xoay phần thân trên', 'Xoay chậm, có kiểm soát mỗi bên', 'Thở ra khi xoay'],
+    common_mistakes: ['Xoay bằng quán tính', 'Tạ quá nặng làm xoắn lưng dưới'],
   }),
   m({
     slug: 'side_plank', name_vi: 'Plank nghiêng', aliases: ['side plank', 'plank nghiêng'],

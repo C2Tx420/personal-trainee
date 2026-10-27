@@ -16,7 +16,7 @@ const slugSchema = z.string().regex(/^[a-z0-9_]+$/, 'slug chỉ gồm a-z, 0-9, 
 const MUSCLES = [
   'chest', 'front_delt', 'side_delt', 'rear_delt', 'lats', 'upper_back', 'traps',
   'biceps', 'triceps', 'forearms', 'quads', 'hamstrings', 'glutes', 'calves',
-  'abs', 'obliques', 'lower_back', 'cardio',
+  'abs', 'obliques', 'lower_back', 'adductors', 'cardio',
 ] as const;
 const MOVEMENT_PATTERNS = [
   'horizontal_push', 'vertical_push', 'horizontal_pull', 'vertical_pull', 'squat', 'hinge',

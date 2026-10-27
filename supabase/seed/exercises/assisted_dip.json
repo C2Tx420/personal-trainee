@@ -1,0 +1,31 @@
+{
+  "aliases": [
+    "assisted dip",
+    "dip trợ lực",
+    "máy dip trợ lực",
+    "assisted push up",
+    "assisted pushup",
+    "đẩy người trợ lực"
+  ],
+  "secondary_muscles": [
+    "chest",
+    "front_delt"
+  ],
+  "load_step_kg": 4.5,
+  "is_time_based": false,
+  "cues": [
+    "Kg càng cao càng nhẹ (trợ lực)",
+    "Quỳ lên đệm, hạ tới khi vai ngang khuỷu",
+    "Đẩy lên duỗi tay, không khoá khuỷu"
+  ],
+  "common_mistakes": [
+    "Hạ quá sâu làm đau vai",
+    "Thả người rơi nhanh khi xuống"
+  ],
+  "slug": "assisted_dip",
+  "name_vi": "Máy dip có trợ lực",
+  "primary_muscle": "triceps",
+  "movement_pattern": "vertical_push",
+  "kind": "compound",
+  "equipment": "machine"
+}
