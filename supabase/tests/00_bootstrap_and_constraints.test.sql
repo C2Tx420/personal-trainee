@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(22);
 
 -- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
@@ -13,7 +13,9 @@ select lives_ok($$ select public.bootstrap_user() $$, 'bootstrap_user chạy đ�
 select lives_ok($$ select public.bootstrap_user() $$, 'bootstrap_user gọi lại không lỗi (idempotent)');
 
 select is((select count(*)::int from public.goals), 3, '3 mốc goal');
-select ok((select count(*) from public.exercises) >= 38, '≥ 38 bài tập seed');
+select ok((select count(*) from public.exercises) >= 44, '≥ 44 bài tập seed');
+select is((select available_at_gym from public.exercises where slug = 'hack_squat'), false, 'hack squat: phòng tập không có máy');
+select is((select archived from public.exercises where slug = 'plank'), true, 'plank đã lưu trữ');
 select is((select count(*)::int from public.exercises where illustration_svg is null), 0, 'mọi bài đều có SVG');
 select is((select status from public.plan_versions where version_no = 1), 'active', 'plan v1 active');
 select is((select count(*)::int from public.session_templates), 3, '3 template push/pull/legs');
@@ -23,6 +25,9 @@ select is(
    where set_type = 'working' and completed and weight_kg is not null),
   1452, 'khối lượng buổi seed = 1.452 kg (không tính làm nóng, kg trống)');
 select is((select count(*)::int from public.workout_sets where set_type = 'warmup'), 2, '2 hiệp làm nóng máy đẩy ngực');
+select lives_ok(
+  $$ insert into public.workout_sessions (session_date, kind, status, note) values ('2026-10-29', 'badminton', 'skipped', 'Bận việc') $$,
+  'nghỉ buổi: lưu được trạng thái skipped kèm lý do');
 
 -- Calo ≥ 1700
 select throws_ok(
