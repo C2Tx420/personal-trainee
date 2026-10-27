@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
-import { useAuth } from '@/auth/AuthGate';
 import { useAppMeta, useInProgress } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
 import { MIN_SCHEMA_VERSION } from '@/lib/version';
 import { Banner, cx } from '@/ui/components';
-import { IconBook, IconDumbbell, IconLock, IconMore, IconPulse, IconToday } from '@/ui/icons';
+import { IconBook, IconDumbbell, IconMore, IconPulse, IconToday } from '@/ui/icons';
 import { UpdatePrompt } from './UpdatePrompt';
 
 const TABS = [
@@ -18,7 +17,6 @@ const TABS = [
 
 export function AppShell() {
   const online = useOnline();
-  const { lock } = useAuth();
   const meta = useAppMeta();
   const inProgress = useInProgress();
   const loc = useLocation();
@@ -37,13 +35,6 @@ export function AppShell() {
           Mất kết nối — không lưu được cho tới khi có mạng
         </div>
       )}
-      <button
-        aria-label="Khoá app"
-        onClick={lock}
-        className="glass-subtle fixed top-[max(env(safe-area-inset-top),0px)] right-3 z-30 mt-2.5 grid size-9 place-items-center rounded-full text-muted transition"
-      >
-        <IconLock className="size-[18px]" />
-      </button>
       <div className="mx-auto max-w-xl px-4 pt-2 empty:hidden">
         {dbOutdated && <Banner tone="bad">Database cần chạy migration mới ({meta.data?.schema_version} &lt; {MIN_SCHEMA_VERSION})</Banner>}
         {inProgress.data && !loc.pathname.startsWith('/workout') && (

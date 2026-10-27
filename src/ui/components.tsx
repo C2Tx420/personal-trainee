@@ -27,7 +27,7 @@ export function Page({
   const nav = useNavigate();
   return (
     <div className={cx('mx-auto w-full px-4 pb-32', wide ? 'max-w-3xl' : 'max-w-xl')}>
-      <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-14 items-center gap-2 pr-14 pl-4')}>
+      <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-14 items-center gap-2 px-4')}>
         {back && (
           <button
             aria-label="Quay lại"
