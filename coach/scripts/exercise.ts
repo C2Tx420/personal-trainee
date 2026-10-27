@@ -3,11 +3,11 @@ import { connect } from './db';
 
 /**
  * In đầy đủ một bài (kể cả SVG) + lịch sử từng hiệp 8 tuần — dùng khi sửa bài.
- *   npm run exercise -- <slug>
+ *   pnpm run exercise <slug>
  */
 const slug = process.argv[2];
 if (!slug) {
-  console.error('Cần slug, vd. npm run exercise -- lat_pulldown');
+  console.error('Cần slug, vd. pnpm run exercise lat_pulldown');
   process.exit(1);
 }
 const sql = connect();

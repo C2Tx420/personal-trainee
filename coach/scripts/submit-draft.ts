@@ -7,7 +7,7 @@ import { arg, connect } from './db';
  * Gửi draft lộ trình cho anh duyệt (§7.5). Chỉ gọi được hàm coach_submit_draft —
  * draft luôn là status=draft, created_by=claude_code, không tự kích hoạt được.
  *
- *   npm run submit-draft -- --file draft.json --note "Lý do + số liệu…" [--based-on active|<uuid>]
+ *   pnpm run submit-draft --file draft.json --note "Lý do + số liệu…" [--based-on active|<uuid>]
  */
 const file = arg('file');
 const note = arg('note');

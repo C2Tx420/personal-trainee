@@ -14,7 +14,7 @@ import { arg, connect } from './db';
  * Báo cáo tuần `coach-weekly/1` cho Claude Code (§7.4). Chỉ đọc qua role
  * coach_readonly. Mọi con số tính bằng chính src/engine của app.
  *
- *   npm run report [-- --week 2026-10-26] > reports/2026-11-02.json
+ *   pnpm run report [--week 2026-10-26] > reports/2026-11-02.json
  */
 const sql = connect();
 const today = todayVN();

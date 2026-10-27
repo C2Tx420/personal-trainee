@@ -287,7 +287,7 @@ test('09 ảnh tiến độ: camera, xoá EXIF, nén 1080px, so sánh', async ()
 });
 
 test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong app', async () => {
-  const report = JSON.parse(execSync('npx tsx scripts/weekly-report.ts --week 2026-10-26', { cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8' }));
+  const report = JSON.parse(execSync('pnpm exec tsx scripts/weekly-report.ts --week 2026-10-26', { cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8' }));
   expect(report.schema).toBe('coach-weekly/1');
   expect(report.training.done_sessions).toBeGreaterThanOrEqual(2);
   expect(report.training.kg_changes.filter((k: { reason: string }) => k.reason === 'too_heavy')).toHaveLength(3);
@@ -323,7 +323,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   const draftFile = path.join(ROOT, 'test-results', 'coach-draft.json');
   fs.writeFileSync(draftFile, JSON.stringify(content));
   const out = JSON.parse(
-    execSync(`npx tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32,5kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850"`, {
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32,5kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850"`, {
       cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8',
     }),
   );
@@ -332,7 +332,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
     noteFile,
     '**Tiến độ cân**: 81,2 kg (−0,5 so với 26/10) · Noel còn 8,3 tuần, cần −0,51 kg/tuần → đúng hướng.\n**Tập luyện**: 2/4 buổi tới T3, khởi động đủ. Kéo xô hụt ở 35kg (3 hiệp "nặng quá").\n**Đề xuất**: draft — kéo xô 32,5kg, ép ngực cáp thay pec deck, hoàn thiện bài máy chèo Impulse.',
   );
-  execSync(`npx tsx scripts/add-review-note.ts --week 2026-10-26 --file "${noteFile}" --plan ${out.draft_id}`, { cwd: path.join(ROOT, 'coach'), env: COACH_ENV });
+  execSync(`pnpm exec tsx scripts/add-review-note.ts --week 2026-10-26 --file "${noteFile}" --plan ${out.draft_id}`, { cwd: path.join(ROOT, 'coach'), env: COACH_ENV });
 
   // Role coach không tự kích hoạt được
   expect(() => execSync(`psql "postgresql://coach_readonly:coach-local-only@127.0.0.1:54322/postgres" -c "update plan_versions set status='active'"`, { stdio: 'pipe' })).toThrow();

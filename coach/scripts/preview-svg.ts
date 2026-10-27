@@ -6,7 +6,7 @@ import { validateSvg } from '../../src/engine/svg-validate';
 
 /**
  * Validate SVG theo coach/svg-style.md rồi mở xem trước (nền sáng + tối).
- *   npm run preview-svg -- path/to/cable_fly.svg [--no-open]
+ *   pnpm run preview-svg path/to/cable_fly.svg [--no-open]
  */
 const file = process.argv[2];
 if (!file) {
