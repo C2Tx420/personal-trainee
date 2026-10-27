@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "lat pulldown",
+    "kéo xô",
+    "kéo xà máy",
+    "pulldown"
+  ],
+  "secondary_muscles": [
+    "biceps",
+    "upper_back"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Đùi kẹp chặt dưới đệm",
+    "Kéo thanh về ngực trên, ngực hướng lên",
+    "Khuỷu kéo xuống và ra sau"
+  ],
+  "common_mistakes": [
+    "Ngả người quá nhiều",
+    "Kéo ra sau gáy"
+  ],
+  "slug": "lat_pulldown",
+  "name_vi": "Máy kéo xô",
+  "primary_muscle": "lats",
+  "movement_pattern": "vertical_pull",
+  "kind": "compound",
+  "equipment": "machine"
+}

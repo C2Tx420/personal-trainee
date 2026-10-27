@@ -1,0 +1,30 @@
+{
+  "aliases": [
+    "chest supported row",
+    "máy chèo",
+    "row máy",
+    "chèo tựa ngực",
+    "t-bar máy"
+  ],
+  "secondary_muscles": [
+    "lats",
+    "biceps",
+    "rear_delt"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Ngực áp sát đệm suốt hiệp",
+    "Kéo khuỷu ra sau, siết bả vai",
+    "Duỗi tay hết khi về"
+  ],
+  "common_mistakes": [
+    "Nhấc ngực khỏi đệm để giật tạ"
+  ],
+  "slug": "chest_supported_machine_row",
+  "name_vi": "Máy chèo tựa ngực",
+  "primary_muscle": "upper_back",
+  "movement_pattern": "horizontal_pull",
+  "kind": "compound",
+  "equipment": "machine"
+}

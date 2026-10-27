@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "back squat",
+    "squat"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "lower_back"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Đòn trên vai sau",
+    "Xuống tới đùi song song"
+  ],
+  "common_mistakes": [
+    "Cong lưng dưới ở đáy"
+  ],
+  "slug": "back_squat",
+  "name_vi": "Squat tạ đòn",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "barbell"
+}

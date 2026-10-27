@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "tay trước",
+    "curl máy",
+    "biceps máy"
+  ],
+  "secondary_muscles": [
+    "forearms"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Nách tì sát đệm",
+    "Cuốn lên hết, siết 1 giây",
+    "Về chậm, duỗi gần hết"
+  ],
+  "common_mistakes": [
+    "Nhấc người khỏi ghế"
+  ],
+  "slug": "machine_biceps_curl",
+  "name_vi": "Máy cuốn tay trước",
+  "primary_muscle": "biceps",
+  "movement_pattern": "isolation_pull",
+  "kind": "isolation",
+  "equipment": "machine"
+}

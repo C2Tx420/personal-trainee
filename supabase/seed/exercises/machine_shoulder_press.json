@@ -1,0 +1,28 @@
+{
+  "aliases": [
+    "đẩy vai",
+    "shoulder press",
+    "đẩy vai máy"
+  ],
+  "secondary_muscles": [
+    "side_delt",
+    "triceps"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Lưng áp sát đệm",
+    "Tay cầm ngang tai khi bắt đầu",
+    "Đẩy thẳng lên, không khoá khuỷu"
+  ],
+  "common_mistakes": [
+    "Ưỡn lưng khỏi đệm",
+    "Hạ quá thấp dưới cằm"
+  ],
+  "slug": "machine_shoulder_press",
+  "name_vi": "Máy đẩy vai",
+  "primary_muscle": "front_delt",
+  "movement_pattern": "vertical_push",
+  "kind": "compound",
+  "equipment": "machine"
+}

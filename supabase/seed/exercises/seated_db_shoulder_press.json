@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "đẩy vai tạ đơn",
+    "dumbbell shoulder press"
+  ],
+  "secondary_muscles": [
+    "side_delt",
+    "triceps"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Ghế dựng gần thẳng",
+    "Hạ tạ ngang tai",
+    "Siết bụng, không ưỡn lưng"
+  ],
+  "common_mistakes": [
+    "Đập hai tạ vào nhau trên đỉnh"
+  ],
+  "slug": "seated_db_shoulder_press",
+  "name_vi": "Đẩy vai tạ đơn ngồi",
+  "primary_muscle": "front_delt",
+  "movement_pattern": "vertical_push",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

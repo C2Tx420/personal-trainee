@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "dumbbell curl",
+    "cuốn tạ đơn",
+    "curl"
+  ],
+  "secondary_muscles": [
+    "forearms"
+  ],
+  "load_step_kg": 1,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu cố định",
+    "Xoay cổ tay ngửa lên khi cuốn"
+  ],
+  "common_mistakes": [
+    "Đung đưa lấy đà"
+  ],
+  "slug": "db_curl",
+  "name_vi": "Curl tạ đơn",
+  "primary_muscle": "biceps",
+  "movement_pattern": "isolation_pull",
+  "kind": "isolation",
+  "equipment": "dumbbell"
+}

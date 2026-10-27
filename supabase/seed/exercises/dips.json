@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "dips",
+    "xà kép"
+  ],
+  "secondary_muscles": [
+    "triceps",
+    "front_delt"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Người hơi đổ trước để vào ngực",
+    "Hạ tới khi vai ngang khuỷu"
+  ],
+  "common_mistakes": [
+    "Hạ quá sâu gây đau vai"
+  ],
+  "slug": "dips",
+  "name_vi": "Dips xà kép",
+  "primary_muscle": "chest",
+  "movement_pattern": "horizontal_push",
+  "kind": "compound",
+  "equipment": "bodyweight"
+}

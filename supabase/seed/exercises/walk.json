@@ -1,0 +1,19 @@
+{
+  "aliases": [
+    "đi bộ",
+    "walk"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 0,
+  "is_time_based": true,
+  "cues": [
+    "30–40 phút, nhịp vừa phải"
+  ],
+  "common_mistakes": [],
+  "slug": "walk",
+  "name_vi": "Đi bộ ngoài trời",
+  "primary_muscle": "cardio",
+  "movement_pattern": "cardio",
+  "kind": "cardio",
+  "equipment": "none"
+}

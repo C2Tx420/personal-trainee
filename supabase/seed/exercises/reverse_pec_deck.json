@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "reverse pec deck",
+    "bay ngược",
+    "rear delt fly"
+  ],
+  "secondary_muscles": [
+    "upper_back"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Ngồi quay mặt vào máy",
+    "Mở tay ra sau ngang vai"
+  ],
+  "common_mistakes": [
+    "Nhún vai"
+  ],
+  "slug": "reverse_pec_deck",
+  "name_vi": "Máy bay ngược (vai sau)",
+  "primary_muscle": "rear_delt",
+  "movement_pattern": "isolation_pull",
+  "kind": "isolation",
+  "equipment": "machine"
+}

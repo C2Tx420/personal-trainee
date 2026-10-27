@@ -1,0 +1,21 @@
+{
+  "aliases": [
+    "dead bug"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 0,
+  "is_time_based": false,
+  "cues": [
+    "Lưng dưới áp sàn",
+    "Duỗi tay chân đối nhau chậm"
+  ],
+  "common_mistakes": [
+    "Lưng dưới bật khỏi sàn"
+  ],
+  "slug": "dead_bug",
+  "name_vi": "Dead bug",
+  "primary_muscle": "abs",
+  "movement_pattern": "core",
+  "kind": "core",
+  "equipment": "bodyweight"
+}

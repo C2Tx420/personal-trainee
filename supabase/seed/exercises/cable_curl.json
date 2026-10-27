@@ -1,0 +1,21 @@
+{
+  "aliases": [
+    "cable curl",
+    "cuốn cáp"
+  ],
+  "secondary_muscles": [],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Khuỷu cố định sát hông"
+  ],
+  "common_mistakes": [
+    "Vung người"
+  ],
+  "slug": "cable_curl",
+  "name_vi": "Curl cáp",
+  "primary_muscle": "biceps",
+  "movement_pattern": "isolation_pull",
+  "kind": "isolation",
+  "equipment": "cable"
+}

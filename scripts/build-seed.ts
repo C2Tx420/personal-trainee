@@ -1,0 +1,109 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { DEFAULT_REMINDERS } from '../src/engine/reminders';
+import { exerciseDefSchema, parsePlanContent, type PlanItem, validatePlanRules } from '../src/engine/plan-schema';
+import { validateSvg } from '../src/engine/svg-validate';
+import { PLAN_V1 } from './seed/plan-v1';
+
+/**
+ * Đọc supabase/seed/** → validate → sinh migration `…0600_seed_data.sql` chứa
+ * hàm `_seed_payload()` (jsonb) mà `bootstrap_user()` dùng ở lần đăng nhập đầu.
+ * Chạy lại mỗi khi sửa thư viện bài tập / lộ trình v1 / lịch sử seed.
+ */
+const ROOT = path.resolve(import.meta.dirname, '..');
+const SEED = path.join(ROOT, 'supabase/seed');
+const OUT = path.join(ROOT, 'supabase/migrations/20261027000600_seed_data.sql');
+const errors: string[] = [];
+
+// ── bài tập: <slug>.json + <slug>.svg
+const exDir = path.join(SEED, 'exercises');
+const exercises = fs
+  .readdirSync(exDir)
+  .filter((f) => f.endsWith('.json'))
+  .sort()
+  .map((f) => {
+    const slug = f.replace(/\.json$/, '');
+    const def = exerciseDefSchema.parse(JSON.parse(fs.readFileSync(path.join(exDir, f), 'utf8')));
+    const svgPath = path.join(exDir, `${slug}.svg`);
+    if (!fs.existsSync(svgPath)) errors.push(`${slug}: thiếu file SVG`);
+    const svg = fs.existsSync(svgPath) ? fs.readFileSync(svgPath, 'utf8').trim() : null;
+    if (svg) for (const e of validateSvg(svg)) errors.push(`${slug}.svg: ${e}`);
+    return { ...def, illustration_svg: svg };
+  });
+const slugs = new Set(exercises.map((e) => e.slug));
+
+// ── lộ trình v1
+const plan = parsePlanContent(PLAN_V1);
+for (const i of validatePlanRules(plan, slugs)) if (i.level === 'error') errors.push(`plan v1: ${i.message}`);
+
+// ── lịch sử ghi bù
+type HistSet = { set_type: 'warmup' | 'working'; set_index: number; reps: number | null; weight_kg: number | null };
+type HistItem = { exercise: string; template_item_position: number | null; note: string | null; sets: HistSet[]; target?: PlanItem };
+const histDir = path.join(SEED, 'history');
+const history = fs
+  .readdirSync(histDir)
+  .filter((f) => f.endsWith('.json'))
+  .sort()
+  .map((f) => {
+    const h = JSON.parse(fs.readFileSync(path.join(histDir, f), 'utf8')) as { kind: string; items: HistItem[] };
+    const tmpl = plan.templates.find((t) => t.key === h.kind);
+    for (const it of h.items) {
+      if (!slugs.has(it.exercise)) errors.push(`${f}: bài "${it.exercise}" không có trong thư viện`);
+      const fromPlan = it.template_item_position !== null ? tmpl?.items[it.template_item_position] : undefined;
+      const working = it.sets.filter((s) => s.set_type === 'working');
+      const reps = working.map((s) => s.reps ?? 0);
+      it.target = {
+        ...(fromPlan ?? {
+          alternatives: [], warmup_sets: [], unit: 'reps', rest_sec_min: 60, rest_sec_max: 60,
+          target_kg: null, target_kg_per_set: null, coach_note: '', note: '',
+          rep_min: Math.min(...reps), rep_max: Math.max(...reps),
+        }),
+        exercise: it.exercise,
+        sets: working.length,
+      } as PlanItem;
+    }
+    return h;
+  });
+
+if (errors.length) {
+  console.error('Seed không hợp lệ:\n' + errors.join('\n'));
+  process.exit(1);
+}
+
+const payload = {
+  profile: { display_name: 'Anh', sex: 'male', birth_year: 2000, height_cm: 171, program_start_date: '2026-10-27' },
+  goals: [
+    { ordinal: 1, name: 'Noel', target_date: '2026-12-25', target_weight_min: 76, target_weight_max: 77, target_body_fat_min: 23, target_body_fat_max: 24 },
+    { ordinal: 2, name: 'Tết Âm lịch', target_date: '2027-02-06', target_weight_min: 73, target_weight_max: 73, target_body_fat_min: 19, target_body_fat_max: 20 },
+    { ordinal: 3, name: 'Hè', target_date: '2027-06-30', target_weight_min: 70, target_weight_max: 70, target_body_fat_min: 16, target_body_fat_max: 16 },
+  ],
+  exercises,
+  plan: { effective_from: '2026-10-27', change_note: 'Lộ trình khởi đầu — tuần 1 ưu tiên máy, tạ mục tiêu ước tính (plan v2.4 §4.4)', content: plan },
+  inbody: [
+    { measured_on: '2026-10-26', weight_kg: 81.7, smm_kg: null, pbf_pct: 28.2, visceral_fat_level: 9, whr: null, ffm_kg: 58.7, bmr_kcal: null, inbody_score: null },
+  ],
+  weights: [{ log_date: '2026-10-26', weight_kg: 81.7, note: 'InBody 26/10' }],
+  notifications: DEFAULT_REMINDERS,
+  history,
+};
+
+const json = JSON.stringify(payload);
+// dollar-quote với tag riêng để không đụng ký tự trong SVG
+const tag = '$seed$';
+if (json.includes(tag)) throw new Error('payload chứa tag dollar-quote');
+
+const sql = `-- ⚠️ FILE SINH TỰ ĐỘNG bởi scripts/build-seed.ts — không sửa tay.
+-- Nguồn: supabase/seed/exercises/*, scripts/seed/plan-v1.ts, supabase/seed/history/*.
+-- ${exercises.length} bài tập · ${history.length} buổi ghi bù · lộ trình v1.
+
+create or replace function public._seed_payload() returns jsonb
+language sql immutable set search_path = '' as $fn$
+  select ${tag}${json}${tag}::jsonb
+$fn$;
+
+revoke execute on function public._seed_payload() from public, anon, authenticated;
+
+update public.app_meta set value = '20261027000600' where key = 'schema_version';
+`;
+fs.writeFileSync(OUT, sql);
+console.log(`Đã sinh ${path.relative(ROOT, OUT)} (${(sql.length / 1024).toFixed(0)} KB, ${exercises.length} bài, ${history.length} buổi lịch sử)`);

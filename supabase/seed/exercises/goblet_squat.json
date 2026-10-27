@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "goblet squat",
+    "squat tạ đơn"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "abs"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Ôm tạ trước ngực",
+    "Ngồi xuống giữa hai gót",
+    "Ngực thẳng"
+  ],
+  "common_mistakes": [
+    "Gối đổ vào trong"
+  ],
+  "slug": "goblet_squat",
+  "name_vi": "Goblet squat",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

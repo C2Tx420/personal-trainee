@@ -1,0 +1,27 @@
+{
+  "aliases": [
+    "seated cable row",
+    "kéo cáp ngồi",
+    "chèo cáp"
+  ],
+  "secondary_muscles": [
+    "lats",
+    "biceps"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Ngồi thẳng, gối hơi cong",
+    "Kéo tay cầm về bụng, siết bả vai",
+    "Không ngả người ra sau"
+  ],
+  "common_mistakes": [
+    "Đung đưa thân người"
+  ],
+  "slug": "seated_cable_row",
+  "name_vi": "Kéo cáp ngồi",
+  "primary_muscle": "upper_back",
+  "movement_pattern": "horizontal_pull",
+  "kind": "compound",
+  "equipment": "cable"
+}

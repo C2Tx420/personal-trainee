@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "side plank",
+    "plank nghiêng"
+  ],
+  "secondary_muscles": [
+    "abs"
+  ],
+  "load_step_kg": 0,
+  "is_time_based": true,
+  "cues": [
+    "Khuỷu dưới vai",
+    "Hông nâng thẳng hàng"
+  ],
+  "common_mistakes": [
+    "Hông chùng xuống"
+  ],
+  "slug": "side_plank",
+  "name_vi": "Plank nghiêng",
+  "primary_muscle": "obliques",
+  "movement_pattern": "core",
+  "kind": "core",
+  "equipment": "bodyweight"
+}

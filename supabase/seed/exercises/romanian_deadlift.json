@@ -1,0 +1,28 @@
+{
+  "aliases": [
+    "rdl",
+    "romanian deadlift",
+    "deadlift romania"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "lower_back"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Đẩy hông ra sau, gối hơi cong",
+    "Tạ trượt sát đùi",
+    "Lưng thẳng suốt"
+  ],
+  "common_mistakes": [
+    "Cong lưng",
+    "Biến thành squat"
+  ],
+  "slug": "romanian_deadlift",
+  "name_vi": "Romanian deadlift",
+  "primary_muscle": "hamstrings",
+  "movement_pattern": "hinge",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "assisted pull up",
+    "kéo xà trợ lực"
+  ],
+  "secondary_muscles": [
+    "biceps"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Kg càng cao càng nhẹ (trợ lực)",
+    "Quỳ lên đệm, kéo ngực về xà"
+  ],
+  "common_mistakes": [
+    "Thả người rơi nhanh khi xuống"
+  ],
+  "slug": "assisted_pull_up",
+  "name_vi": "Máy kéo xà có trợ lực",
+  "primary_muscle": "lats",
+  "movement_pattern": "vertical_pull",
+  "kind": "compound",
+  "equipment": "machine"
+}

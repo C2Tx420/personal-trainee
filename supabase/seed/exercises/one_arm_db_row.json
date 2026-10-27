@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "chèo tạ đơn",
+    "one arm row",
+    "db row"
+  ],
+  "secondary_muscles": [
+    "upper_back",
+    "biceps"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Tay và gối tì ghế, lưng ngang",
+    "Kéo tạ về hông"
+  ],
+  "common_mistakes": [
+    "Xoay người để kéo"
+  ],
+  "slug": "one_arm_db_row",
+  "name_vi": "Chèo tạ đơn một tay",
+  "primary_muscle": "lats",
+  "movement_pattern": "horizontal_pull",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

@@ -1,0 +1,30 @@
+{
+  "aliases": [
+    "đẩy ngực",
+    "đẩy ngực máy",
+    "chest press",
+    "máy đẩy ngực ngồi"
+  ],
+  "secondary_muscles": [
+    "front_delt",
+    "triceps"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Chỉnh ghế để tay cầm ngang giữa ngực",
+    "Ép bả vai ra sau, ngực mở",
+    "Đẩy ra hết tầm nhưng không khoá khuỷu",
+    "Về chậm 2 giây"
+  ],
+  "common_mistakes": [
+    "Nhún vai lên tai",
+    "Thả tạ rơi tự do khi về"
+  ],
+  "slug": "machine_chest_press",
+  "name_vi": "Máy đẩy ngực",
+  "primary_muscle": "chest",
+  "movement_pattern": "horizontal_push",
+  "kind": "compound",
+  "equipment": "machine"
+}

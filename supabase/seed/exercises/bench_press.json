@@ -1,0 +1,28 @@
+{
+  "aliases": [
+    "bench press",
+    "bench",
+    "đẩy ngực đòn"
+  ],
+  "secondary_muscles": [
+    "front_delt",
+    "triceps"
+  ],
+  "load_step_kg": 2.5,
+  "is_time_based": false,
+  "cues": [
+    "Bả vai siết ra sau, bàn chân bám sàn",
+    "Hạ đòn chạm giữa ngực",
+    "Khuỷu tay ~45° so với thân"
+  ],
+  "common_mistakes": [
+    "Nảy đòn khỏi ngực",
+    "Khuỷu bè 90°"
+  ],
+  "slug": "bench_press",
+  "name_vi": "Đẩy ngực tạ đòn",
+  "primary_muscle": "chest",
+  "movement_pattern": "horizontal_push",
+  "kind": "compound",
+  "equipment": "barbell"
+}
