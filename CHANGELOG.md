@@ -1,19 +1,20 @@
 # Changelog
 
-Định dạng theo Keep a Changelog, version theo SemVer (xem plan v2.4 §15).
+Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 
 ## [Unreleased]
 
-Plan: v2.4 · Migration mới nhất: 20261027000800
+Plan: v2.4 · Latest migration: 20261027000800
 
-### Thêm
-- Build mới hoàn toàn dạng React PWA (Vite) + Supabase, thay app Expo cũ.
-- Đăng nhập Supabase (1 tài khoản) + PIN 4 số mỗi lần mở app, kiểm tra ở server (secret `APP_PIN`), sai 5 lần → đăng nhập lại.
-- Trang Hôm nay: buổi theo lịch, khởi động, đếm ngược mốc mục tiêu, banner lộ trình chờ duyệt / nhận xét coach / cảnh báo Legs–cầu lông.
-- Luồng tập từng bước: khởi động có đồng hồ → từng bài, từng hiệp (kg/lần/cảm giác/ghi chú) → nghỉ → tổng kết; ghi kg thực tế kèm lý do; đổi bài gõ tự do (bài tạm); để sau / bỏ bài; tiếp tục khi gián đoạn.
-- Ghi bù buổi tập, ghi nhanh bằng chữ, ghi cầu lông / đi bộ / zone 2 / core.
-- Thư viện 38 bài tập có hình SVG + điểm kỹ thuật, đánh dấu “không có máy”.
-- Cân nặng + số đo + biểu đồ + đường mục tiêu + cảnh báo 2 tuần không giảm; InBody; ảnh tiến độ riêng tư (xoá EXIF, 1080px, signed URL).
-- Lộ trình có phiên bản: diff, duyệt (hôm nay / hẹn ngày), từ chối, tự sửa → bản mới.
-- Nhắc nhở Web Push, sao lưu / nhập JSON, coach/ cho Claude Code review đầu tuần.
-- Seed: hồ sơ, 3 mốc, InBody 26/10, lộ trình v1 (tuần 1, ưu tiên máy), buổi Push 26/10/2026.
+### Added
+- Complete rebuild as a React PWA (Vite) + Supabase, replacing the old Expo app.
+- Supabase sign-in (single account) + 4-digit PIN every time the app opens, verified server-side (secret `APP_PIN`); 5 wrong attempts → sign in again.
+- Today screen: scheduled session, warm-up, goal countdown, banners for pending plan drafts / coach notes / Legs–badminton warning.
+- Guided workout flow: timed warm-up → each exercise, each set (kg / reps / effort / note) → rest → summary; log actual kg with a reason; free-text exercise swap (provisional exercise); do later / skip exercise; resume after interruption.
+- Backfill sessions, free-text quick log, log badminton / walk / zone 2 / core.
+- Library of 38 exercises with SVG illustrations + technique cues, "machine not available" flag.
+- Body weight + measurements + charts + goal line + 2-week plateau warning; InBody; private progress photos (EXIF stripped, 1080px, signed URLs).
+- Versioned plans: diff, approve (today / scheduled date), reject, self-edit → new version.
+- Web Push reminders, JSON backup / import, coach/ for Claude Code's Monday review.
+- Dark-only theme with a single accent color and an SVG icon set.
+- Seed: profile, 3 goals, InBody 26/10, plan v1 (week 1, machines first), Push session 26/10/2026.

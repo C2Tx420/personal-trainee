@@ -1,44 +1,44 @@
-# Sức khỏe & Tập luyện
+# Health & Training
 
-PWA cá nhân (1 người dùng) theo dõi tập luyện và cơ thể: lịch PPL + cầu lông cố định, **luồng tập từng bước** (khởi động → từng bài, từng hiệp → nghỉ → tổng kết), cân nặng, số đo, InBody, ảnh tiến độ riêng tư. Mỗi thứ Hai **Claude Code** đọc số liệu qua role chỉ-đọc và gửi **draft lộ trình** — anh duyệt trong app mới có hiệu lực.
+Personal single-user PWA for tracking training and body metrics: a fixed PPL + badminton schedule, a **guided workout flow** (warm-up → each exercise, each set → rest → summary), body weight, measurements, InBody scans and private progress photos. Every Monday **Claude Code** reads the data through a read-only role and submits a **plan draft** — it only takes effect once approved in the app.
 
-React + Vite + `vite-plugin-pwa` · Supabase (Auth, Postgres + RLS, Storage, Edge Functions, pg_cron) · TanStack Query · Tailwind v4 · Recharts. Online-only, giao diện tiếng Việt, ưu tiên điện thoại.
+React + Vite + `vite-plugin-pwa` · Supabase (Auth, Postgres + RLS, Storage, Edge Functions, pg_cron) · TanStack Query · Tailwind v4 · Recharts. Online-only, Vietnamese UI, mobile-first.
 
 ```bash
 npm install
 supabase start && supabase db reset
 npm run dev          # app
-npm test             # unit test engine (Vitest)
-npm run db:test      # pgTAP: RLS, ràng buộc, quyền coach
-npm run e2e          # Playwright toàn luồng + ảnh chụp e2e/screenshots/
+npm test             # engine unit tests (Vitest)
+npm run db:test      # pgTAP: RLS, constraints, coach permissions
+npm run e2e          # full Playwright flow + screenshots in e2e/screenshots/
 ```
 
-## Cấu trúc
+## Structure
 
 ```
 src/
-  engine/        TS thuần, test bằng Vitest — lịch, mốc, khởi động, luồng tập, tổng kết,
-                 diff lộ trình, đổi bài, ghi nhanh bằng chữ, cân nặng, InBody, SVG, nhắc nhở
-  data/          đọc/ghi Supabase + hook TanStack Query (cache trong bộ nhớ)
-  auth/          đăng nhập, khoá PIN (kiểm tra ở Edge Function verify-pin), tự khoá 5 phút
-  app/           các màn: today/ workout/ training/ exercises/ body/ more/
-  ui/            component dùng chung + biểu đồ
-  export/        sao lưu JSON pt-backup/1
-  sw.ts          service worker: precache file tĩnh + Web Push (không cache dữ liệu)
+  engine/        pure TS, tested with Vitest — schedule, goals, warm-up, workout flow, summary,
+                 plan diff, substitutions, free-text quick log, weight, InBody, SVG, reminders
+  data/          Supabase reads/writes + TanStack Query hooks (in-memory cache)
+  auth/          sign-in, PIN on app open (verified by the verify-pin Edge Function)
+  app/           screens: today/ workout/ training/ exercises/ body/ more/
+  ui/            shared components, icons, charts
+  export/        JSON backup pt-backup/1
+  sw.ts          service worker: precaches static assets + Web Push (no data caching)
 supabase/
-  migrations/    schema, RLS, storage, RPC, seed (sinh tự động), role coach_readonly, cron
-  functions/     verify-pin, send-reminders (+ _shared/reminders.ts dùng chung với engine)
-  seed/          38 bài tập (json + svg), lịch sử ghi bù (buổi Push 26/10/2026)
+  migrations/    schema, RLS, storage, RPCs, seed (generated), coach_readonly role, cron
+  functions/     verify-pin, send-reminders (+ _shared/reminders.ts shared with the engine)
+  seed/          38 exercises (json + svg), backfilled history (Push session 26/10/2026)
   tests/         pgTAP
-scripts/         build-seed.ts, svg/ (sinh hình bài tập), make-icons.ts
-coach/           CLAUDE.md + script cho Claude Code: report, submit-draft, add-review-note…
+scripts/         build-seed.ts, svg/ (exercise illustrations), make-icons.ts
+coach/           CLAUDE.md + scripts for Claude Code: report, submit-draft, add-review-note…
 e2e/             Playwright
 ```
 
-## Nguyên tắc
+## Principles
 
-- Dữ liệu sức khỏe chỉ nằm trên Supabase. Không analytics, không font/CDN bên thứ ba.
-- Ảnh tiến độ: bucket private, xoá EXIF + nén 1080px trước khi upload, chỉ xem qua signed URL 60 giây, không cache, không vào báo cáo coach.
-- Calo tham khảo ≥ 1.700 (CHECK trong DB + validator + coach). Legs và cầu lông không liền ngày.
-- Lộ trình bất biến sau khi duyệt; mọi thay đổi là một phiên bản mới. Claude Code chỉ tạo được draft.
-- Version: SemVer trong `package.json` + `CHANGELOG.md` + git tag. Migration chỉ mở rộng.
+- Health data lives only in Supabase. No analytics, no third-party fonts or CDNs.
+- Progress photos: private bucket, EXIF stripped and resized to 1080px before upload, viewed only through 60-second signed URLs, never cached, never included in coach reports.
+- Reference calories ≥ 1,700 (DB CHECK + validator + coach). Legs and badminton never on consecutive days.
+- Plans are immutable once approved; every change is a new version. Claude Code can only create drafts.
+- Versioning: SemVer in `package.json` + `CHANGELOG.md` + git tag. Migrations are additive only.
