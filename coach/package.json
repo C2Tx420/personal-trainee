@@ -1,0 +1,14 @@
+{
+  "name": "pt-coach",
+  "private": true,
+  "type": "module",
+  "description": "Script cho Claude Code review tuần — dùng chung node_modules ở thư mục gốc",
+  "scripts": {
+    "report": "tsx scripts/weekly-report.ts",
+    "submit-draft": "tsx scripts/submit-draft.ts",
+    "add-review-note": "tsx scripts/add-review-note.ts",
+    "exercise": "tsx scripts/exercise.ts",
+    "preview-svg": "tsx scripts/preview-svg.ts",
+    "schema": "tsx scripts/export-schema.ts"
+  }
+}
