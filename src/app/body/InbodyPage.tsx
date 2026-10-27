@@ -6,7 +6,7 @@ import { estimateBodyFatPct } from '@/engine/goals';
 import { compareInbody, fatMassKg, inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
 import { SimpleLine } from '@/ui/charts';
-import { Badge, Banner, Button, Card, Field, Input, Page, SectionTitle, Spinner } from '@/ui/components';
+import { Badge, Banner, Button, Card, Field, Input, Page, SectionTitle, Skeleton } from '@/ui/components';
 
 const FIELDS = [
   ['weight_kg', 'Cân nặng (kg)'],
@@ -27,7 +27,7 @@ export function InbodyPage() {
   const [vals, setVals] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  if (inbody.isLoading) return <Page title="InBody" back="/body"><Spinner /></Page>;
+  if (inbody.isLoading) return <Page title="InBody" back="/body"><Skeleton /></Page>;
   const logs = inbody.data ?? [];
   const latest = logs.at(-1);
   const prev = logs.at(-2);

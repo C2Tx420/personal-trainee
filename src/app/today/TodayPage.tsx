@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { startSession } from '@/data/api';
+import { deleteSession, startSession } from '@/data/api';
 import { qk, useActivePlan, useExerciseMaps, useGoals, useInbody, useInProgress, useInvalidate, usePhotos, usePlans, useReviews, useTraining, useWeights } from '@/data/queries';
 import { diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
 import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
@@ -10,8 +10,9 @@ import type { SundayOption } from '@/engine/plan-schema';
 import { dayPlanFor, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, todayConflictWarning } from '@/engine/schedule';
 import { lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
-import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Spinner } from '@/ui/components';
+import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
 import { ExerciseLine } from '../shared';
+import { SkipDaySheet } from './SkipDaySheet';
 
 const SUNDAY_LABEL: Record<SundayOption, string> = {
   walk: 'Đi bộ 30–40 phút',
@@ -37,8 +38,9 @@ export function TodayPage() {
   const inProgress = useInProgress();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [skipKind, setSkipKind] = useState<SessionKind | null>(null);
 
-  if (plan.isLoading || ex.loading || training.isLoading) return <Page title="Hôm nay"><Spinner /></Page>;
+  if (plan.isLoading || ex.loading || training.isLoading) return <Page title="Hôm nay"><Skeleton /></Page>;
   if (plan.error) return <Page title="Hôm nay"><ErrorBox error={plan.error} /></Page>;
   if (!plan.data) return <Page title="Hôm nay"><Banner tone="warn">Chưa có lộ trình active</Banner></Page>;
 
@@ -46,6 +48,7 @@ export function TodayPage() {
   const day = dayPlanFor(content, today);
   const sessions = training.data?.sessions ?? [];
   const doneToday = sessions.filter((s) => s.session_date === today && s.status === 'completed');
+  const skippedToday = sessions.filter((s) => s.session_date === today && s.status === 'skipped');
   const lastWeight = weights.data?.at(-1);
   const trend = weights.data ? lossTrendKgPerWeek(weights.data, today) : null;
   const ffm = inbody.data ? latestFfm(inbody.data) : null;
@@ -53,7 +56,11 @@ export function TodayPage() {
   const goal = activeGoal(progress);
   const drafts = (plans.data ?? []).filter((p) => p.status === 'draft');
   const unread = (reviews.data ?? []).filter((r) => !r.is_read);
-  const conflict = todayConflictWarning(content, today, sessions.map((s) => ({ date: s.session_date, kind: s.kind })));
+  const conflict = todayConflictWarning(
+    content,
+    today,
+    sessions.filter((s) => s.status !== 'skipped').map((s) => ({ date: s.session_date, kind: s.kind })),
+  );
   const inb = inbodyDue(inbody.data?.at(-1)?.measured_on ?? null, today);
   const lastPhoto = photos.data?.[0]?.taken_on ?? null;
   const photoDue = !lastPhoto || diffDays(lastPhoto, today) >= 14;
@@ -79,6 +86,29 @@ export function TodayPage() {
       setStarting(false);
     }
   }
+
+  async function unskip(id: string) {
+    await deleteSession(id);
+    await invalidate(qk.training);
+  }
+
+  /** Skipped-day note + undo, or the "Nghỉ buổi này" button. */
+  const skipRow = (kind: SessionKind) => {
+    const skipped = skippedToday.find((s) => s.kind === kind);
+    if (skipped) {
+      return (
+        <div className="glass-subtle rounded-ctl flex items-center gap-3 px-3.5 py-3 text-sm">
+          <div className="min-w-0 flex-1">
+            <Badge tone="warn">Đã nghỉ</Badge> {skipped.note && <span className="text-muted">{skipped.note}</span>}
+          </div>
+          <Button size="sm" variant="ghost" onClick={() => void unskip(skipped.id)}>Huỷ</Button>
+        </div>
+      );
+    }
+    return inProgress.data ? null : (
+      <Button variant="ghost" block className="mt-2" onClick={() => setSkipKind(kind)}>Nghỉ buổi này</Button>
+    );
+  };
 
   const startButton = (kind: SessionKind) =>
     inProgress.data ? (
@@ -157,8 +187,13 @@ export function TodayPage() {
             </div>
             {done ? (
               <Button block onClick={() => nav(`/training/session/${done.id}`)}>Xem buổi đã tập</Button>
+            ) : skippedToday.some((s) => s.kind === day.template) ? (
+              skipRow(day.template)
             ) : (
-              startButton(day.template)
+              <>
+                {startButton(day.template)}
+                {skipRow(day.template)}
+              </>
             )}
           </Card>
         );
@@ -171,8 +206,13 @@ export function TodayPage() {
           {day.warmup && <p className="mb-3 text-sm">Khởi động {day.warmup.minutes}′: {day.warmup.mobility.join(' · ')}</p>}
           {doneToday.some((s) => s.kind === 'badminton') ? (
             <Badge tone="ok">Đã ghi</Badge>
+          ) : skippedToday.some((s) => s.kind === 'badminton') ? (
+            skipRow('badminton')
           ) : (
-            <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>Ghi buổi cầu lông</Button>
+            <>
+              <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>Ghi buổi cầu lông</Button>
+              {skipRow('badminton')}
+            </>
           )}
         </Card>
       )}
@@ -220,6 +260,8 @@ export function TodayPage() {
           </Card>
         </>
       )}
+
+      <SkipDaySheet kind={skipKind} date={today} onClose={() => setSkipKind(null)} />
 
       <p className="mt-4 px-1 text-xs text-muted">
         Tham khảo (không ghi): ăn ~{formatNumberVN(content.nutrition.calories_kcal)} kcal · đạm ~{content.nutrition.protein_g}g · nước{' '}

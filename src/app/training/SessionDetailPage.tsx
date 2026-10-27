@@ -8,7 +8,7 @@ import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { FEEL_LABEL, KG_CHANGE_LABEL, type SetRow, SUBSTITUTION_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
 import { sessionSummary } from '@/engine/workout-summary';
-import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Spinner, Stat } from '@/ui/components';
+import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Skeleton, Stat } from '@/ui/components';
 import { fmtKg } from '../shared';
 import { SetCard } from '../workout/SetCard';
 
@@ -22,7 +22,7 @@ export function SessionDetailPage() {
   const [edit, setEdit] = useState<SetRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Spinner /></Page>;
+  if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Skeleton /></Page>;
   if (detail.error || !detail.data) return <Page title="Buổi tập" back="/training"><ErrorBox error={detail.error} /></Page>;
   const { session, items, sets } = detail.data;
   const sum = sessionSummary(session, items, sets, ex.byId);
@@ -34,8 +34,9 @@ export function SessionDetailPage() {
       <p className="mb-3 text-sm text-muted">
         {WEEKDAY_LABEL[weekdayOf(session.session_date)]}, {formatVN(session.session_date, true)}
         {session.is_backfill && ' · ghi bù'}
-        {session.note && !session.note.startsWith('Ghi nhanh') && ` · ${session.note}`}
+        {session.note && session.status !== 'skipped' && !session.note.startsWith('Ghi nhanh') && ` · ${session.note}`}
       </p>
+      {session.status === 'skipped' && <Banner tone="warn">Đã nghỉ buổi này{session.note ? ` — ${session.note}` : ''}</Banner>}
       {session.status === 'in_progress' && (
         <Banner tone="accent" onClick={() => nav(`/workout/${session.id}`)} action={<b>Tiếp tục ›</b>}>Buổi đang tập dở</Banner>
       )}
@@ -48,7 +49,7 @@ export function SessionDetailPage() {
           <Stat label="Thời gian" value={sum.durationMin ? `${sum.durationMin} phút` : '—'} />
         </div>
       )}
-      {session.kind === 'badminton' && (
+      {session.kind === 'badminton' && session.status !== 'skipped' && (
         <Card>Cầu lông · {session.duration_min} phút · cường độ {session.badminton_intensity === 'light' ? 'nhẹ' : session.badminton_intensity === 'moderate' ? 'vừa' : 'nặng'} · ≈ {session.est_kcal} kcal</Card>
       )}
       {w && (

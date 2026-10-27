@@ -5,7 +5,7 @@ import { formatVN } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
 import { FEEL_LABEL, KG_CHANGE_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
-import { Badge, Banner, Card, Empty, ExerciseImg, Page, SectionTitle, Spinner, Toggle } from '@/ui/components';
+import { Badge, Banner, Card, Empty, ExerciseImg, Page, SectionTitle, Skeleton, Spinner, Toggle } from '@/ui/components';
 import { itemSummary } from '../shared';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from './labels';
 
@@ -18,7 +18,7 @@ export function ExerciseDetailPage() {
   const ids = e ? [e.id, ...ex.list.filter((x) => x.canonical_exercise_id === e.id).map((x) => x.id)] : [];
   const history = useExerciseHistory(ids);
 
-  if (ex.loading) return <Page title="Bài tập" back="/exercises"><Spinner /></Page>;
+  if (ex.loading) return <Page title="Bài tập" back="/exercises"><Skeleton /></Page>;
   if (!e) return <Page title="Bài tập" back="/exercises"><Empty>Không tìm thấy bài</Empty></Page>;
   const uses = (plan.data?.content.templates ?? []).flatMap((t) => t.items.filter((i) => i.exercise === slug).map((i) => ({ t: t.name, i })));
 

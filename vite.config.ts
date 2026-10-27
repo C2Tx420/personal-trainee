@@ -30,7 +30,7 @@ function versionJson(): Plugin {
       this.emitFile({
         type: 'asset',
         fileName: 'version.json',
-        source: JSON.stringify({ version: APP_VERSION, sha: SHA, builtAt: BUILD_TIME, minSchema: '20261027000800' }),
+        source: JSON.stringify({ version: APP_VERSION, sha: SHA, builtAt: BUILD_TIME, minSchema: '20261027000900' }),
       });
     },
   };
@@ -56,8 +56,8 @@ export default defineConfig({
       injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
       devOptions: { enabled: false },
       manifest: {
-        name: 'Sức khỏe & Tập luyện',
-        short_name: 'Tập luyện',
+        name: 'Personal Trainee',
+        short_name: 'Personal Trainee',
         description: 'Theo dõi tập luyện, cân nặng, số đo, InBody — cá nhân',
         lang: 'vi',
         start_url: '/',

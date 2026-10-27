@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router';
 import { usePlans } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
 import { formatNumberVN } from '@/engine/math';
-import { Card, Page, Spinner } from '@/ui/components';
+import { Card, Page, Skeleton } from '@/ui/components';
 import { CREATED_BY_LABEL, StatusBadge } from './plan-ui';
 
 export function PlansPage() {
   const nav = useNavigate();
   const plans = usePlans();
-  if (plans.isLoading) return <Page title="Lộ trình" back="/more"><Spinner /></Page>;
+  if (plans.isLoading) return <Page title="Lộ trình" back="/more"><Skeleton /></Page>;
   return (
     <Page title="Lịch sử lộ trình" back="/more">
       {(plans.data ?? []).map((p) => (

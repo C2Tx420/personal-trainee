@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "lunge",
+    "walking lunge",
+    "chùng chân",
+    "bước chùng"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "hamstrings"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Bước dài vừa phải, thân thẳng",
+    "Hạ tới hai gối ~90°",
+    "Đẩy bằng gót chân trước để đứng lên"
+  ],
+  "common_mistakes": [
+    "Bước quá ngắn, gối trước vượt xa mũi chân",
+    "Đổ người ra trước"
+  ],
+  "slug": "db_lunge",
+  "name_vi": "Lunge tạ đơn",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

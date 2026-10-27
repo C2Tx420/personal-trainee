@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useActivePlan, useExerciseMaps } from '@/data/queries';
 import { searchExercises } from '@/engine/substitutions';
-import { Badge, Chip, ExerciseImg, Input, Page, Spinner } from '@/ui/components';
+import { Badge, Chip, ExerciseImg, Input, Page, Skeleton } from '@/ui/components';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from './labels';
 
 type Filter = 'in_plan' | 'all' | 'unavailable' | 'provisional';
@@ -15,7 +15,7 @@ export function ExercisesPage() {
   const [filter, setFilter] = useState<Filter>('in_plan');
   const [muscle, setMuscle] = useState<string | null>(null);
 
-  if (ex.loading) return <Page title="Bài tập"><Spinner /></Page>;
+  if (ex.loading) return <Page title="Bài tập"><Skeleton /></Page>;
   const inPlan = new Map<string, string[]>();
   for (const t of plan.data?.content.templates ?? []) {
     for (const it of t.items) inPlan.set(it.exercise, [...(inPlan.get(it.exercise) ?? []), t.name]);

@@ -11,7 +11,7 @@ export function AboutPage() {
   return (
     <Page title="Cài đặt & giới thiệu" back="/more">
       <Card>
-        <div className="mb-1 text-lg font-bold">Sức khỏe & Tập luyện</div>
+        <div className="mb-1 text-lg font-bold">Personal Trainee</div>
         <div className="tabular text-sm" data-testid="version-line">
           Phiên bản {APP_VERSION} ({GIT_SHA}) · build {built} · Plan {PLAN_DOC_VERSION} · DB {meta.data?.schema_version ?? '…'}
         </div>

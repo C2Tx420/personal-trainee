@@ -14,6 +14,13 @@ export const MEASUREMENT_FIELDS = [
 ] as const;
 
 export type MeasurementKey = (typeof MEASUREMENT_FIELDS)[number][0];
+
+/**
+ * The measurements logged each week: waist + hip (WHR), chest, upper arm, thigh.
+ * The other columns stay readable for older entries but are no longer asked for.
+ */
+export const MAIN_MEASUREMENTS: readonly MeasurementKey[] = ['waist_navel_cm', 'hip_cm', 'chest_cm', 'upper_arm_cm', 'thigh_cm'];
+export const MAIN_MEASUREMENT_FIELDS = MEASUREMENT_FIELDS.filter(([k]) => MAIN_MEASUREMENTS.includes(k));
 export type Measurements = Partial<Record<MeasurementKey, number | null>>;
 
 /** Waist-to-hip ratio — only when both numbers are present. */

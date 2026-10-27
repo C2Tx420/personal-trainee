@@ -1,0 +1,32 @@
+{
+  "aliases": [
+    "deadlift",
+    "dl",
+    "kéo đất"
+  ],
+  "secondary_muscles": [
+    "hamstrings",
+    "lower_back",
+    "quads",
+    "upper_back"
+  ],
+  "load_step_kg": 5,
+  "is_time_based": false,
+  "cues": [
+    "Đòn sát ống chân, trên giữa bàn chân",
+    "Hít sâu siết bụng, lưng thẳng trước khi kéo",
+    "Đẩy sàn bằng chân, đòn trượt sát người",
+    "Đứng thẳng hết hông, không ngả ra sau"
+  ],
+  "common_mistakes": [
+    "Cong lưng khi kéo",
+    "Đòn rời xa người",
+    "Giật đòn khỏi sàn"
+  ],
+  "slug": "deadlift",
+  "name_vi": "Deadlift tạ đòn",
+  "primary_muscle": "glutes",
+  "movement_pattern": "hinge",
+  "kind": "compound",
+  "equipment": "barbell"
+}

@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "bulgarian split squat",
+    "bulgarian",
+    "split squat",
+    "squat chân sau gác ghế"
+  ],
+  "secondary_muscles": [
+    "glutes",
+    "hamstrings"
+  ],
+  "load_step_kg": 2,
+  "is_time_based": false,
+  "cues": [
+    "Mu chân sau gác lên ghế",
+    "Hạ thẳng xuống tới gối sau gần chạm sàn",
+    "Dồn trọng tâm vào chân trước, đẩy bằng cả bàn chân"
+  ],
+  "common_mistakes": [
+    "Gối trước đổ vào trong",
+    "Đứng quá gần ghế"
+  ],
+  "slug": "bulgarian_split_squat",
+  "name_vi": "Bulgarian split squat tạ đơn",
+  "primary_muscle": "quads",
+  "movement_pattern": "squat",
+  "kind": "compound",
+  "equipment": "dumbbell"
+}

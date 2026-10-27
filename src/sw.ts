@@ -23,11 +23,11 @@ self.addEventListener('push', (event) => {
     try {
       return event.data?.json() as { title?: string; body?: string; tag?: string; url?: string };
     } catch {
-      return { title: 'Tập luyện', body: event.data?.text() };
+      return { title: 'Personal Trainee', body: event.data?.text() };
     }
   })();
   event.waitUntil(
-    self.registration.showNotification(data.title ?? 'Tập luyện', {
+    self.registration.showNotification(data.title ?? 'Personal Trainee', {
       body: data.body,
       tag: data.tag,
       icon: '/icons/icon-192.png',

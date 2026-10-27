@@ -33,7 +33,7 @@ test.afterAll(async () => {
     `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>E2E screenshots</title>
 <style>body{font:14px system-ui;margin:16px;background:#f4f5f7}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;align-items:start}
 figure{margin:0;background:#fff;border-radius:12px;padding:8px}img{width:100%;border-radius:8px;border:1px solid #e1e5ea}figcaption{margin-top:6px;font-weight:600}</style>
-<h1>Sức khỏe & Tập luyện — E2E (${new Date().toLocaleString('vi-VN')})</h1><main>${cards}</main>\n`,
+<h1>Personal Trainee — E2E (${new Date().toLocaleString('vi-VN')})</h1><main>${cards}</main>\n`,
   );
   await page.close();
 });
@@ -56,6 +56,16 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   await expect(page.getByText(/Còn 59 ngày/)).toBeVisible();
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(20, 18, 17)');
   await shot(page, '04-today', 'Hôm nay — buổi Pull, khởi động, đếm ngược mốc Noel (theme kiểu Crouton)');
+
+  // skip the day with a reason, then undo
+  await page.getByRole('button', { name: 'Nghỉ buổi này' }).click();
+  await page.getByRole('button', { name: 'Bận việc' }).click();
+  await shot(page, '04b-skip-day', 'Nghỉ buổi này: chọn lý do / ghi chú cho coach');
+  await page.getByRole('button', { name: /Lưu — nghỉ buổi này/ }).click();
+  await expect(page.getByText('Đã nghỉ')).toBeVisible();
+  expect(psql("select status || ':' || note from workout_sessions where kind = 'pull' and status = 'skipped'")).toBe('skipped:Bận việc');
+  await page.getByRole('button', { name: 'Huỷ', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Bắt đầu buổi tập' })).toBeVisible();
 });
 
 test('03 thư viện bài tập + lịch sử', async () => {
@@ -200,7 +210,7 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
 test('08 cơ thể: cân + số đo, InBody', async () => {
   await page.getByRole('link', { name: 'Cơ thể', exact: true }).click();
   await page.getByLabel('Cân nặng (kg)').fill('81,2');
-  await page.getByRole('button', { name: /Số đo cơ thể/ }).click();
+  await page.getByRole('button', { name: /Số đo chính/ }).click();
   await page.getByLabel('Vòng eo (ngang rốn)').fill('96');
   await page.getByLabel('Vòng hông').fill('102');
   await page.getByRole('button', { name: 'Lưu', exact: true }).click();
@@ -374,8 +384,8 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   expect(backup).not.toHaveProperty('photos');
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
-  await expect(page.getByTestId('version-line')).toContainText('Plan v2.4');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261027000800');
+  await expect(page.getByTestId('version-line')).toContainText('Plan v2.5');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261027000900');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB, changelog');
   await nav(page, '/exercises');
   await page.getByRole('button', { name: 'Không có máy', exact: true }).click();

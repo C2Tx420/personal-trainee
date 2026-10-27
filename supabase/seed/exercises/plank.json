@@ -21,5 +21,6 @@
   "primary_muscle": "abs",
   "movement_pattern": "core",
   "kind": "core",
-  "equipment": "bodyweight"
+  "equipment": "bodyweight",
+  "archived": true
 }

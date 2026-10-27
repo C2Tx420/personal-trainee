@@ -174,6 +174,7 @@ const report = {
       by_session: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, cardio: s.warmup?.cardio?.exercise ?? null, minutes: s.warmup?.cardio?.minutes ?? null, skipped: s.warmup?.skipped ?? null, mobility_done: s.warmup?.mobility_done ?? null })),
     },
     backfilled_sessions: weekSessions.filter((s) => s.is_backfill).map((s) => s.session_date),
+    skipped_days: sRows.filter((s) => s.session_date >= ws && s.session_date <= we && s.status === 'skipped').map((s) => ({ date: s.session_date, kind: s.kind, note: s.note })),
     sessions: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, duration_min: s.duration_min, volume_kg: volumeKg(setRows.filter((x) => x.session_id === s.id)), note: s.note?.startsWith('Ghi nhanh') ? 'ghi nhanh' : s.note })),
     substitutions: iRows.filter((i) => weekIds.has(i.session_id) && i.substitution_reason).map((i) => ({ date: dateOf.get(i.session_id), planned: slugOf(i.planned_exercise_id), done: slugOf(i.exercise_id), reason: i.substitution_reason, note: i.substitution_note })),
     skipped_items: iRows.filter((i) => weekIds.has(i.session_id) && (i.status === 'skipped' || i.status === 'partial')).map((i) => ({ date: dateOf.get(i.session_id), exercise: slugOf(i.exercise_id), status: i.status, reason: i.skip_reason })),

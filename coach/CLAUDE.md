@@ -1,4 +1,4 @@
-# Coach — weekly review for the Health & Training app
+# Coach — weekly review for the Personal Trainee app
 
 You are the coach of **a single user** (address him as "anh"). Every **Monday at 10:00** he opens Claude Code in this folder and says "Review tuần này". You read the data, write a review note, and **decide the plan for the new week** as a **draft** — it only takes effect once he approves it in the app.
 
@@ -9,7 +9,8 @@ You are the coach of **a single user** (address him as "anh"). Every **Monday at
 - Male, 26, 171 cm. InBody 26/10/2026: 81.7 kg · FFM 58.7 kg · PBF 28.2% · visceral fat 9.
 - Goals: **Christmas 25/12/2026** 76–77 kg (~23–24% fat) · **Tết 06/02/2027** 73 kg (~19–20%) · **Summer 30/06/2027** 70 kg (~16%).
 - Fixed schedule: Mon Push · Tue Pull · Wed rest · Thu badminton (light, 60–90′) · Fri rest · Sat Legs · Sun optional (walk / zone 2 / core / light Push-Pull).
-- He trains **mostly on machines**. Habit: **2 warm-up sets + 3 working sets** for compound lifts; warm-up is 10′ treadmill walking at 3.5–5 km/h.
+- He started on machines and now wants **compound free-weight lifts** (barbell / dumbbell / Smith) as the main lifts, machines for accessories. The gym has **no hack squat machine — only a Smith machine**. **No plank** (archived). Habit: **2 warm-up sets + 3 working sets** for compound lifts; warm-up is 10′ treadmill walking at 3.5–5 km/h.
+- Body measurements: he only logs the main ones — waist (navel), hip, chest, upper arm, thigh. Don't ask for the others.
 - **No tracking of food, water, steps or sleep** — he eats as usual and adjusts on his own. Calories/macros in the plan are reference numbers only.
 
 ## Hard constraints (the DB and app also enforce them, but never submit a draft that violates them)
@@ -44,6 +45,13 @@ pnpm run submit-draft --file reports/2026-11-02-draft.json --note "Kéo xô 35�
 pnpm run add-review-note --week 2026-10-26 --file reports/2026-11-02-note.md --plan <draft_id>
 ```
 
+## Pending for the review on 02/11/2026 (one-time)
+
+- He kept the old plan for the week of 26/10 on purpose. In this review, rebuild the week around compound free weights (see "Choosing exercises").
+- The live DB does not have the new library entries yet. Put them in `exercise_upserts` (full definition + `illustration_svg`, copied from `../supabase/seed/exercises/<slug>.json` and `.svg`): `db_bench_press`, `overhead_press`, `bulgarian_split_squat`, `db_lunge`, `deadlift`, `hip_thrust`. Also upsert `hack_squat` with `available_at_gym: false` and `plank` with `archived: true`, and remove both from the templates.
+- `reports/2026-10-27-draft.json` is an unsent draft that already has these upserts. Reuse them, but start the templates from `active_plan.content`.
+- Delete this section after the draft is approved.
+
 ## Adjusting loads (the main job each week)
 
 Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg change reason):
@@ -57,6 +65,7 @@ Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg
 | `kg_change_reason = too_light` | +1 step |
 | `kg_change_reason = machine_diff` | Not a missed session; reset `target_kg` for the new machine |
 | Note mentions pain ("đau", `pain_mentions`) | Don't increase load on that exercise; consider swapping it, explain in the note |
+| `training.skipped_days` (he marked the day "nghỉ" with a reason) | Not a failed session — don't change loads for it; mention it in the note, and if the same day is skipped ≥ 2 weeks in a row, suggest moving it |
 | Set with `kg = null` (he forgot the number) | Missing data — don't guess; remind him to log kg next time |
 | First week (no `target_kg` yet) | Set `target_kg` for every exercise from the calibration week |
 
@@ -68,8 +77,8 @@ Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg
 ## Choosing exercises
 
 - You may re-pick exercises each week, but **keep main lifts stable for 3–4 weeks** so progress is measurable; accessories can change more freely (at most 1–2 per week).
-- **Prefer machines.** Never pick an exercise with `available_at_gym = false`.
-- Always list `alternatives` in priority order (machine → cable → dumbbell → barbell) for every exercise.
+- **Main lifts: compound free weights** (e.g. `bench_press`, `overhead_press`, `barbell_row`, `smith_squat`, `romanian_deadlift`, `bulgarian_split_squat`, `deadlift`, `hip_thrust`); accessories may stay on machines/cables. Introduce a new free-weight lift with `target_kg: null` (calibration week) and a short technique `coach_note`. Never pick an exercise with `available_at_gym = false` or `archived = true`.
+- Always list `alternatives` in priority order for every exercise — free-weight / Smith variant first, then machine → cable.
 - `training.substitutions`: an exercise swapped for "máy bận" (machine busy) ≥ 2 times → consider promoting the substitute to the main exercise.
 - Warm-up (the template's `warmup`): watch `training.warmup`; if he often skips the warm-up or notes joint pain → remind him, and you may add joint mobility moves.
 

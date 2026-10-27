@@ -83,12 +83,15 @@ export function WorkoutFlowPage() {
     if (focusId && ids.includes(focusId)) setFocusId(null);
   }, [flowItems, sets, refresh, focusId]);
 
+  // Finished / not in progress → its detail page (in an effect: navigating during render loops while the route chunk loads)
+  const ended = !!session && session.status !== 'in_progress';
+  useEffect(() => {
+    if (ended) nav(`/training/session/${id}`, { replace: true });
+  }, [ended, id, nav]);
+
   if (detail.isLoading || ex.loading) return <Spinner label="Đang mở buổi tập…" />;
   if (detail.error || !session) return <div className="p-4"><ErrorBox error={detail.error ?? 'Không tìm thấy buổi tập'} /></div>;
-  if (session.status !== 'in_progress') {
-    nav(`/training/session/${session.id}`, { replace: true });
-    return null;
-  }
+  if (ended) return <Spinner label="Đang mở buổi đã lưu…" />;
 
   // ── current step (may be overridden by "jump to exercise")
   let step: FlowStep = forceSummary ? { type: 'summary' } : nextStep(session, flowItems, sets);
