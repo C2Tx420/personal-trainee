@@ -4,7 +4,7 @@ import { arg, connect } from './db';
 /**
  * Ghi nhận xét tuần (§7.5) — anh đọc trong app (Thêm → Nhận xét coach).
  *
- *   npm run add-review-note -- --week 2026-10-26 --file note.md [--plan <draft_id>]
+ *   pnpm run add-review-note --week 2026-10-26 --file note.md [--plan <draft_id>]
  */
 const week = arg('week');
 const file = arg('file');

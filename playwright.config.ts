@@ -34,7 +34,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: 'npx vite build && npx vite preview --port 4173 --strictPort',
+      command: 'pnpm exec vite build && pnpm exec vite preview --port 4173 --strictPort',
       url: 'http://127.0.0.1:4173',
       reuseExistingServer: true,
       timeout: 180_000,
