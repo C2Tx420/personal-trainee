@@ -50,6 +50,10 @@ pnpm run add-review-note --week 2026-10-26 --file reports/2026-11-02-note.md --p
 - He kept the old plan for the week of 26/10 on purpose. In this review, rebuild the week around compound free weights (see "Choosing exercises").
 - The live DB does not have the new library entries yet. Put them in `exercise_upserts` (full definition + `illustration_svg`, copied from `../supabase/seed/exercises/<slug>.json` and `.svg`): `db_bench_press`, `overhead_press`, `bulgarian_split_squat`, `db_lunge`, `deadlift`, `hip_thrust`. Also upsert `hack_squat` with `available_at_gym: false` and `plank` with `archived: true`, and remove both from the templates.
 - `reports/2026-10-27-draft.json` is an unsent draft that already has these upserts. Reuse them, but start the templates from `active_plan.content`.
+- Pull 27/10, confirmed with him:
+  - `lat_pulldown` (35kg) was done on the cable station, which is what the app's lat pulldown means; it is now named "Kéo xô cáp" (equipment `cable`). `user_lat_pulldown_qnrj` (27kg, renamed "Máy kéo xô") is a separate lat pulldown machine. Both are real, so 6 lat sets that day. If the fix SQL was not run, the live DB still shows the old names; then upsert `lat_pulldown` from `../supabase/seed/exercises/lat_pulldown.json`.
+  - The face pull substitute was the Matrix Aura Lateral Raise machine (seated, arm pads; https://johnsonfitness.co.nz/products/matrix-aura-lateral-raise) at 27kg. He uses it for side delts and rear delts. If he ran the fix SQL it is logged under `user_may_nang_vai_ngang_ngoi` (primary `side_delt`, secondary `rear_delt`, `traps`); otherwise it is still under `db_lateral_raise`, so ignore that 27kg when setting the Push lateral-raise load.
+  - Give both provisional machines full definitions + SVG (or map them to a canonical exercise). The lateral raise machine is a fine face pull alternative when the cable is busy, but keep `reverse_pec_deck` or face pull on Pull most weeks for rear delts and upper back.
 - Delete this section after the draft is approved.
 
 ## Adjusting loads (the main job each week)

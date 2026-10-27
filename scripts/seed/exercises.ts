@@ -99,8 +99,8 @@ export const EXERCISES: Def[] = [
 
   // ───────── Pull
   m({
-    slug: 'lat_pulldown', name_vi: 'Máy kéo xô', aliases: ['lat pulldown', 'kéo xô', 'kéo xà máy', 'pulldown'],
-    primary_muscle: 'lats', secondary_muscles: ['biceps', 'upper_back'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'machine',
+    slug: 'lat_pulldown', name_vi: 'Kéo xô cáp', aliases: ['lat pulldown', 'kéo xô', 'pulldown', 'kéo xô cáp'],
+    primary_muscle: 'lats', secondary_muscles: ['biceps', 'upper_back'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'cable',
     cues: ['Đùi kẹp chặt dưới đệm', 'Kéo thanh về ngực trên, ngực hướng lên', 'Khuỷu kéo xuống và ra sau'],
     common_mistakes: ['Ngả người quá nhiều', 'Kéo ra sau gáy'],
   }),

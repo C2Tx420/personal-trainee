@@ -28,6 +28,8 @@ Plan: v2.5 · Latest migration: 20261027000900
 - Hack squat is marked "not available" (the gym only has a Smith machine) and plank is archived. Plan v1 itself is unchanged; the coach builds the new exercise selection from the week of 02/11.
 - Body measurements form asks only for the main ones: waist (navel), hip, chest, upper arm, thigh. Older entries for other measurements still show in the chart.
 - Coach guidance: main lifts are compound free weights; skipped days are not failed sessions.
+- `lat_pulldown` renamed "Máy kéo xô" → **"Kéo xô cáp"** (equipment: cable), matching the gym's cable station; the separate lat pulldown machine is its own exercise.
 
 ### Fixed
 - Page header on notch / Dynamic Island iPhones (e.g. 14 Pro Max): content no longer hugs the bottom edge; the "resume workout" banner now sits under the header instead of under the status bar; offline bar respects the safe area.
+- Exercise swap: typing the name or alias of the exercise being swapped (e.g. "Lat pulldown" while swapping lat pulldown) no longer creates a provisional duplicate; the picker says it is the same exercise.

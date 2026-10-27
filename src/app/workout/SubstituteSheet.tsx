@@ -67,7 +67,7 @@ export function SubstituteSheet({
         </div>
       </div>
       <div className="mb-3">
-        <ExercisePicker library={library.filter((e) => e.id !== original.id)} quick={quick} value={pick} onChange={setPick} />
+        <ExercisePicker library={library} exclude={original} quick={quick} value={pick} onChange={setPick} />
       </div>
       <Field label="Ghi chú (tuỳ chọn)">
         <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="vd. máy hỏng, đổi sang tạ đơn" />
