@@ -1,5 +1,5 @@
-import { roundToStep } from './math';
 import type { PlanItem } from './plan-schema';
+import { roundLoad } from './stack';
 
 export type PlannedSet = {
   setType: 'warmup' | 'working';
@@ -15,7 +15,7 @@ export type PlannedSet = {
  *
  * Warm-up load: fixed `kg` if set, otherwise `pct`% of the working load
  * (`target_kg`, or `fallbackWorkingKg` = previous working-set kg when absent),
- * rounded to the load step. Nothing to compute from → null (entered manually).
+ * rounded to the load step (nearest pin on lb stacks). Nothing to compute from → null (entered manually).
  */
 export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingKg: number | null): PlannedSet[] {
   const workingKg = item.target_kg ?? fallbackWorkingKg;
@@ -26,7 +26,7 @@ export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingK
           const reps = w.reps === 'same' ? item.rep_max : w.reps;
           let kg: number | null = null;
           if (w.kg !== undefined) kg = w.kg;
-          else if (w.pct !== undefined && workingKg !== null) kg = roundToStep((workingKg * w.pct) / 100, loadStepKg);
+          else if (w.pct !== undefined && workingKg !== null) kg = roundLoad((workingKg * w.pct) / 100, loadStepKg);
           return { setType: 'warmup', index: i + 1, targetKg: kg, repMin: reps, repMax: reps };
         });
   const working: PlannedSet[] = Array.from({ length: item.sets }, (_, i) => ({

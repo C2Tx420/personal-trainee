@@ -1,8 +1,9 @@
 import { useParams } from 'react-router';
-import { setExerciseAvailable } from '@/data/api';
+import { setExerciseAvailable, setExerciseLbStack } from '@/data/api';
 import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
+import { isLbStack } from '@/engine/stack';
 import { FEEL_LABEL, KG_CHANGE_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
 import { Badge, Banner, Card, Empty, ExerciseImg, Page, SectionTitle, Skeleton, Spinner, Toggle } from '@/ui/components';
@@ -76,6 +77,25 @@ export function ExerciseDetailPage() {
         </div>
         {!e.available_at_gym && e.unavailable_note && <Banner tone="warn">{e.unavailable_note}</Banner>}
       </Card>
+
+      {(e.equipment === 'machine' || e.equipment === 'cable') && (
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="font-semibold">Máy chia nấc lb (Matrix)</div>
+              <div className="text-xs text-muted">Bật → khi tập chọn nấc 40 / 50 / 60 lb… app ghi 18 / 23 / 27 kg</div>
+            </div>
+            <Toggle
+              label="Máy chia nấc lb"
+              checked={isLbStack(e.load_step_kg)}
+              onChange={async (v) => {
+                await setExerciseLbStack(e.id, v);
+                await invalidate(qk.exercises);
+              }}
+            />
+          </div>
+        </Card>
+      )}
 
       <SectionTitle>Lịch sử tạ</SectionTitle>
       {history.isLoading && <Spinner />}

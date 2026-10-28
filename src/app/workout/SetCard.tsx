@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { type SetInput } from '@/data/api';
-import { kgDeviates } from '@/engine/progression';
+import { formatSet, kgDeviates } from '@/engine/progression';
+import { isLbStack, kgToLb, pinsAround, stackStep } from '@/engine/stack';
 import { type ExerciseRow, type Feel, FEEL_LABEL, KG_CHANGE_LABEL, type KgChangeReason, type SessionItemRow, type SetRow } from '@/engine/types';
 import { type PlannedSet, setLabel } from '@/engine/warmup';
 import { Button, Chip, cx, Input, Stepper } from '@/ui/components';
@@ -10,6 +11,7 @@ import { fmtKg } from '../shared';
 /**
  * The set being performed: kg/reps (−/+ buttons), effort, note, and — when kg differs from
  * the target — a row of reason chips (④ §6.2). Also used to edit a logged set.
+ * lb-stack machines step pin to pin and get one-tap pin chips; `lastSet` is the same set last session.
  */
 export function SetCard({
   item,
@@ -19,6 +21,7 @@ export function SetCard({
   initialKg,
   initialReason = null,
   existing,
+  lastSet,
   onSave,
   saveLabel = 'Xong hiệp',
 }: {
@@ -30,6 +33,7 @@ export function SetCard({
   /** kg change reason carried over from the previous set (when the kg is carried over too) */
   initialReason?: KgChangeReason | null;
   existing?: SetRow;
+  lastSet?: SetRow | null;
   onSave: (s: SetInput) => Promise<void>;
   saveLabel?: string;
 }) {
@@ -46,6 +50,10 @@ export function SetCard({
 
   const deviates = !timeBased && planned.setType === 'working' && kgDeviates(planned.targetKg, kg);
   const belowReps = !timeBased && reps !== null && reps < planned.repMin;
+  const lb = !timeBased && isLbStack(exercise.load_step_kg);
+  const beatsLast =
+    !!lastSet && !timeBased && kg !== null && reps !== null && lastSet.weight_kg !== null && lastSet.reps !== null &&
+    (kg > lastSet.weight_kg || (kg === lastSet.weight_kg && reps > lastSet.reps));
 
   async function save() {
     setBusy(true);
@@ -90,8 +98,61 @@ export function SetCard({
         </div>
       </div>
 
+      {lastSet && !existing && (
+        <div className="tabular -mt-1 mb-3 flex items-center gap-2 text-sm" data-testid="last-set">
+          <span className="min-w-0 flex-1 text-muted">
+            Lần trước: <b className="text-fg">{formatSet(lastSet)}</b>
+            {lastSet.feel && ` · ${FEEL_LABEL[lastSet.feel].toLowerCase()}`}
+            {beatsLast && <span className="ml-1 text-ok">↑ hơn lần trước</span>}
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              if (!timeBased) setKg(lastSet.weight_kg);
+              setReps(timeBased ? lastSet.seconds : lastSet.reps);
+            }}
+          >
+            Lặp lại
+          </Button>
+        </div>
+      )}
+
       <div className="grid gap-3">
-        {!timeBased && <Stepper label="kg" unit="kg" value={kg} onChange={setKg} step={exercise.load_step_kg || 2.5} allowEmpty />}
+        {!timeBased && (
+          <Stepper
+            label="kg"
+            unit="kg"
+            value={kg}
+            onChange={setKg}
+            step={exercise.load_step_kg || 2.5}
+            onStep={lb ? (d) => setKg(stackStep(kg, d)) : undefined}
+            allowEmpty
+          />
+        )}
+        {lb && (
+          <div data-testid="lb-pins">
+            <div className="-mt-1 mb-1.5 text-xs text-muted">
+              Máy chia nấc lb{kg !== null && ` · ${fmtKg(kg)} kg ≈ ${kgToLb(kg)} lb`}
+            </div>
+            <div className="flex gap-1.5">
+              {pinsAround(kg).map((p) => (
+                <button
+                  key={p.lb}
+                  type="button"
+                  onClick={() => setKg(p.kg)}
+                  className={cx(
+                    'tabular flex-1 rounded-ctl border py-1.5 text-center leading-tight',
+                    kg === p.kg ? 'border-accent/60 bg-accent-soft text-accent' : 'border-white/10 bg-white/[0.04]',
+                  )}
+                >
+                  <span className="block text-sm font-semibold">{p.lb} lb</span>
+                  <span className="block text-[11px] text-muted">{p.kg} kg</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <Stepper label={timeBased ? 'giây' : 'lần'} unit={timeBased ? 'giây' : 'lần'} value={reps} onChange={setReps} step={timeBased ? 5 : 1} />
       </div>
 

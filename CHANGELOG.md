@@ -4,7 +4,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 
 ## [Unreleased]
 
-Plan: v2.5 · Latest migration: 20261027000900
+Plan: v2.6 · Latest migration: 20261027000900
 
 ### Added
 - Complete rebuild as a React PWA (Vite) + Supabase, replacing the old Expo app.
@@ -21,6 +21,11 @@ Plan: v2.5 · Latest migration: 20261027000900
 - Compound free-weight exercises: dumbbell bench press, standing barbell overhead press, Bulgarian split squat, dumbbell lunge, barbell deadlift, barbell hip thrust (with SVG illustrations).
 - "Nghỉ buổi này" on the Today card for a scheduled session or badminton day: pick a reason / add a note; shown in history and in the coach's weekly report (`skipped_days`). Undo from the same card.
 - Launch splash: dark static splash in `index.html`, then the same splash in React — no white flash; skeleton cards while a page loads.
+- Matrix lb-stack machines (`load_step_kg` 4.5): −/+ go pin to pin, a row of one-tap pin chips (40 lb · 18 kg …), loads logged as whole kg (18 / 23 / 27 / 32 / 36); warm-up % and the "+1 step" hint land on a pin. Switch "Máy chia nấc lb" on the exercise page.
+- Personal records: 🏆 on the set, "Kỷ lục mới" card on the session summary and session detail (heaviest load ever, or more reps than ever at a load done before).
+- "Tiến độ từ 26/10" card on Today: weekly-average weight, waist, and first vs latest top set of up to 4 lifts.
+- The set card shows the same set from last session ("Lần trước: 27×12 · vừa") with a "Lặp lại" button.
+- Progress photo capture: last photo overlay can be set to Tắt / Mờ / Rõ.
 
 ### Changed
 - App renamed to **Personal Trainee** (manifest, home-screen title, login, notifications).
@@ -33,4 +38,5 @@ Plan: v2.5 · Latest migration: 20261027000900
 
 ### Fixed
 - Page header on notch / Dynamic Island iPhones (e.g. 14 Pro Max): content no longer hugs the bottom edge; the "resume workout" banner now sits under the header instead of under the status bar; offline bar respects the safe area.
+- E2E no longer depends on the day it runs: the browser clock is fixed to Tue 27/10/2026 (back to real time before approving a plan, which the server checks against its own date).
 - Exercise swap: typing the name or alias of the exercise being swapped (e.g. "Lat pulldown" while swapping lat pulldown) no longer creates a provisional duplicate; the picker says it is the same exercise.

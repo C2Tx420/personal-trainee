@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { deleteSession, startSession } from '@/data/api';
-import { qk, useActivePlan, useExerciseMaps, useGoals, useInbody, useInProgress, useInvalidate, usePhotos, usePlans, useReviews, useTraining, useWeights } from '@/data/queries';
+import { qk, useActivePlan, useExerciseMaps, useGoals, useInbody, useInProgress, useInvalidate, useMeasurements, usePhotos, usePlans, useReviews, useTraining, useWeights } from '@/data/queries';
 import { diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
 import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
 import { inbodyDue, latestFfm } from '@/engine/inbody';
@@ -12,6 +12,7 @@ import { lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
 import { ExerciseLine } from '../shared';
+import { ProgressCard } from './ProgressCard';
 import { SkipDaySheet } from './SkipDaySheet';
 
 const SUNDAY_LABEL: Record<SundayOption, string> = {
@@ -31,6 +32,7 @@ export function TodayPage() {
   const ex = useExerciseMaps();
   const goals = useGoals();
   const weights = useWeights();
+  const measurements = useMeasurements();
   const inbody = useInbody();
   const photos = usePhotos();
   const reviews = useReviews();
@@ -259,6 +261,10 @@ export function TodayPage() {
             </div>
           </Card>
         </>
+      )}
+
+      {training.data && weights.data && (
+        <ProgressCard weights={weights.data} measurements={measurements.data ?? []} training={training.data} byId={ex.byId} />
       )}
 
       <SkipDaySheet kind={skipKind} date={today} onClose={() => setSkipKind(null)} />
