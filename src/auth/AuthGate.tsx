@@ -3,9 +3,11 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useS
 import { bootstrap } from '@/data/api';
 import { queryClient } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
+import { useSwUpdate } from '@/lib/sw-update';
 import { supabase } from '@/lib/supabase';
 import { Banner, Button, Splash } from '@/ui/components';
 import { IconWifiOff } from '@/ui/icons';
+import { ForceUpdate } from './ForceUpdate';
 import { LoginPage } from './LoginPage';
 import { PinLock } from './PinLock';
 
@@ -36,9 +38,13 @@ function markBooted(uid: string) {
   }
 }
 
-/** App gate: not signed in → Login; signed in → enter the PIN every time the app opens. */
+/**
+ * App gate: not signed in → Login; signed in → enter the PIN every time the app opens.
+ * A waiting new release is installed first, before the login / PIN screen.
+ */
 export function AuthGate({ children }: { children: ReactNode }) {
   const online = useOnline();
+  const update = useSwUpdate();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [locked, setLocked] = useState(true);
   const [booted, setBooted] = useState(false);
@@ -84,6 +90,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }, [session, locked, booted]);
 
   if (!online && (session === undefined || !booted)) return <OfflineScreen />;
+  if (update.needRefresh && (!session || locked)) return <ForceUpdate />;
   if (session === undefined) return <Splash />;
   if (!session) return <LoginPage />;
   if (locked) {

@@ -5,7 +5,10 @@ import { useOnline } from '@/lib/hooks';
 import { MIN_SCHEMA_VERSION } from '@/lib/version';
 import { Banner, cx, PageBanners } from '@/ui/components';
 import { IconBook, IconDumbbell, IconMore, IconPulse, IconToday } from '@/ui/icons';
+import { NotificationPrompt } from './NotificationPrompt';
 import { UpdatePrompt } from './UpdatePrompt';
+import { WhatsNewSheet } from './WhatsNew';
+import { useWhatsNewUnseen } from './whats-new';
 
 const TABS = [
   { to: '/', label: 'Hôm nay', Icon: IconToday, end: true },
@@ -21,6 +24,7 @@ export function AppShell() {
   const inProgress = useInProgress();
   const loc = useLocation();
   const nav = useNavigate();
+  const whatsNew = useWhatsNewUnseen();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,6 +54,9 @@ export function AppShell() {
         <Outlet />
       </PageBanners>
       <UpdatePrompt blocked={!!inProgress.data} />
+      <WhatsNewSheet blocked={!!inProgress.data || loc.pathname.startsWith('/workout') || loc.pathname === '/more/whats-new'} />
+      {/* after "Có gì mới" is closed, one sheet at a time */}
+      <NotificationPrompt blocked={whatsNew || !!inProgress.data || loc.pathname.startsWith('/workout') || loc.pathname === '/more/reminders'} />
       <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(env(safe-area-inset-bottom),12px)]">
         <div className="glass-strong mx-auto flex max-w-xl gap-1 rounded-[26px] p-1.5">
           {TABS.map(({ to, label, Icon, end }) => (
@@ -66,7 +73,10 @@ export function AppShell() {
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={cx('size-[22px]', isActive && 'text-accent')} />
+                  <span className="relative">
+                    <Icon className={cx('size-[22px]', isActive && 'text-accent')} />
+                    {to === '/more' && whatsNew && <span className="absolute -top-0.5 -right-1 size-2 rounded-full bg-accent" aria-label="Có tính năng mới" />}
+                  </span>
                   {label}
                 </>
               )}

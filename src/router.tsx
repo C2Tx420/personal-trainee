@@ -37,6 +37,7 @@ export const router = createBrowserRouter([
       { path: 'more/reviews', lazy: () => import('./app/more/ReviewsPage').then((m) => ({ Component: m.ReviewsPage })) },
       { path: 'more/reminders', lazy: () => import('./app/more/RemindersPage').then((m) => ({ Component: m.RemindersPage })) },
       { path: 'more/backup', lazy: () => import('./app/more/BackupPage').then((m) => ({ Component: m.BackupPage })) },
+      { path: 'more/whats-new', lazy: () => import('./app/more/WhatsNewPage').then((m) => ({ Component: m.WhatsNewPage })) },
       { path: 'more/about', lazy: () => import('./app/more/AboutPage').then((m) => ({ Component: m.AboutPage })) },
     ],
   },

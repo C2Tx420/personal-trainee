@@ -20,6 +20,8 @@ test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
   // The flow assumes Tue 27/10/2026 (Pull day, 59 days to Noel); every timestamp the app writes comes from this clock
   await page.clock.install({ time: new Date('2026-10-27T08:00:00+07:00') });
+  // a phone that has never been asked about notifications (headless Chromium reports "denied")
+  await page.addInitScript(() => Object.defineProperty(Notification, 'permission', { get: () => 'default' }));
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('console', (m) => {
     if (m.type() === 'error' && !/Failed to load resource|net::ERR_INTERNET_DISCONNECTED|getUserMedia/.test(m.text())) errors.push(m.text());
@@ -53,6 +55,19 @@ test('01 đăng nhập + PIN', async () => {
 });
 
 test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ sáng)', async () => {
+  // first open after an update: "Có gì mới" once per device
+  const news = page.getByRole('dialog', { name: 'Có gì mới' });
+  await expect(news).toBeVisible();
+  await expect(news.getByText('Máy chia nấc lb', { exact: true })).toBeVisible();
+  await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
+  await news.getByRole('button', { name: 'Đã hiểu' }).click();
+  await expect(news).toBeHidden();
+  // then, first run on this device: ask for reminders right away
+  const push = page.getByRole('dialog', { name: 'Bật nhắc nhở' });
+  await expect(push).toBeVisible();
+  await shot(page, '03c-push-prompt', 'Lần đầu mở: hỏi bật nhắc nhở ngay (không phải tự vào Cài đặt)');
+  await push.getByRole('button', { name: 'Để sau' }).click();
+  await expect(push).toBeHidden();
   await expect(page.getByText('Kéo xô cáp').first()).toBeVisible();
   await expect(page.getByText(/Noel · 25\/12/)).toBeVisible();
   await expect(page.getByText(/Còn 59 ngày/)).toBeVisible();
@@ -412,7 +427,11 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await nav(page, '/more/about');
   await expect(page.getByTestId('version-line')).toContainText('Plan v2.6');
   await expect(page.getByTestId('version-line')).toContainText('DB 20261027000900');
-  await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB, changelog');
+  await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
+  await page.getByText('Có gì mới', { exact: true }).click();
+  await expect(page.getByText('Bản đầu tiên')).toBeVisible();
+  await expect(page.getByText(/Nhật ký kỹ thuật/)).toBeVisible();
+  await shot(page, '39b-whats-new', 'Có gì mới: từng bản cập nhật bằng tiếng Việt, nhật ký kỹ thuật thu gọn');
   await nav(page, '/exercises');
   await page.getByRole('button', { name: 'Không có máy', exact: true }).click();
   await expect(page.getByText('Máy chèo tựa ngực', { exact: true })).toBeVisible();
