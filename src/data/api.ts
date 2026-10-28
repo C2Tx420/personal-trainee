@@ -3,6 +3,7 @@ import type { Goal } from '@/engine/goals';
 import type { InbodyLog } from '@/engine/inbody';
 import { type PlanContent, type PlanItem, parsePlanContent } from '@/engine/plan-schema';
 import type { SessionKind } from '@/engine/schedule';
+import { LB_STACK_STEP_KG } from '@/engine/stack';
 import { slugifyVi } from '@/engine/text';
 import type {
   ExerciseRow,
@@ -488,6 +489,11 @@ export async function createBackfillSession(args: {
 
 export async function setExerciseAvailable(id: string, available: boolean): Promise<void> {
   must(await supabase.from('exercises').update({ available_at_gym: available, unavailable_note: available ? null : `Đánh dấu ${todayVN()}` }).eq('id', id));
+}
+
+/** lb-stack machine ↔ plain 2,5 kg step (the load step is what marks a Matrix lb stack). */
+export async function setExerciseLbStack(id: string, on: boolean): Promise<void> {
+  must(await supabase.from('exercises').update({ load_step_kg: on ? LB_STACK_STEP_KG : 2.5 }).eq('id', id));
 }
 
 // ───────────────────────── Body

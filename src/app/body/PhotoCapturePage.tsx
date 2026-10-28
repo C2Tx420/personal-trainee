@@ -4,7 +4,7 @@ import { useAuth } from '@/auth/AuthGate';
 import { photoObjectUrl, uploadPhoto } from '@/data/api';
 import { qk, useInvalidate, usePhotos } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
-import { Banner, Button, Page } from '@/ui/components';
+import { Banner, Button, Chip, Page } from '@/ui/components';
 import { prepareImage } from './image-pipeline';
 
 const ANGLES = [
@@ -13,6 +13,13 @@ const ANGLES = [
   { key: 'back', label: 'Lưng' },
 ] as const;
 type Angle = (typeof ANGLES)[number]['key'];
+
+/** How strongly last time's photo shows over the camera (to line up the same pose). */
+const GHOST_LEVELS = [
+  { label: 'Tắt', opacity: 0 },
+  { label: 'Mờ', opacity: 0.3 },
+  { label: 'Rõ', opacity: 0.55 },
+] as const;
 
 /** Body outline guide overlaid on the camera. */
 function Silhouette({ angle }: { angle: Angle }) {
@@ -42,6 +49,7 @@ export function PhotoCapturePage() {
   const [camError, setCamError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [ghost, setGhost] = useState<string | null>(null);
+  const [ghostOpacity, setGhostOpacity] = useState<number>(GHOST_LEVELS[1].opacity);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<Angle[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -120,11 +128,21 @@ export function PhotoCapturePage() {
       </div>
       <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-ctl bg-black">
         {stream && <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 h-full w-full object-cover" />}
-        {ghost && <img src={ghost} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
+        {ghost && ghostOpacity > 0 && <img src={ghost} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: ghostOpacity }} />}
         {angle && <Silhouette angle={angle} />}
         {countdown !== null && <div className="absolute inset-0 grid place-items-center text-8xl font-bold text-white drop-shadow">{countdown}</div>}
         {!stream && <div className="absolute inset-x-0 bottom-3 text-center text-sm text-white/80">{camError ?? 'Đang mở camera…'}</div>}
       </div>
+      {ghost && (
+        <div className="mb-3 flex items-center gap-2 text-sm" aria-label="Ảnh lần trước">
+          <span className="text-muted">Ảnh lần trước:</span>
+          {GHOST_LEVELS.map((g) => (
+            <Chip key={g.label} active={ghostOpacity === g.opacity} onClick={() => setGhostOpacity(g.opacity)}>
+              {g.label}
+            </Chip>
+          ))}
+        </div>
+      )}
       <p className="mb-3 text-xs text-muted">
         Đứng vào khung, giữ cùng ánh sáng và khoảng cách như lần trước. Ảnh được xoá EXIF (GPS, thiết bị), nén còn 1080px và lưu riêng tư — chỉ anh xem được.
       </p>

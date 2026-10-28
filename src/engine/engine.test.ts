@@ -7,11 +7,13 @@ import { activeGoal, estimateBodyFatPct, type Goal, goalProgress } from './goals
 import { diffPlans } from './plan-diff';
 import { legsBadmintonAdjacency, parsePlanContent, planContentSchema, validatePlanRules } from './plan-schema';
 import { kgDeviates, prefillKg, progressionHint } from './progression';
+import { bodyChange, personalRecords, strengthChanges } from './progress';
 import { dueReminders, DEFAULT_REMINDERS } from './reminders';
 import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, templateFor } from './schedule';
+import { kgToLb, lbToKg, pinsAround, roundLoad, stackStep } from './stack';
 import { exactMatch, searchExercises, suggestSubstitutes } from './substitutions';
 import { validateSvg } from './svg-validate';
-import type { SetRow } from './types';
+import type { SessionRow, SetRow } from './types';
 import { plannedSets } from './warmup';
 import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } from './weight';
 import { volumeKg } from './workout-summary';
@@ -235,5 +237,87 @@ describe('nhắc nhở', () => {
     const review = dueReminders(DEFAULT_REMINDERS, { ...ctx, minuteOfDay: 600 });
     expect(review.map((r) => r.kind)).toEqual(['water', 'weekly_review']);
     expect(JSON.stringify(review)).not.toMatch(/\d+[.,]?\d*\s?kg/);
+  });
+});
+
+describe('máy chia nấc lb (Matrix)', () => {
+  it('logs pins as whole kg: 40/50/60/70/80 lb = 18/23/27/32/36', () => {
+    expect([40, 50, 60, 70, 80].map(lbToKg)).toEqual([18, 23, 27, 32, 36]);
+    expect([18, 23, 27, 32, 36].map(kgToLb)).toEqual([40, 50, 60, 70, 80]);
+  });
+  it('steps pin to pin, also from a kg between pins', () => {
+    expect(stackStep(27, 1)).toBe(32);
+    expect(stackStep(27, -1)).toBe(23);
+    expect(stackStep(25, 1)).toBe(27);
+    expect(stackStep(25, -1)).toBe(23);
+    expect(stackStep(20, 1)).toBe(23);
+    expect(stackStep(20, -1)).toBe(18);
+    expect(stackStep(5, -1)).toBe(5);
+    expect(stackStep(null, 1)).toBe(18);
+  });
+  it('chips around the current load', () => {
+    expect(pinsAround(27).map((p) => p.lb)).toEqual([40, 50, 60, 70, 80]);
+    expect(pinsAround(5).map((p) => p.lb)).toEqual([10, 20, 30, 40, 50]);
+  });
+  it('warm-up % and the +1 hint land on a pin', () => {
+    expect(roundLoad(27 * 0.75, 4.5)).toBe(18);
+    expect(roundLoad(32 * 0.75, 4.5)).toBe(23);
+    expect(roundLoad(27 * 0.75, 2.5)).toBe(20);
+    const item = { ...PLAN_V1.templates[0].items[0], target_kg: null, rep_max: 12, unit: 'reps' as const };
+    expect(progressionHint(item, { date: '2026-10-27', sets: [set({ weight_kg: 27, reps: 12 })] }, 4.5)).toContain('32 kg');
+    expect(progressionHint(item, { date: '2026-10-27', sets: [set({ weight_kg: 27, reps: 12 })] }, 2.5)).toContain('29,5 kg');
+  });
+});
+
+describe('kỷ lục + tiến độ', () => {
+  const prev = [set({ weight_kg: 23, reps: 12 }), set({ weight_kg: 27, reps: 8 }), set({ exercise_id: 'b', weight_kg: 35, reps: 10 })];
+  it('heavier than ever → kg record; more reps at that load → reps record; first time → none', () => {
+    const cur = [
+      set({ id: 'k', weight_kg: 32, reps: 6 }),
+      set({ exercise_id: 'b', weight_kg: 35, reps: 10 }),
+      set({ id: 'r', exercise_id: 'b', weight_kg: 35, reps: 12 }),
+      set({ exercise_id: 'new', weight_kg: 50, reps: 10 }),
+    ];
+    expect(personalRecords(cur, prev)).toEqual([
+      { exerciseId: 'e', setId: 'k', kind: 'kg', kg: 32, reps: 6, prevKg: 27, prevReps: null },
+      { exerciseId: 'b', setId: 'r', kind: 'reps', kg: 35, reps: 12, prevKg: null, prevReps: 10 },
+    ]);
+  });
+  it('reps records only at a load done before; warm-ups and empty kg are ignored', () => {
+    expect(personalRecords([set({ weight_kg: 23, reps: 12 }), set({ weight_kg: 40, reps: 1, set_type: 'warmup' }), set({ weight_kg: null, reps: 20 })], prev)).toEqual([]);
+    expect(personalRecords([set({ weight_kg: 25, reps: 13 })], prev)).toEqual([]);
+    expect(personalRecords([set({ weight_kg: 23, reps: 13 })], prev)).toMatchObject([{ kind: 'reps', kg: 23, reps: 13, prevReps: 12 }]);
+  });
+  it('merges provisional exercises into their canonical one', () => {
+    const canon = (id: string) => (id === 'dup' ? 'e' : id);
+    expect(personalRecords([set({ exercise_id: 'dup', weight_kg: 27, reps: 9 })], prev, canon)).toMatchObject([{ exerciseId: 'e', kind: 'reps' }]);
+  });
+
+  const session = (id: string, date: string, status: SessionRow['status'] = 'completed') => ({ id, session_date: date, status }) as SessionRow;
+  it('strength: first vs latest top set, only exercises done twice, completed sessions only', () => {
+    const sessions = [session('s1', '2026-10-26'), session('s2', '2026-11-02'), session('s3', '2026-11-09', 'in_progress')];
+    const sets = [
+      set({ session_id: 's1', weight_kg: 20, reps: 12, set_type: 'warmup' }),
+      set({ session_id: 's1', weight_kg: 27, reps: 12 }),
+      set({ session_id: 's2', weight_kg: 32, reps: 8 }),
+      set({ session_id: 's3', weight_kg: 50, reps: 8 }),
+      set({ session_id: 's1', exercise_id: 'b', weight_kg: 35, reps: 10 }),
+      set({ session_id: 's2', exercise_id: 'b', weight_kg: 35, reps: 12 }),
+      set({ session_id: 's2', exercise_id: 'once', weight_kg: 10, reps: 10 }),
+    ];
+    expect(strengthChanges(sessions, sets)).toEqual([
+      { exerciseId: 'e', first: { date: '2026-10-26', kg: 27, reps: 12 }, last: { date: '2026-11-02', kg: 32, reps: 8 }, pct: 19 },
+      { exerciseId: 'b', first: { date: '2026-10-26', kg: 35, reps: 10 }, last: { date: '2026-11-02', kg: 35, reps: 12 }, pct: 0 },
+    ]);
+  });
+  it('body: weekly averages need two weeks; waist needs two entries', () => {
+    const one = bodyChange([{ log_date: '2026-10-26', weight_kg: 81.7 }, { log_date: '2026-10-28', weight_kg: 80 }], [{ log_date: '2026-10-26', waist_navel_cm: 95 }]);
+    expect(one).toEqual({ weight: null, weightThisWeek: 80.85, waist: null });
+    const two = bodyChange(
+      [{ log_date: '2026-10-26', weight_kg: 81.7 }, { log_date: '2026-10-28', weight_kg: 80 }, { log_date: '2026-11-02', weight_kg: 80.2 }],
+      [{ log_date: '2026-10-26', waist_navel_cm: 95 }, { log_date: '2026-11-02', waist_navel_cm: null }, { log_date: '2026-11-09', waist_navel_cm: 93.5 }],
+    );
+    expect(two.weight).toEqual({ firstWeek: '2026-10-26', firstAvg: 80.85, lastAvg: 80.2, delta: -0.6, weeks: 2 });
+    expect(two.waist).toEqual({ firstDate: '2026-10-26', first: 95, last: 93.5, delta: -1.5 });
   });
 });

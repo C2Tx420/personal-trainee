@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { addExtraItem, createProvisionalExercise, finishSession, saveSet, type SetInput, updateItem } from '@/data/api';
 import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate, useSessionDetail, useWeights } from '@/data/queries';
 import { lastPerformance, formatSet, prefillKg, progressionHint } from '@/engine/progression';
+import { personalRecords } from '@/engine/progress';
 import { type FlowItem, type FlowStep, flowProgress, itemBadge, itemsToMarkDone, nextStep, orderedItems, plannedFor, remainingSets } from '@/engine/session-flow';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import type { TemplateWarmup } from '@/engine/plan-schema';
@@ -14,6 +15,7 @@ import { Badge, Banner, Button, Card, Chip, cx, ErrorBox, ExerciseImg, GLASS_HEA
 import { IconClose, IconList } from '@/ui/icons';
 import { fmtKg, itemSummary } from '../shared';
 import { ExercisePicker, type PickResult } from './ExercisePicker';
+import { RecordsCard } from './RecordsCard';
 import { RestOverlay } from './RestOverlay';
 import { SetCard } from './SetCard';
 import { SubstituteSheet } from './SubstituteSheet';
@@ -64,6 +66,13 @@ export function WorkoutFlowPage() {
       ),
     [history.data, id],
   );
+
+  // 🏆 against every earlier session of these exercises
+  const records = useMemo(() => {
+    const previous = (history.data ?? []).filter((h) => h.sessionId !== id).flatMap((h) => h.sets);
+    return personalRecords(sets, previous, (exId) => ex.byId.get(exId)?.canonical_exercise_id ?? exId);
+  }, [history.data, id, sets, ex.byId]);
+  const recordSetIds = new Set(records.map((r) => r.setId));
 
   const flowItems: FlowItem[] = useMemo(
     () =>
@@ -191,6 +200,7 @@ export function WorkoutFlowPage() {
           <Stat label="Khối lượng" value={`${sum.volumeKg.toLocaleString('vi-VN')} kg`} sub={sum.missingKgExercises.length ? `${sum.missingKgExercises.length} bài không có số kg` : undefined} />
           <Stat label="Thời gian" value={`${sum.durationMin ?? '—'} phút`} sub={sum.warmupDone === null ? undefined : sum.warmupDone ? 'Có khởi động' : 'Bỏ khởi động'} />
         </div>
+        <RecordsCard records={records} byId={ex.byId} />
         {sum.itemsSubstituted.length > 0 && (
           <Card>
             <div className="mb-1 font-semibold">Đổi bài</div>
@@ -233,6 +243,10 @@ export function WorkoutFlowPage() {
     const doneHere = sets.filter((s) => s.session_item_id === item.id && s.completed);
     const fi = flowItems.find((f) => f.item.id === item.id)!;
     const allPlanned = plannedFor(fi);
+    const lastSet =
+      step.type === 'set' && step.planned.setType === 'working' && last
+        ? (last.sets.find((s) => s.set_index === step.planned.index) ?? [...last.sets].sort((a, b) => a.set_index - b.set_index).at(-1) ?? null)
+        : null;
     body = (
       <div>
         <ExerciseImg svg={exercise?.illustration_svg} name={exercise?.name_vi ?? ''} className={cx('mb-3', step.type === 'set' && 'mx-auto max-w-[260px]')} />
@@ -281,6 +295,7 @@ export function WorkoutFlowPage() {
                 planned={step.planned}
                 workingTotal={step.workingTotal}
                 initialKg={prefillKg(step.planned, doneHere, last)}
+                lastSet={lastSet}
                 initialReason={
                   step.planned.setType === 'working'
                     ? (doneHere.filter((s) => s.set_type === 'working').sort((a, b) => a.set_index - b.set_index).at(-1)?.kg_change_reason ?? null)
@@ -304,6 +319,7 @@ export function WorkoutFlowPage() {
                   className={cx('tabular rounded-full border px-3 py-1 text-sm', s.kg_change_reason ? 'border-warn/40 bg-warn-soft text-warn' : 'border-white/10 bg-white/[0.05]')}
                 >
                   ✓ {setLabel({ setType: s.set_type, index: s.set_index })} · {formatSet(s)}
+                  {recordSetIds.has(s.id) && ' 🏆'}
                 </button>
               ))}
           </div>

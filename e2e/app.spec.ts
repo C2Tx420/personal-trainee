@@ -18,6 +18,8 @@ const COACH_ENV = { ...process.env, COACH_DATABASE_URL: 'postgresql://coach_read
 
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
+  // The flow assumes Tue 27/10/2026 (Pull day, 59 days to Noel); every timestamp the app writes comes from this clock
+  await page.clock.install({ time: new Date('2026-10-27T08:00:00+07:00') });
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('console', (m) => {
     if (m.type() === 'error' && !/Failed to load resource|net::ERR_INTERNET_DISCONNECTED|getUserMedia/.test(m.text())) errors.push(m.text());
@@ -54,6 +56,8 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   await expect(page.getByText('Kéo xô cáp').first()).toBeVisible();
   await expect(page.getByText(/Noel · 25\/12/)).toBeVisible();
   await expect(page.getByText(/Còn 59 ngày/)).toBeVisible();
+  await expect(page.getByText('Tiến độ từ 26/10')).toBeVisible();
+  await expect(page.getByTestId('progress-card')).toContainText('mỗi bài tập 2 buổi là so được');
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(20, 18, 17)');
   await shot(page, '04-today', 'Hôm nay — buổi Pull, khởi động, đếm ngược mốc Noel (theme kiểu Crouton)');
 
@@ -76,6 +80,12 @@ test('03 thư viện bài tập + lịch sử', async () => {
   await expect(page.getByText('Lịch sử tạ')).toBeVisible();
   await expect(page.getByText('27×12').first()).toBeVisible();
   await shot(page, '07-exercise-detail', 'Chi tiết bài: hình, kỹ thuật, lịch sử buổi 26/10 (2 làm nóng 20kg + 3×27kg)');
+
+  // the curl machine is a Matrix stack marked in lb
+  await nav(page, '/exercises/machine_biceps_curl');
+  await page.getByRole('switch', { name: 'Máy chia nấc lb' }).click();
+  await expect(page.getByRole('switch', { name: 'Máy chia nấc lb' })).toHaveAttribute('aria-checked', 'true');
+  expect(psql("select load_step_kg from exercises where slug = 'machine_biceps_curl'")).toBe('4.50');
 });
 
 test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → tiếp tục sau khi tải lại', async () => {
@@ -154,6 +164,16 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
 
   await expect(page.getByRole('heading', { name: 'Máy cuốn tay trước' })).toBeVisible();
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
+  // lb stack: one tap on a pin, −/+ go pin to pin
+  const kg = page.getByRole('textbox', { name: 'kg', exact: true });
+  await page.getByTestId('lb-pins').getByRole('button', { name: /^40 lb/ }).click();
+  await expect(kg).toHaveValue('18');
+  await page.getByRole('button', { name: 'Tăng kg' }).click();
+  await expect(kg).toHaveValue('23');
+  await page.getByRole('button', { name: 'Giảm kg' }).click();
+  await expect(kg).toHaveValue('18');
+  await page.getByRole('button', { name: 'Nhẹ quá' }).click();
+  await shot(page, '14b-lb-pins', 'Máy Matrix chia nấc lb: bấm 40 lb → ghi 18 kg, −/+ nhảy từng nấc');
   for (let i = 0; i < 3; i++) await completeSet(page);
 
   // the deferred exercise comes back at the end of the session
@@ -178,6 +198,7 @@ test('06 tổng kết + chi tiết buổi', async () => {
     'unavailable|phòng không có máy tựa ngực',
   );
   expect(psql("select available_at_gym from exercises where slug = 'chest_supported_machine_row'")).toBe('f');
+  expect(psql("select string_agg(distinct s.weight_kg::text, ',') from workout_sets s join exercises e on e.id = s.exercise_id where e.slug = 'machine_biceps_curl'")).toBe('18.00');
 });
 
 test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu lông', async () => {
@@ -350,6 +371,8 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   // The coach role cannot activate a plan
   expect(() => execSync(`psql "postgresql://coach_readonly:coach-local-only@127.0.0.1:54322/postgres" -c "update plan_versions set status='active'"`, { stdio: 'pipe' })).toThrow();
 
+  // approve_plan_version checks "from today" against the server's date → back to the real clock
+  await page.clock.setSystemTime(new Date());
   await reloadAndUnlock(page, '/');
   await expect(page.getByText('Có 1 lộ trình mới chờ duyệt')).toBeVisible();
   await expect(page.getByText('Nhận xét tuần mới từ coach')).toBeVisible();
@@ -387,7 +410,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   expect(backup).not.toHaveProperty('photos');
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
-  await expect(page.getByTestId('version-line')).toContainText('Plan v2.5');
+  await expect(page.getByTestId('version-line')).toContainText('Plan v2.6');
   await expect(page.getByTestId('version-line')).toContainText('DB 20261027000900');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB, changelog');
   await nav(page, '/exercises');

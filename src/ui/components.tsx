@@ -135,6 +135,7 @@ export function Stepper({
   label,
   allowEmpty,
   min = 0,
+  onStep,
 }: {
   value: number | null;
   onChange: (v: number | null) => void;
@@ -143,12 +144,14 @@ export function Stepper({
   label: string;
   allowEmpty?: boolean;
   min?: number;
+  /** custom −/+ (e.g. pin to pin on lb stacks) instead of ± step */
+  onStep?: (dir: 1 | -1) => void;
 }) {
   const fmt = (v: number) => String(Math.round(v * 100) / 100);
   const btn = 'glass-subtle rounded-ctl grid size-14 shrink-0 place-items-center text-3xl font-light text-fg active:bg-white/[0.08]';
   return (
     <div className="flex items-center gap-2" aria-label={label}>
-      <button type="button" aria-label={`Giảm ${label}`} className={btn} onClick={() => onChange(Math.max(min, (value ?? 0) - step))}>
+      <button type="button" aria-label={`Giảm ${label}`} className={btn} onClick={() => (onStep ? onStep(-1) : onChange(Math.max(min, (value ?? 0) - step)))}>
         −
       </button>
       <div className="glass-input rounded-ctl flex h-14 min-w-0 flex-1 items-baseline justify-center gap-1 px-2 pt-2.5">
@@ -167,7 +170,7 @@ export function Stepper({
         />
         <span className="shrink-0 text-sm text-muted">{unit}</span>
       </div>
-      <button type="button" aria-label={`Tăng ${label}`} className={btn} onClick={() => onChange((value ?? 0) + step)}>
+      <button type="button" aria-label={`Tăng ${label}`} className={btn} onClick={() => (onStep ? onStep(1) : onChange((value ?? 0) + step))}>
         +
       </button>
     </div>

@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { deleteSession, saveSet } from '@/data/api';
-import { qk, useExerciseMaps, useInvalidate, useSessionDetail } from '@/data/queries';
+import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useSessionDetail } from '@/data/queries';
 import { formatVN, WEEKDAY_LABEL, weekdayOf } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
+import { personalRecords } from '@/engine/progress';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { FEEL_LABEL, KG_CHANGE_LABEL, type SetRow, SUBSTITUTION_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
 import { sessionSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Skeleton, Stat } from '@/ui/components';
 import { fmtKg } from '../shared';
+import { RecordsCard } from '../workout/RecordsCard';
 import { SetCard } from '../workout/SetCard';
 
 /** Logged session detail: view, edit each set, delete the session. */
@@ -21,6 +23,8 @@ export function SessionDetailPage() {
   const ex = useExerciseMaps();
   const [edit, setEdit] = useState<SetRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const exIds = useMemo(() => [...new Set((detail.data?.items ?? []).map((i) => i.exercise_id))].sort(), [detail.data]);
+  const history = useExerciseHistory(exIds);
 
   if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Skeleton /></Page>;
   if (detail.error || !detail.data) return <Page title="Buổi tập" back="/training"><ErrorBox error={detail.error} /></Page>;
@@ -28,6 +32,12 @@ export function SessionDetailPage() {
   const sum = sessionSummary(session, items, sets, ex.byId);
   const w = session.warmup;
   const editItem = edit ? items.find((i) => i.id === edit.session_item_id) : null;
+  const records = personalRecords(
+    sets,
+    (history.data ?? []).filter((h) => h.sessionId !== id && h.date <= session.session_date).flatMap((h) => h.sets),
+    (exId) => ex.byId.get(exId)?.canonical_exercise_id ?? exId,
+  );
+  const recordSetIds = new Set(records.map((r) => r.setId));
 
   return (
     <Page title={`${SESSION_KIND_LABEL[session.kind]} · ${formatVN(session.session_date)}`} back="/training">
@@ -49,6 +59,7 @@ export function SessionDetailPage() {
           <Stat label="Thời gian" value={sum.durationMin ? `${sum.durationMin} phút` : '—'} />
         </div>
       )}
+      <RecordsCard records={records} byId={ex.byId} />
       {session.kind === 'badminton' && session.status !== 'skipped' && (
         <Card>Cầu lông · {session.duration_min} phút · cường độ {session.badminton_intensity === 'light' ? 'nhẹ' : session.badminton_intensity === 'moderate' ? 'vừa' : 'nặng'} · ≈ {session.est_kcal} kcal</Card>
       )}
@@ -94,7 +105,7 @@ export function SessionDetailPage() {
                       <span className="text-xs text-warn">{fmtKg(x.target_kg)}→{fmtKg(x.weight_kg)} ({KG_CHANGE_LABEL[x.kg_change_reason]})</span>
                     )}
                     {x.feel && <Badge>{FEEL_LABEL[x.feel]}</Badge>}
-                    <b>{formatSet(x)}</b>
+                    <b>{formatSet(x)}{recordSetIds.has(x.id) && ' 🏆'}</b>
                   </span>
                 </button>
               ))}

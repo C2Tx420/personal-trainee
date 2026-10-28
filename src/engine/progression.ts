@@ -1,5 +1,6 @@
 import type { IsoDate } from './dates';
 import type { PlanItem } from './plan-schema';
+import { isLbStack, stackStep } from './stack';
 import type { SetRow } from './types';
 import type { PlannedSet } from './warmup';
 
@@ -46,7 +47,7 @@ export function kgDeviates(targetKg: number | null, actualKg: number | null): bo
 
 /**
  * Load increase suggestion — only when the plan has no `target_kg` for the exercise.
- * Last working set of the previous session hit `rep_max` → +1 load step (timed exercises: +5 seconds).
+ * Last working set of the previous session hit `rep_max` → +1 load step / next pin on lb stacks (timed exercises: +5 seconds).
  */
 export function progressionHint(item: PlanItem, last: PastSession | null, loadStepKg: number): string | null {
   if (item.target_kg !== null || !last) return null;
@@ -56,6 +57,6 @@ export function progressionHint(item: PlanItem, last: PastSession | null, loadSt
     return (lastSet.seconds ?? 0) >= item.rep_max ? `Thử ${item.rep_max + 5} giây` : null;
   }
   if (lastSet.weight_kg === null || (lastSet.reps ?? 0) < item.rep_max) return null;
-  const next = lastSet.weight_kg + loadStepKg;
+  const next = isLbStack(loadStepKg) ? stackStep(lastSet.weight_kg, 1) : lastSet.weight_kg + loadStepKg;
   return `Lần trước đủ ${item.rep_max} lần — thử ${String(next).replace('.', ',')} kg`;
 }
