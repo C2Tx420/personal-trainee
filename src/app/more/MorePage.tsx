@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router';
 import { usePlans, useReviews } from '@/data/queries';
 import { APP_VERSION } from '@/lib/version';
 import { Badge, Card, Page } from '@/ui/components';
-import { IconArchive, IconBell, IconChat, IconInfo, IconLayers } from '@/ui/icons';
+import { IconArchive, IconBell, IconChat, IconInfo, IconLayers, IconSparkle } from '@/ui/icons';
+import { RELEASES, useWhatsNewUnseen } from '../whats-new';
 
 export function MorePage() {
   const nav = useNavigate();
@@ -10,11 +11,13 @@ export function MorePage() {
   const reviews = useReviews();
   const drafts = (plans.data ?? []).filter((p) => p.status === 'draft').length;
   const unread = (reviews.data ?? []).filter((r) => !r.is_read).length;
+  const whatsNew = useWhatsNewUnseen();
   const rows: { to: string; icon: React.ReactNode; label: string; sub: string; badge?: React.ReactNode }[] = [
     { to: '/more/plans', icon: <IconLayers className="size-5" />, label: 'Lộ trình', sub: 'Lịch sử phiên bản, so sánh, duyệt', badge: drafts ? <Badge tone="accent">{drafts} chờ duyệt</Badge> : null },
     { to: '/more/reviews', icon: <IconChat className="size-5" />, label: 'Nhận xét coach', sub: 'Review tuần của Claude Code', badge: unread ? <Badge tone="info">{unread} mới</Badge> : null },
     { to: '/more/reminders', icon: <IconBell className="size-5" />, label: 'Nhắc nhở', sub: 'Thông báo đẩy, giờ nhắc' },
     { to: '/more/backup', icon: <IconArchive className="size-5" />, label: 'Sao lưu', sub: 'Xuất / nhập JSON' },
+    { to: '/more/whats-new', icon: <IconSparkle className="size-5" />, label: 'Có gì mới', sub: `${RELEASES[0].date} · ${RELEASES[0].title}`, badge: whatsNew ? <Badge tone="accent">Mới</Badge> : null },
     { to: '/more/about', icon: <IconInfo className="size-5" />, label: 'Cài đặt & giới thiệu', sub: `Phiên bản ${APP_VERSION}` },
   ];
   return (

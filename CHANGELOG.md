@@ -26,6 +26,9 @@ Plan: v2.6 · Latest migration: 20261027000900
 - "Tiến độ từ 26/10" card on Today: weekly-average weight, waist, and first vs latest top set of up to 4 lifts.
 - The set card shows the same set from last session ("Lần trước: 27×12 · vừa") with a "Lặp lại" button.
 - Progress photo capture: last photo overlay can be set to Tắt / Mờ / Rõ.
+- First run on a device asks to turn on reminders (sheet after "Có gì mới", never during a workout; "Để sau" asks again in a week). iPhone outside the home-screen app gets "Thêm vào MH chính" steps instead. A device that already allowed notifications but has no subscription re-subscribes quietly.
+- Forced update: a waiting new release installs before the login / PIN screen. The app also checks for a release every 30 minutes and when it comes back to the foreground; inside the app the "Cập nhật" toast stays (and still waits during a workout).
+- "Có gì mới": user-facing release notes in Vietnamese (`src/app/whats-new.ts`) on their own page (Thêm → Có gì mới), shown once as a sheet after an update (never during a workout), with a dot on the Thêm tab until seen. The technical CHANGELOG moved there, collapsed; About links to it.
 
 ### Changed
 - App renamed to **Personal Trainee** (manifest, home-screen title, login, notifications).

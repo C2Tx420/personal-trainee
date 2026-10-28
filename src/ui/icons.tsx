@@ -112,6 +112,13 @@ export const IconInfo = (p: SVGProps<SVGSVGElement>) => (
   </Base>
 );
 
+export const IconSparkle = (p: SVGProps<SVGSVGElement>) => (
+  <Base {...p}>
+    <path d="M12 3.5 13.8 10.2 20.5 12l-6.7 1.8L12 20.5l-1.8-6.7L3.5 12l6.7-1.8z" />
+    <path d="M19 3.5v3M17.5 5h3" />
+  </Base>
+);
+
 export const IconWifiOff = (p: SVGProps<SVGSVGElement>) => (
   <Base {...p}>
     <path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 4-2.4M19 13a10 10 0 0 0-3-2M2 9.5a15 15 0 0 1 5-3M22 9.5A15 15 0 0 0 11 5.1" />

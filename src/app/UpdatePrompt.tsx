@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
+import { applySwUpdate, useSwUpdate } from '@/lib/sw-update';
 import { APP_VERSION } from '@/lib/version';
 import { Button } from '@/ui/components';
 
 /**
- * New service worker → "Có phiên bản mới — Cập nhật" toast (§15.4).
- * Never reloads on its own; while a workout is in progress it waits until the session ends.
+ * A new release arrived while the app is open → "Có phiên bản mới — Cập nhật" toast (§15.4).
+ * Never reloads on its own here; while a workout is in progress it waits until the session ends.
+ * (On the next launch the update is forced before the PIN — see ForceUpdate.)
  */
 export function UpdatePrompt({ blocked }: { blocked: boolean }) {
-  const {
-    needRefresh: [needRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({ immediate: true });
+  const { needRefresh, applying } = useSwUpdate();
   const [next, setNext] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,8 +27,8 @@ export function UpdatePrompt({ blocked }: { blocked: boolean }) {
         Có phiên bản mới <b>{next ?? ''}</b>
         <div className="text-xs opacity-70">Đang dùng {APP_VERSION}</div>
       </div>
-      <Button variant="primary" size="sm" onClick={() => void updateServiceWorker(true)}>
-        Cập nhật
+      <Button variant="primary" size="sm" disabled={applying} onClick={applySwUpdate}>
+        {applying ? 'Đang cập nhật…' : 'Cập nhật'}
       </Button>
     </div>
   );
