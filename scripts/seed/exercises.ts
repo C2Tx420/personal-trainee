@@ -203,7 +203,7 @@ export const EXERCISES: Def[] = [
   }),
   m({
     slug: 'hack_squat', name_vi: 'Máy hack squat', aliases: ['hack squat', 'hack'],
-    primary_muscle: 'quads', secondary_muscles: ['glutes'], movement_pattern: 'squat', kind: 'compound', equipment: 'machine', available_at_gym: false,
+    primary_muscle: 'quads', secondary_muscles: ['glutes'], movement_pattern: 'squat', kind: 'compound', equipment: 'machine',
     cues: ['Lưng áp sát đệm', 'Xuống tới đùi song song', 'Gối theo hướng mũi chân'],
     common_mistakes: ['Gót chân nhấc lên'],
   }),

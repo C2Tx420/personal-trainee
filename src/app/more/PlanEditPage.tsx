@@ -51,7 +51,7 @@ export function PlanEditPage() {
   }
 
   return (
-    <Page title={`Sửa từ v${base.version_no}`} back={`/more/plans/${id}`}>
+    <Page title="Sửa lộ trình" back={`/more/plans/${id}`}>
       <Card>
         <Field label="Calo tham khảo (≥ 1.700)">
           <Input inputMode="numeric" value={c.nutrition.calories_kcal} onChange={(e) => set((d) => (d.nutrition.calories_kcal = Number(e.target.value) || 0))} />

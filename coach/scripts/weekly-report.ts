@@ -3,6 +3,7 @@ import { goalProgress, type Goal } from '../../src/engine/goals';
 import { compareInbody, inbodyDue, type InbodyLog, latestFfm } from '../../src/engine/inbody';
 import { round } from '../../src/engine/math';
 import { legsBadmintonAdjacency, parsePlanContent } from '../../src/engine/plan-schema';
+import { planWeek, programStartOf } from '../../src/engine/plan-week';
 import { actualLegsBadmintonConflicts } from '../../src/engine/schedule';
 import { measurementDeltas, whr } from '../../src/engine/body';
 import type { SessionItemRow, SessionRow, SetRow } from '../../src/engine/types';
@@ -132,10 +133,17 @@ const meas4 = meas.filter((m) => m.log_date_s <= addDays(ws, -21)).at(-1) ?? nul
 const latestIb = ibLogs.at(-1) ?? null;
 const prevIb = ibLogs.at(-2) ?? null;
 
+// app names plans by week inside each goal phase ("Tuần 2 · Noel"), restarting at every goal
+const programStart = programStartOf(plans.map((p) => ({ id: p.id as string, version_no: p.version_no as number, effective_from: p.effective_from as string | null, created_at: new Date(p.created_at as string).toISOString() }))) ?? ws;
+const phaseWeek = (d: IsoDate) => {
+  const w = planWeek(d, goalRows, programStart);
+  return { goal: w.goalName, week: w.week, total_weeks: w.totalWeeks, label: `Tuần ${w.week}${w.goalName ? ` · ${w.goalName}` : ''}` };
+};
+
 const report = {
   schema: 'coach-weekly/1',
   generated_at: new Date().toISOString(),
-  week: { start: ws, end: we },
+  week: { start: ws, end: we, reviewed: phaseWeek(ws), next_plan: phaseWeek(addDays(ws, 7)) },
   active_plan: { id: active.id, version_no: active.version_no, effective_from: active.effective_from, calories_kcal: content.nutrition.calories_kcal, content },
   pending_drafts: plans.filter((p) => p.status === 'draft').map((p) => ({ id: p.id, version_no: p.version_no, created_by: p.created_by, change_note: p.change_note })),
   rejected_recent: plans.filter((p) => p.status === 'rejected').slice(-3).map((p) => ({ version_no: p.version_no, change_note: p.change_note })),
