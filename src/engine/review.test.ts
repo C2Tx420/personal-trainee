@@ -4,6 +4,7 @@ import type { Goal } from './goals';
 import { sessionChanges } from './plan-diff';
 import { parsePlanContent } from './plan-schema';
 import { planLabels, planWeek } from './plan-week';
+import { canReflect, missingReflection, reflectionLocked, reviewedWeeks } from './reflection';
 import { inlineBold, parseReviewNote } from './review-note';
 
 const goal = (name: string, target_date: string, ordinal: number): Goal => ({
@@ -73,5 +74,23 @@ describe('thay đổi theo buổi', () => {
     expect(v.items[1].changes[0]).toEqual({ kind: 'target_kg', text: '30 kg → 35 kg', dir: 'up' });
     expect(v.items[2].changes[0].dir).toBe('down');
     expect(sessionChanges(a, a, (s) => s).every((s) => !s.changed)).toBe(true);
+  });
+});
+
+describe('cảm nhận sau buổi', () => {
+  const reviewed = reviewedWeeks([{ week_start: '2026-10-26' }]);
+  it('khoá cả tuần đã review (T2–CN), tuần chưa review vẫn ghi bù được', () => {
+    expect(reflectionLocked('2026-10-26', reviewed)).toBe(true);
+    expect(reflectionLocked('2026-11-01', reviewed)).toBe(true);
+    expect(reflectionLocked('2026-11-02', reviewed)).toBe(false);
+    expect(canReflect({ status: 'completed', session_date: '2026-10-31' }, reviewed)).toBe(false);
+    expect(canReflect({ status: 'completed', session_date: '2026-11-03' }, reviewed)).toBe(true);
+  });
+  it('chỉ buổi đã xong; nhắc khi chưa ghi', () => {
+    expect(canReflect({ status: 'skipped', session_date: '2026-11-03' }, reviewed)).toBe(false);
+    expect(canReflect({ status: 'in_progress', session_date: '2026-11-03' }, reviewed)).toBe(false);
+    expect(missingReflection({ status: 'completed', session_date: '2026-11-03', reflection: '  ' }, reviewed)).toBe(true);
+    expect(missingReflection({ status: 'completed', session_date: '2026-11-03', reflection: 'Khoẻ' }, reviewed)).toBe(false);
+    expect(missingReflection({ status: 'completed', session_date: '2026-10-28', reflection: null }, reviewed)).toBe(false);
   });
 });

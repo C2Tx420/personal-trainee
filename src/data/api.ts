@@ -364,15 +364,27 @@ export async function addExtraItem(sessionId: string, exercise: ExerciseRow, pos
   );
 }
 
-export async function finishSession(s: SessionRow, estKcal: number | null): Promise<void> {
+export async function finishSession(s: SessionRow, estKcal: number | null, reflection: string | null): Promise<void> {
   const end = new Date();
   const duration = s.started_at ? Math.round((end.getTime() - new Date(s.started_at).getTime()) / 60_000) : s.duration_min;
   must(
     await supabase
       .from('workout_sessions')
-      .update({ status: 'completed', ended_at: end.toISOString(), duration_min: duration, est_kcal: estKcal })
+      .update({
+        status: 'completed',
+        ended_at: end.toISOString(),
+        duration_min: duration,
+        est_kcal: estKcal,
+        // only when written: the DB rejects reflection changes once the week is reviewed
+        ...(reflection ? { reflection } : {}),
+      })
       .eq('id', s.id),
   );
+}
+
+/** Post-workout reflection, also after the fact — the DB locks it once the week is reviewed. */
+export async function saveReflection(id: string, reflection: string | null): Promise<void> {
+  must(await supabase.from('workout_sessions').update({ reflection }).eq('id', id));
 }
 
 export async function deleteSession(id: string): Promise<void> {

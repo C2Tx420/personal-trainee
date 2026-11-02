@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useActivePlan, useExerciseMaps, useTraining, useWeights } from '@/data/queries';
+import { useActivePlan, useExerciseMaps, useReviews, useTraining, useWeights } from '@/data/queries';
 import { addDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
 import { formatNumberVN } from '@/engine/math';
+import { missingReflection, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { topSetSeries, volumeKg, weeklyVolumeByExercise, weekSummary } from '@/engine/workout-summary';
 import { SimpleBars, SimpleLine } from '@/ui/charts';
@@ -13,6 +14,7 @@ export function TrainingPage() {
   const training = useTraining();
   const plan = useActivePlan();
   const weights = useWeights();
+  const reviews = useReviews();
   const ex = useExerciseMaps();
   const today = todayVN();
   const [weeks, setWeeks] = useState<'4' | '8'>('4');
@@ -27,6 +29,7 @@ export function TrainingPage() {
   if (training.isLoading || plan.isLoading) return <Page title="Tập"><Skeleton /></Page>;
   if (training.error) return <Page title="Tập"><ErrorBox error={training.error} /></Page>;
   const sessions = data?.sessions ?? [];
+  const reviewed = reviews.data ? reviewedWeeks(reviews.data) : null;
   const content = plan.data?.content;
   const ws = weekStart(today);
   const week = content && data ? weekSummary(ws, sessions, data.items, data.sets, content, weights.data?.at(-1)?.weight_kg ?? 81.7) : null;
@@ -107,6 +110,7 @@ export function TrainingPage() {
                   {s.duration_min ? ` · ${s.duration_min} phút` : ''}
                   {s.status === 'skipped' && s.note ? ` · ${s.note}` : ''}
                 </div>
+                {reviewed && missingReflection(s, reviewed) && <div className="text-xs text-accent">✎ Chưa ghi cảm nhận</div>}
               </div>
               <div className="tabular text-right text-sm">
                 {items.length > 0 ? <div>{items.filter((i) => i.status === 'done' || i.status === 'partial').length}/{items.length} bài</div> : null}

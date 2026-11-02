@@ -59,6 +59,7 @@ export type SessionRow = {
   badminton_intensity: 'light' | 'moderate' | 'hard' | null;
   est_kcal: number | null;
   note: string | null;
+  reflection: string | null;
 };
 
 export type ItemStatus = 'pending' | 'in_progress' | 'done' | 'partial' | 'skipped';

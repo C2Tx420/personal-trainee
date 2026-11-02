@@ -183,7 +183,7 @@ const report = {
     },
     backfilled_sessions: weekSessions.filter((s) => s.is_backfill).map((s) => s.session_date),
     skipped_days: sRows.filter((s) => s.session_date >= ws && s.session_date <= we && s.status === 'skipped').map((s) => ({ date: s.session_date, kind: s.kind, note: s.note })),
-    sessions: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, duration_min: s.duration_min, volume_kg: volumeKg(setRows.filter((x) => x.session_id === s.id)), note: s.note?.startsWith('Ghi nhanh') ? 'ghi nhanh' : s.note })),
+    sessions: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, duration_min: s.duration_min, volume_kg: volumeKg(setRows.filter((x) => x.session_id === s.id)), note: s.note?.startsWith('Ghi nhanh') ? 'ghi nhanh' : s.note, reflection: s.reflection })),
     substitutions: iRows.filter((i) => weekIds.has(i.session_id) && i.substitution_reason).map((i) => ({ date: dateOf.get(i.session_id), planned: slugOf(i.planned_exercise_id), done: slugOf(i.exercise_id), reason: i.substitution_reason, note: i.substitution_note })),
     skipped_items: iRows.filter((i) => weekIds.has(i.session_id) && (i.status === 'skipped' || i.status === 'partial')).map((i) => ({ date: dateOf.get(i.session_id), exercise: slugOf(i.exercise_id), status: i.status, reason: i.skip_reason })),
     kg_changes: setRows.filter((s) => weekIds.has(s.session_id) && s.kg_change_reason).map((s) => ({ date: dateOf.get(s.session_id), exercise: slugOf(s.exercise_id), set: s.set_index, target_kg: s.target_kg, actual_kg: s.weight_kg, reason: s.kg_change_reason, note: s.kg_change_note })),

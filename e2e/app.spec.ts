@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Buổi nhẹ ngày nghỉ', { exact: true })).toBeVisible();
+  await expect(news.getByText('Cảm nhận sau buổi', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -201,9 +201,17 @@ test('06 tổng kết + chi tiết buổi', async () => {
   await expect(page.getByRole('heading', { name: 'Tổng kết buổi' })).toBeVisible();
   await expect(page.getByText(/Máy chèo tựa ngực → /)).toBeVisible();
   await expect(page.getByText(/kế hoạch 35kg → thực tế/)).toHaveCount(3);
-  await shot(page, '16-summary', 'Tổng kết: bài đổi, kg khác kế hoạch, khối lượng');
+  await page.getByLabel('Cảm nhận sau buổi').fill('Hơi mệt, ngủ 6 tiếng');
+  await shot(page, '16-summary', 'Tổng kết: bài đổi, kg khác kế hoạch, khối lượng, cảm nhận');
   await page.getByRole('button', { name: 'Lưu & kết thúc' }).click();
   await expect(page.getByRole('heading', { name: /Pull · 27\/10/ })).toBeVisible();
+  // backfill / edit the reflection while the week is not reviewed yet
+  const reflection = page.getByLabel('Cảm nhận sau buổi');
+  await expect(reflection).toHaveValue('Hơi mệt, ngủ 6 tiếng');
+  await reflection.fill('Hơi mệt, ngủ 6 tiếng; kéo xô nặng');
+  await page.getByRole('button', { name: 'Lưu cảm nhận' }).click();
+  await expect(page.getByRole('button', { name: 'Lưu cảm nhận' })).toBeHidden();
+  expect(psql("select reflection from workout_sessions where session_date = '2026-10-27' and kind = 'pull'")).toBe('Hơi mệt, ngủ 6 tiếng; kéo xô nặng');
   await shot(page, '17-session-detail', 'Chi tiết buổi đã lưu — sửa từng hiệp, xoá buổi');
 
   const n = psql("select count(*) from workout_sets s join workout_sessions w on w.id = s.session_id where w.session_date = '2026-10-27' and s.completed");
@@ -342,6 +350,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   expect(report.training.kg_changes.filter((k: { reason: string }) => k.reason === 'too_heavy')).toHaveLength(3);
   expect(report.training.substitutions[0]).toMatchObject({ planned: 'chest_supported_machine_row', reason: 'unavailable' });
   expect(report.provisional_exercises).toHaveLength(1);
+  expect(report.training.sessions.find((s: { kind: string }) => s.kind === 'pull')).toMatchObject({ reflection: 'Hơi mệt, ngủ 6 tiếng; kéo xô nặng' });
   expect(JSON.stringify(report)).not.toContain('storage_path');
   fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'test-results', 'coach-report.json'), JSON.stringify(report, null, 2));
@@ -390,6 +399,14 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await page.clock.setSystemTime(new Date());
   await reloadAndUnlock(page, '/');
   await expect(page.getByText('Có 1 lộ trình mới chờ duyệt')).toBeVisible();
+
+  // Week reviewed → the reflection is locked
+  await nav(page, `/training/session/${psql("select id from workout_sessions where session_date = '2026-10-27' and kind = 'pull'")}`);
+  await expect(page.getByLabel('Cảm nhận sau buổi')).toBeDisabled();
+  await expect(page.getByText(/coach đã review — không ghi \/ sửa cảm nhận/)).toBeVisible();
+  expect(() => psql("update workout_sessions set reflection = 'sửa' where session_date = '2026-10-27' and kind = 'pull'")).toThrow();
+
+  await nav(page, '/');
   await expect(page.getByText('Nhận xét tuần mới từ coach')).toBeVisible();
   await shot(page, '30-today-draft', 'Hôm nay: banner lộ trình chờ duyệt + nhận xét coach');
   await page.getByText('Có 1 lộ trình mới chờ duyệt').click();
@@ -427,7 +444,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
   await expect(page.getByTestId('version-line')).toContainText('Plan v2.6');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261027000900');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261102000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();
   await expect(page.getByText('Bản đầu tiên')).toBeVisible();

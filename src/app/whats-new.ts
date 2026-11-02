@@ -10,6 +10,15 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-02.3',
+    date: '02/11/2026',
+    title: 'Cảm nhận sau buổi tập',
+    plan: 'v2.6',
+    items: [
+      { icon: '📝', title: 'Cảm nhận sau buổi', body: 'Tổng kết buổi có ô ghi cảm nhận (khoẻ / mệt, ngủ, chỗ nào đau…). Quên ghi thì vào chi tiết buổi ghi bù; Lịch sử đánh dấu "Chưa ghi cảm nhận". Coach đọc khi review tuần — tuần đã review thì không sửa được nữa.', to: '/training' },
+    ],
+  },
+  {
     id: '2026-11-02.2',
     date: '02/11/2026',
     title: 'Buổi nhẹ ngày nghỉ, cập nhật bắt buộc',
