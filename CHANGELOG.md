@@ -4,9 +4,10 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 
 ## [Unreleased]
 
-Plan: v2.6 · Latest migration: 20261027000900
+Plan: v2.6 · Latest migration: 20261102000100
 
 ### Added
+- Post-workout reflection ("Cảm nhận sau buổi"): optional text on the session summary, editable / backfilled on the session detail until that week has a coach review note, then read-only (`src/engine/reflection.ts`, DB trigger `workout_sessions_reflection_guard`). History marks done sessions still missing one; the coach report gets `sessions[].reflection`. Migration `20261102000100` (nullable `workout_sessions.reflection`).
 - Rest days on the Today card offer optional light sessions (walk / zone 2 / core; only walk / core the day before Legs) — `restDayOptions` in `schedule.ts`. Badminton day: "Thay bằng Zone 2 / Đi bộ" marks badminton skipped with the reason and opens the substitute log prefilled (45–50 min, note "Thay buổi cầu lông").
 - Plans are named by training week instead of version number ("Tuần 2 · Noel"): every goal is a phase and the week count restarts at each goal (`src/engine/plan-week.ts`). Plan history is grouped by phase; the coach report gets `week.reviewed` / `week.next_plan` labels.
 - Plan review screen: changes grouped per session (new / replaced exercises, ↑/↓ load badges, coach note under the exercise, unchanged exercises dimmed, removed ones struck through), a summary row, a collapsible exercise-library section, and the coach's reason as a bullet list (`sessionChanges` in `plan-diff.ts`).

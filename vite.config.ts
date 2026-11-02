@@ -30,7 +30,7 @@ function versionJson(): Plugin {
       this.emitFile({
         type: 'asset',
         fileName: 'version.json',
-        source: JSON.stringify({ version: APP_VERSION, sha: SHA, builtAt: BUILD_TIME, minSchema: '20261027000900' }),
+        source: JSON.stringify({ version: APP_VERSION, sha: SHA, builtAt: BUILD_TIME, minSchema: '20261102000100' }),
       });
     },
   };

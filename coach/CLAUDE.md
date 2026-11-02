@@ -89,6 +89,7 @@ Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg
 | `kg_change_reason = machine_diff` | Not a missed session; reset `target_kg` for the new machine |
 | Note mentions pain ("đau", `pain_mentions`) | Don't increase load on that exercise; consider swapping it, explain in the note |
 | `training.skipped_days` (he marked the day "nghỉ" with a reason) | Not a failed session — don't change loads for it; mention it in the note, and if the same day is skipped ≥ 2 weeks in a row, suggest moving it |
+| `sessions[].reflection` (his post-workout feeling: tired, slept badly, joint pain, loved an exercise…) | Context for the numbers — a Hard set after "ngủ ít" is not a reason to drop the load; pain → same rule as notes. Quote it briefly in the note. Locked once your review note for that week is saved, so it never changes after you read it |
 | Set with `kg = null` (he forgot the number) | Missing data — don't guess; remind him to log kg next time |
 | First week (no `target_kg` yet) | Set `target_kg` for every exercise from the calibration week |
 

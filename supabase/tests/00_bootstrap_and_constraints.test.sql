@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(26);
 
 -- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
@@ -28,6 +28,25 @@ select is((select count(*)::int from public.workout_sets where set_type = 'warmu
 select lives_ok(
   $$ insert into public.workout_sessions (session_date, kind, status, note) values ('2026-10-29', 'badminton', 'skipped', 'Bận việc') $$,
   'nghỉ buổi: lưu được trạng thái skipped kèm lý do');
+
+-- Reflection: backfill allowed until the week has a review note, then locked
+select lives_ok(
+  $$ update public.workout_sessions set reflection = 'Khoẻ, ngủ đủ' where session_date = '2026-10-26' $$,
+  'ghi bù cảm nhận khi tuần chưa review');
+reset role;
+insert into public.review_notes (user_id, week_start, content)
+values ('11111111-1111-4111-8111-111111111111', '2026-10-26', 'Nhận xét tuần 1 đủ dài để lưu');
+set local role authenticated;
+select throws_ok(
+  $$ update public.workout_sessions set reflection = 'Sửa sau review' where session_date = '2026-10-26' $$,
+  'P0001', null, 'tuần đã review → không sửa cảm nhận');
+select lives_ok(
+  $$ update public.workout_sessions set duration_min = 61, reflection = 'Khoẻ, ngủ đủ' where session_date = '2026-10-26' $$,
+  'tuần đã review: sửa cột khác (cảm nhận giữ nguyên) vẫn được');
+select lives_ok(
+  $$ insert into public.workout_sessions (session_date, kind, status) values ('2026-11-03', 'pull', 'completed');
+     update public.workout_sessions set reflection = 'Mệt' where session_date = '2026-11-03' $$,
+  'tuần chưa review vẫn ghi được');
 
 -- Calo ≥ 1700
 select throws_ok(

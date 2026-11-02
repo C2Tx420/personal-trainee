@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { addExtraItem, createProvisionalExercise, finishSession, saveSet, type SetInput, updateItem } from '@/data/api';
-import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate, useSessionDetail, useWeights } from '@/data/queries';
+import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail, useWeights } from '@/data/queries';
 import { lastPerformance, formatSet, prefillKg, progressionHint } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
+import { reflectionLocked, reviewedWeeks } from '@/engine/reflection';
 import { type FlowItem, type FlowStep, flowProgress, itemBadge, itemsToMarkDone, nextStep, orderedItems, plannedFor, remainingSets } from '@/engine/session-flow';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import type { TemplateWarmup } from '@/engine/plan-schema';
@@ -11,9 +12,10 @@ import { FEEL_LABEL, KG_CHANGE_LABEL, SUBSTITUTION_LABEL, type ExerciseRow, type
 import { setLabel } from '@/engine/warmup';
 import { estimateSessionKcal, sessionSummary } from '@/engine/workout-summary';
 import { useNow, useWakeLock } from '@/lib/hooks';
-import { Badge, Banner, Button, Card, Chip, cx, ErrorBox, ExerciseImg, GLASS_HEADER, Input, ProgressBar, Sheet, Spinner, Stat } from '@/ui/components';
+import { Badge, Banner, Button, Card, Chip, cx, ErrorBox, ExerciseImg, GLASS_HEADER, Input, ProgressBar, Sheet, Spinner, Stat, TextArea } from '@/ui/components';
 import { IconClose, IconList } from '@/ui/icons';
 import { fmtKg, itemSummary } from '../shared';
+import { REFLECTION_PLACEHOLDER } from '../training/ReflectionCard';
 import { ExercisePicker, type PickResult } from './ExercisePicker';
 import { RecordsCard } from './RecordsCard';
 import { RestOverlay } from './RestOverlay';
@@ -32,6 +34,7 @@ export function WorkoutFlowPage() {
   const ex = useExerciseMaps();
   const plan = useActivePlan();
   const weights = useWeights();
+  const reviews = useReviews();
   const items = useMemo(() => detail.data?.items ?? [], [detail.data]);
   const sets = useMemo(() => detail.data?.sets ?? [], [detail.data]);
   const exIds = useMemo(() => [...new Set(items.map((i) => i.exercise_id))].sort(), [items]);
@@ -50,6 +53,7 @@ export function WorkoutFlowPage() {
   const [addPick, setAddPick] = useState<PickResult | null>(null);
   const [forceSummary, setForceSummary] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [reflection, setReflection] = useState('');
   const [error, setError] = useState<unknown>(null);
 
   const session = detail.data?.session;
@@ -169,7 +173,7 @@ export function WorkoutFlowPage() {
     try {
       const minutes = session!.started_at ? Math.round((Date.now() - new Date(session!.started_at).getTime()) / 60_000) : 60;
       const kcal = plan.data ? estimateSessionKcal({ ...session!, duration_min: minutes }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? 81.7) : null;
-      await finishSession(session!, kcal);
+      await finishSession(session!, kcal, reflection.trim() || null);
       await refresh();
       nav(`/training/session/${session!.id}`, { replace: true });
     } catch (e) {
@@ -221,6 +225,13 @@ export function WorkoutFlowPage() {
                 {k.note ? `: ${k.note}` : ''})
               </div>
             ))}
+          </Card>
+        )}
+        {reviews.data && !reflectionLocked(session.session_date, reviewedWeeks(reviews.data)) && (
+          <Card>
+            <div className="mb-2 font-semibold">Cảm nhận sau buổi</div>
+            <TextArea aria-label="Cảm nhận sau buổi" rows={3} maxLength={2000} placeholder={REFLECTION_PLACEHOLDER} value={reflection} onChange={(e) => setReflection(e.target.value)} />
+            <p className="mt-1 text-xs text-muted">Tuỳ chọn — ghi bù sau ở chi tiết buổi cũng được, đến khi tuần đó được review.</p>
           </Card>
         )}
         {error ? <ErrorBox error={error} /> : null}

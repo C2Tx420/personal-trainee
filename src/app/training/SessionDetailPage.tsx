@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { deleteSession, saveSet } from '@/data/api';
-import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useSessionDetail } from '@/data/queries';
+import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail } from '@/data/queries';
 import { formatVN, WEEKDAY_LABEL, weekdayOf } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
+import { reflectionLocked, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { FEEL_LABEL, KG_CHANGE_LABEL, type SetRow, SUBSTITUTION_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
@@ -13,6 +14,7 @@ import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Sk
 import { fmtKg } from '../shared';
 import { RecordsCard } from '../workout/RecordsCard';
 import { SetCard } from '../workout/SetCard';
+import { ReflectionCard } from './ReflectionCard';
 
 /** Logged session detail: view, edit each set, delete the session. */
 export function SessionDetailPage() {
@@ -25,6 +27,7 @@ export function SessionDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const exIds = useMemo(() => [...new Set((detail.data?.items ?? []).map((i) => i.exercise_id))].sort(), [detail.data]);
   const history = useExerciseHistory(exIds);
+  const reviews = useReviews();
 
   if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Skeleton /></Page>;
   if (detail.error || !detail.data) return <Page title="Buổi tập" back="/training"><ErrorBox error={detail.error} /></Page>;
@@ -60,6 +63,9 @@ export function SessionDetailPage() {
         </div>
       )}
       <RecordsCard records={records} byId={ex.byId} />
+      {session.status === 'completed' && reviews.data && (
+        <ReflectionCard session={session} locked={reflectionLocked(session.session_date, reviewedWeeks(reviews.data))} />
+      )}
       {session.kind === 'badminton' && session.status !== 'skipped' && (
         <Card>Cầu lông · {session.duration_min} phút · cường độ {session.badminton_intensity === 'light' ? 'nhẹ' : session.badminton_intensity === 'moderate' ? 'vừa' : 'nặng'} · ≈ {session.est_kcal} kcal</Card>
       )}
