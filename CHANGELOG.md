@@ -7,6 +7,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.6 · Latest migration: 20261027000900
 
 ### Added
+- Rest days on the Today card offer optional light sessions (walk / zone 2 / core; only walk / core the day before Legs) — `restDayOptions` in `schedule.ts`. Badminton day: "Thay bằng Zone 2 / Đi bộ" marks badminton skipped with the reason and opens the substitute log prefilled (45–50 min, note "Thay buổi cầu lông").
 - Plans are named by training week instead of version number ("Tuần 2 · Noel"): every goal is a phase and the week count restarts at each goal (`src/engine/plan-week.ts`). Plan history is grouped by phase; the coach report gets `week.reviewed` / `week.next_plan` labels.
 - Plan review screen: changes grouped per session (new / replaced exercises, ↑/↓ load badges, coach note under the exercise, unchanged exercises dimmed, removed ones struck through), a summary row, a collapsible exercise-library section, and the coach's reason as a bullet list (`sessionChanges` in `plan-diff.ts`).
 - Coach notes page: structured cards parsed from the note's markdown (headline, sections with icons, ✓/⚠ bullets, highlighted "Cần anh trả lời" box, link to the week's plan with its status); only the newest note is expanded (`src/engine/review-note.ts`).
@@ -45,6 +46,7 @@ Plan: v2.6 · Latest migration: 20261027000900
 - Exercise library: 9 machine exercises for the gym's Matrix machines, with illustrations — leg extension, hip abduction, hip adduction, lateral raise machine, lat pulldown machine, seated dip, assisted dip, ab crunch machine, rotary torso (53 exercises). New muscle group "Đùi trong" (adductors). More aliases for seated cable row, chest-supported row and assisted pull-up.
 
 ### Fixed
+- Force update really locks: opening or resuming the app compares `/version.json` with the running build and locks the app until the new build is installed (no longer waits for the service worker to notice it, which let him in with only a toast). Install works whether the new worker is waiting, still installing or not fetched yet; a reload-loop guard stops forcing after 2 attempts at the same build.
 - App updates are one global guard instead of a per-screen toast (which kept showing on screens like Ghi bù / Bài tập): a waiting release installs before the login / PIN, or on the next screen change in the app (reload lands on that screen and keeps the app unlocked — no PIN for the app's own update reload, same tab within 60 s; never inside the workout flow). Releases are identified by build (commit + build time from `version.json`) instead of `0.1.0`; applying reloads even if another tab already activated the new worker; pages still on the old build reload when the new worker takes over; a lazy screen whose old chunk was purged reloads once.
 - E2E global setup waits for auth to come back after `supabase db reset` instead of failing on a 502.
 - Page header on notch / Dynamic Island iPhones (e.g. 14 Pro Max): content no longer hugs the bottom edge; the "resume workout" banner now sits under the header instead of under the status bar; offline bar respects the safe area.

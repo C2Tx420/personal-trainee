@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Lộ trình đặt tên theo tuần', { exact: true })).toBeVisible();
+  await expect(news.getByText('Buổi nhẹ ngày nghỉ', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
