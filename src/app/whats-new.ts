@@ -10,6 +10,17 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-02.2',
+    date: '02/11/2026',
+    title: 'Buổi nhẹ ngày nghỉ, cập nhật bắt buộc',
+    plan: 'v2.6',
+    items: [
+      { icon: '🚶', title: 'Buổi nhẹ ngày nghỉ', body: 'Ngày nghỉ có sẵn đi bộ / zone 2 / core nếu anh muốn vận động. Hôm trước Legs chỉ gợi ý đi bộ hoặc core để giữ chân khoẻ.', to: '/' },
+      { icon: '🏸', title: 'Không đánh cầu lông?', body: 'Thẻ cầu lông có "Thay bằng Zone 2 / Đi bộ": tự ghi nghỉ cầu lông kèm lý do và mở màn ghi buổi thay thế (45–50 phút).', to: '/' },
+      { icon: '🔒', title: 'Cập nhật bắt buộc', body: 'Mở app hoặc quay lại app mà có bản mới → khoá màn hình và cập nhật ngay, không cần nhập lại PIN nếu anh đang dùng dở. Đang tập thì chờ xong buổi.' },
+    ],
+  },
+  {
     id: '2026-11-02',
     date: '02/11/2026',
     title: 'Lộ trình theo tuần, review gọn hơn',

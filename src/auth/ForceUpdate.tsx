@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
-import { applySwUpdate, CURRENT_RELEASE, releaseLabel, useSwUpdate } from '@/lib/sw-update';
+import { applySwUpdate, CURRENT_RELEASE, releaseLabel, rememberUnlock, useSwUpdate } from '@/lib/sw-update';
 import { Button } from '@/ui/components';
 
 /**
- * Global update guard screen: shown while a waiting release is installed — before the login /
- * PIN screen, or right after a screen change in the app (see sw-update). Reloads into the new build.
+ * Global update guard screen: locks the app while a new release is installed — on open / resume,
+ * before the login / PIN, or right after a screen change in the app (see sw-update). Reloads into
+ * the new build; `keepUnlocked` skips the PIN after that reload when he was already in the app.
  */
-export function ForceUpdate() {
+export function ForceUpdate({ keepUnlocked }: { keepUnlocked: boolean }) {
   const { latest } = useSwUpdate();
   const [slow, setSlow] = useState(false);
 
   useEffect(() => {
+    if (keepUnlocked) rememberUnlock(); // he was already in the app → no PIN after the reload
     applySwUpdate();
     const t = setTimeout(() => setSlow(true), 8000);
     return () => clearTimeout(t);
-  }, []);
+  }, [keepUnlocked]);
 
   return (
     <div className="fixed inset-0 grid place-items-center px-6 text-center" role="status" aria-label="Đang cập nhật">

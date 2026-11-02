@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { logSimpleSession } from '@/data/api';
 import { qk, useActivePlan, useInvalidate, useWeights } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
@@ -10,20 +10,23 @@ import { Banner, Button, Card, Chip, ErrorBox, Field, Input, Page } from '@/ui/c
 
 const INTENSITY_LABEL: Record<Intensity, string> = { light: 'Nhẹ', moderate: 'Vừa', hard: 'Nặng' };
 const DEFAULT_MIN: Record<string, number> = { badminton: 75, walk: 35, zone2: 30, core: 12 };
+/** Replacing a badminton session (?thay=badminton): similar length. */
+const SUBSTITUTE_MIN: Record<string, number> = { walk: 50, zone2: 45 };
 
 /** Log badminton / walk / zone 2 / core: duration + intensity, estimated calories. */
 export function SimpleSessionPage() {
   const { kind = 'badminton' } = useParams();
   const k = kind as SessionKind;
+  const replacesBadminton = useSearchParams()[0].get('thay') === 'badminton';
   const nav = useNavigate();
   const invalidate = useInvalidate();
   const plan = useActivePlan();
   const weights = useWeights();
   const [date, setDate] = useState(todayVN());
-  const [minutes, setMinutes] = useState(DEFAULT_MIN[k] ?? 30);
+  const [minutes, setMinutes] = useState((replacesBadminton ? SUBSTITUTE_MIN[k] : undefined) ?? DEFAULT_MIN[k] ?? 30);
   const [intensity, setIntensity] = useState<Intensity>('light');
   const [warmupDone, setWarmupDone] = useState(true);
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(replacesBadminton ? 'Thay buổi cầu lông' : '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
 

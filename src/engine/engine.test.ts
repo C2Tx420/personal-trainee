@@ -9,7 +9,7 @@ import { legsBadmintonAdjacency, parsePlanContent, planContentSchema, validatePl
 import { kgDeviates, prefillKg, progressionHint } from './progression';
 import { bodyChange, personalRecords, strengthChanges } from './progress';
 import { dueReminders, DEFAULT_REMINDERS } from './reminders';
-import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, templateFor } from './schedule';
+import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, restDayOptions, templateFor } from './schedule';
 import { kgToLb, lbToKg, pinsAround, roundLoad, stackStep } from './stack';
 import { exactMatch, searchExercises, suggestSubstitutes } from './substitutions';
 import { validateSvg } from './svg-validate';
@@ -81,6 +81,9 @@ describe('plan v1 + rule lịch', () => {
     expect(dayPlanFor(plan, '2026-10-27')).toEqual({ kind: 'session', template: 'pull' });
     expect(dayPlanFor(plan, '2026-10-29').kind).toBe('badminton');
     expect(dayPlanFor(plan, '2026-10-31')).toEqual({ kind: 'session', template: 'legs' });
+    // T4 nghỉ: đi bộ / zone 2 / core · T6 (mai Legs): chỉ đi bộ / core
+    expect(restDayOptions(plan, '2026-10-28')).toEqual(['walk', 'zone2', 'core']);
+    expect(restDayOptions(plan, '2026-10-30')).toEqual(['walk', 'core']);
   });
   it('Legs liền cầu lông bị phát hiện, kể cả vòng tuần', () => {
     expect(legsBadmintonAdjacency(plan.schedule)).toEqual([]);

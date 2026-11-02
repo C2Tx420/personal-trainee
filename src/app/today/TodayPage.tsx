@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { deleteSession, startSession } from '@/data/api';
+import { deleteSession, skipScheduledDay, startSession } from '@/data/api';
 import { qk, useActivePlan, useExerciseMaps, useGoals, useInbody, useInProgress, useInvalidate, useMeasurements, usePhotos, usePlans, useReviews, useTraining, useWeights } from '@/data/queries';
 import { diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
 import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
 import { inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
 import type { SundayOption } from '@/engine/plan-schema';
-import { dayPlanFor, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, todayConflictWarning } from '@/engine/schedule';
+import { BADMINTON_SUBSTITUTES, dayPlanFor, type LightKind, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, todayConflictWarning } from '@/engine/schedule';
 import { lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
@@ -88,6 +88,30 @@ export function TodayPage() {
       setStarting(false);
     }
   }
+
+  /** Badminton not played → mark it skipped (reason = the substitute) and log the substitute. */
+  async function substitute(k: LightKind) {
+    setError(null);
+    try {
+      if (!skippedToday.some((s) => s.kind === 'badminton')) {
+        await skipScheduledDay({ date: today, kind: 'badminton', note: `Không đánh — thay bằng ${SESSION_KIND_LABEL[k].toLowerCase()}` });
+        await invalidate(qk.training);
+      }
+      nav(`/training/simple/${k}?thay=badminton`);
+    } catch (e) {
+      setError(e);
+    }
+  }
+
+  /** Light sessions already logged today (rest / badminton day). */
+  const lightDone = doneToday.filter((s) => s.kind === 'walk' || s.kind === 'zone2' || s.kind === 'core');
+  const lightDoneRow = lightDone.length > 0 && (
+    <div className="mb-2 flex flex-wrap gap-1.5">
+      {lightDone.map((s) => (
+        <Badge key={s.id} tone="ok">Đã ghi {SESSION_KIND_LABEL[s.kind].toLowerCase()}{s.duration_min ? ` ${s.duration_min}′` : ''}</Badge>
+      ))}
+    </div>
+  );
 
   async function unskip(id: string) {
     await deleteSession(id);
@@ -209,12 +233,25 @@ export function TodayPage() {
           {doneToday.some((s) => s.kind === 'badminton') ? (
             <Badge tone="ok">Đã ghi</Badge>
           ) : skippedToday.some((s) => s.kind === 'badminton') ? (
-            skipRow('badminton')
+            <>
+              {lightDoneRow}
+              {skipRow('badminton')}
+            </>
           ) : (
             <>
               <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>Ghi buổi cầu lông</Button>
               {skipRow('badminton')}
             </>
+          )}
+          {!doneToday.some((s) => s.kind === 'badminton') && lightDone.length === 0 && (
+            <div className="mt-3 border-t border-line pt-3">
+              <p className="mb-2 text-sm text-muted">Không đánh được? Thay bằng cardio nhẹ cùng thời lượng — không tập chân.</p>
+              <div className="grid grid-cols-2 gap-2">
+                {BADMINTON_SUBSTITUTES.map((k) => (
+                  <Button key={k} onClick={() => void substitute(k)}>{SESSION_KIND_LABEL[k]}</Button>
+                ))}
+              </div>
+            </div>
           )}
         </Card>
       )}
@@ -222,8 +259,23 @@ export function TodayPage() {
       {day.kind === 'rest' && (
         <Card>
           <h3 className="mb-1 text-xl font-bold">Nghỉ</h3>
-          <p className="mb-3 text-sm text-muted">Gợi ý: đi bộ 20–30 phút, mục tiêu ≥ {formatNumberVN(content.activity.rest_day_steps_max)} bước.</p>
-          <Button block onClick={() => nav('/training/simple/walk')}>Ghi đi bộ</Button>
+          {(() => {
+            const opts = restDayOptions(content, today);
+            return (
+              <>
+                <p className="mb-3 text-sm text-muted">
+                  Nghỉ là chính. Muốn vận động thì chọn 1 buổi nhẹ (không tạ)
+                  {opts.includes('zone2') ? '.' : ' — mai Legs nên chỉ đi bộ nhẹ hoặc core, giữ chân khoẻ.'}
+                </p>
+                {lightDoneRow}
+                <div className="grid gap-2">
+                  {opts.map((o) => (
+                    <Button key={o} variant="secondary" onClick={() => nav(`/training/simple/${o}`)}>{SUNDAY_LABEL[o]}</Button>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
         </Card>
       )}
 

@@ -87,3 +87,15 @@ export function todayConflictWarning(
     ? `Hôm ${hit.date === addDays(today, -1) ? 'qua' : 'mai'} có cầu lông — Legs và cầu lông nên cách nhau ít nhất 1 ngày`
     : `Hôm ${hit.date === addDays(today, -1) ? 'qua' : 'mai'} có Legs — cầu lông và Legs nên cách nhau ít nhất 1 ngày`;
 }
+
+/** Light activity that fits a rest day or replaces badminton. */
+export type LightKind = 'walk' | 'zone2' | 'core';
+
+/** Optional light sessions on a rest day — the day before Legs keeps the legs fresh (no zone 2). */
+export function restDayOptions(content: PlanContent, date: IsoDate): LightKind[] {
+  const next = dayPlanFor(content, addDays(date, 1));
+  return next.kind === 'session' && next.template === 'legs' ? ['walk', 'core'] : ['walk', 'zone2', 'core'];
+}
+
+/** Badminton day without badminton: easy cardio of a similar length, never a leg session. */
+export const BADMINTON_SUBSTITUTES: LightKind[] = ['zone2', 'walk'];
