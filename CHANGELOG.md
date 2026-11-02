@@ -7,6 +7,9 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.6 · Latest migration: 20261027000900
 
 ### Added
+- Plans are named by training week instead of version number ("Tuần 2 · Noel"): every goal is a phase and the week count restarts at each goal (`src/engine/plan-week.ts`). Plan history is grouped by phase; the coach report gets `week.reviewed` / `week.next_plan` labels.
+- Plan review screen: changes grouped per session (new / replaced exercises, ↑/↓ load badges, coach note under the exercise, unchanged exercises dimmed, removed ones struck through), a summary row, a collapsible exercise-library section, and the coach's reason as a bullet list (`sessionChanges` in `plan-diff.ts`).
+- Coach notes page: structured cards parsed from the note's markdown (headline, sections with icons, ✓/⚠ bullets, highlighted "Cần anh trả lời" box, link to the week's plan with its status); only the newest note is expanded (`src/engine/review-note.ts`).
 - Complete rebuild as a React PWA (Vite) + Supabase, replacing the old Expo app.
 - Supabase sign-in (single account) + 4-digit PIN every time the app opens, verified server-side (secret `APP_PIN`); 5 wrong attempts → sign in again.
 - Today screen: scheduled session, warm-up, goal countdown, banners for pending plan drafts / coach notes / Legs–badminton warning.
@@ -31,6 +34,8 @@ Plan: v2.6 · Latest migration: 20261027000900
 - "Có gì mới": user-facing release notes in Vietnamese (`src/app/whats-new.ts`) on their own page (Thêm → Có gì mới), shown once as a sheet after an update (never during a workout), with a dot on the Thêm tab until seen. The technical CHANGELOG moved there, collapsed; About links to it.
 
 ### Changed
+- Coach guide: machines are the backbone with exactly 1 free-weight compound per session; new review-note format (headline + labelled sections + ✓/⚠ bullets); review runs only on Monday after the weigh-in.
+- `hack_squat` is available at the gym again (seed + coach guide).
 - App renamed to **Personal Trainee** (manifest, home-screen title, login, notifications).
 - Faster start: every screen except Today is a lazily loaded chunk (charts no longer in the main bundle); after the first launch on a device, bootstrap runs in the background instead of blocking the app.
 - Hack squat is marked "not available" (the gym only has a Smith machine) and plank is archived. Plan v1 itself is unchanged; the coach builds the new exercise selection from the week of 02/11.
@@ -40,6 +45,8 @@ Plan: v2.6 · Latest migration: 20261027000900
 - Exercise library: 9 machine exercises for the gym's Matrix machines, with illustrations — leg extension, hip abduction, hip adduction, lateral raise machine, lat pulldown machine, seated dip, assisted dip, ab crunch machine, rotary torso (53 exercises). New muscle group "Đùi trong" (adductors). More aliases for seated cable row, chest-supported row and assisted pull-up.
 
 ### Fixed
+- App updates are one global guard instead of a per-screen toast (which kept showing on screens like Ghi bù / Bài tập): a waiting release installs before the login / PIN, or on the next screen change in the app (reload lands on that screen and keeps the app unlocked — no PIN for the app's own update reload, same tab within 60 s; never inside the workout flow). Releases are identified by build (commit + build time from `version.json`) instead of `0.1.0`; applying reloads even if another tab already activated the new worker; pages still on the old build reload when the new worker takes over; a lazy screen whose old chunk was purged reloads once.
+- E2E global setup waits for auth to come back after `supabase db reset` instead of failing on a 502.
 - Page header on notch / Dynamic Island iPhones (e.g. 14 Pro Max): content no longer hugs the bottom edge; the "resume workout" banner now sits under the header instead of under the status bar; offline bar respects the safe area.
 - E2E no longer depends on the day it runs: the browser clock is fixed to Tue 27/10/2026 (back to real time before approving a plan, which the server checks against its own date).
 - Exercise swap: typing the name or alias of the exercise being swapped (e.g. "Lat pulldown" while swapping lat pulldown) no longer creates a provisional duplicate; the picker says it is the same exercise.

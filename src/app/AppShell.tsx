@@ -6,7 +6,6 @@ import { MIN_SCHEMA_VERSION } from '@/lib/version';
 import { Banner, cx, PageBanners } from '@/ui/components';
 import { IconBook, IconDumbbell, IconMore, IconPulse, IconToday } from '@/ui/icons';
 import { NotificationPrompt } from './NotificationPrompt';
-import { UpdatePrompt } from './UpdatePrompt';
 import { WhatsNewSheet } from './WhatsNew';
 import { useWhatsNewUnseen } from './whats-new';
 
@@ -53,7 +52,6 @@ export function AppShell() {
       <PageBanners value={banners}>
         <Outlet />
       </PageBanners>
-      <UpdatePrompt blocked={!!inProgress.data} />
       <WhatsNewSheet blocked={!!inProgress.data || loc.pathname.startsWith('/workout') || loc.pathname === '/more/whats-new'} />
       {/* after "Có gì mới" is closed, one sheet at a time */}
       <NotificationPrompt blocked={whatsNew || !!inProgress.data || loc.pathname.startsWith('/workout') || loc.pathname === '/more/reminders'} />

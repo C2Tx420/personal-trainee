@@ -10,6 +10,19 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-02',
+    date: '02/11/2026',
+    title: 'Lộ trình theo tuần, review gọn hơn',
+    plan: 'v2.6',
+    items: [
+      { icon: '🗓️', title: 'Lộ trình đặt tên theo tuần', body: 'Không còn v1, v2: mỗi lộ trình là "Tuần 2 · Noel". Mỗi mục tiêu (Noel, Tết, Hè) là một giai đoạn, tuần đếm lại từ 1.', to: '/more/plans' },
+      { icon: '🔍', title: 'Duyệt lộ trình dễ xem', body: 'Thay đổi gom theo từng buổi: bài mới / bài thay, ↑ tăng tạ / ↓ giảm tạ, lời coach ngay dưới bài; bài không đổi làm mờ; thư viện bài tập thu gọn.' },
+      { icon: '💬', title: 'Nhận xét coach dạng thẻ', body: 'Câu tóm tắt ở đầu, từng mục cân / số đo / tập luyện / đề xuất có biểu tượng, ✓ điểm tốt – ⚠ cần chú ý, câu hỏi cho anh nằm trong khung riêng. Bản cũ thu gọn.', to: '/more/reviews' },
+      { icon: '🔄', title: 'Tự cập nhật, không còn thanh nhắc', body: 'Có bản mới thì app tự cài lúc mở app hoặc khi anh chuyển sang màn khác (không mất chữ đang gõ), không cài giữa buổi tập. Bỏ thanh "Có phiên bản mới".' },
+      { icon: '🏋️', title: 'Máy là chính', body: 'Coach giữ bài chính trên máy, mỗi buổi thêm đúng 1 bài tạ tự do. Có máy hack squat ở phòng tập.' },
+    ],
+  },
+  {
     id: '2026-10-28',
     date: '28/10/2026',
     title: 'Máy Matrix, kỷ lục và tiến độ',

@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Máy chia nấc lb', { exact: true })).toBeVisible();
+  await expect(news.getByText('Lộ trình đặt tên theo tuần', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -393,13 +393,13 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await expect(page.getByText('Nhận xét tuần mới từ coach')).toBeVisible();
   await shot(page, '30-today-draft', 'Hôm nay: banner lộ trình chờ duyệt + nhận xét coach');
   await page.getByText('Có 1 lộ trình mới chờ duyệt').click();
-  await expect(page.getByText(/32,5 kg/)).toBeVisible();
-  await shot(page, '31-plan-diff', 'Diff draft của Claude: đổi tạ, bài mới (kèm hình), sửa bài tạm, calo');
+  await expect(page.getByText(/→ 32,5 kg/)).toBeVisible();
+  await shot(page, '31-plan-diff', 'Duyệt lộ trình: thay đổi theo buổi, tăng/giảm tạ, thư viện gọn, calo');
   await page.getByRole('button', { name: 'Duyệt', exact: true }).click();
   await shot(page, '32-approve', 'Duyệt: áp dụng hôm nay hoặc chọn ngày');
   await page.getByRole('dialog').getByRole('button', { name: 'Duyệt', exact: true }).click();
   await expect(page.getByText('Đã duyệt — áp dụng từ hôm nay')).toBeVisible();
-  await shot(page, '33-approved', 'Đã duyệt → v2 active, v1 lưu trữ');
+  await shot(page, '33-approved', 'Đã duyệt → bản mới đang dùng, bản cũ lưu trữ');
   expect(psql("select version_no || ':' || status from plan_versions order by version_no")).toBe('1:archived\n2:active');
   expect(psql("select is_provisional::text || ':' || name_vi from exercises where slug like 'user_%'")).toBe('false:Máy chèo ngồi Impulse');
 });
@@ -408,8 +408,9 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await page.getByRole('link', { name: 'Thêm', exact: true }).click();
   await shot(page, '34-more', 'Tab Thêm');
   await page.getByText('Lộ trình', { exact: true }).click();
-  await expect(page.getByText('v2', { exact: true })).toBeVisible();
-  await shot(page, '35-plans', 'Lịch sử phiên bản lộ trình');
+  await expect(page.getByText(/^Tuần \d+/).first()).toBeVisible();
+  await expect(page.getByText(/^Giai đoạn /).first()).toBeVisible();
+  await shot(page, '35-plans', 'Lộ trình theo tuần, gom theo giai đoạn mục tiêu');
   await nav(page, '/more/reviews');
   await expect(page.getByText(/Kéo xô hụt ở 35kg/)).toBeVisible();
   await shot(page, '36-reviews', 'Nhận xét coach');
