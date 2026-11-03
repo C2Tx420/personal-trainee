@@ -64,23 +64,25 @@ export function AuthGate({ children }: { children: ReactNode }) {
     setLocked(true);
   }, []);
 
-  const unlock = useCallback(() => {
-    setLocked(false);
-    const uid = session?.user.id;
-    if (!uid || !bootedBefore(uid)) return;
-    // Seen this device before → show the app now, top up seed data in the background
-    setBooted(true);
-    bootstrap()
-      .then((changed) => {
-        if (changed) void queryClient.invalidateQueries();
-      })
-      .catch(() => {});
-  }, [session]);
+  const unlock = useCallback(() => setLocked(false), []);
+
+  // Seen this device before → show the app right away (also after the reload for an update, which
+  // skips the PIN) and top up seed data in the background
+  const warm = !!session && bootedBefore(session.user.id);
 
   // First launch on this device: wait for the seed data before showing the app
   useEffect(() => {
     if (!session || locked || booted) return;
     const uid = session.user.id;
+    if (warm) {
+      setBooted(true);
+      bootstrap()
+        .then((changed) => {
+          if (changed) void queryClient.invalidateQueries();
+        })
+        .catch(() => {});
+      return;
+    }
     bootstrap()
       .then(() => {
         markBooted(uid);
@@ -88,7 +90,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         setBootError(null);
       })
       .catch((e: Error) => setBootError(e.message));
-  }, [session, locked, booted]);
+  }, [session, locked, booted, warm]);
 
   if (!online && (session === undefined || !booted)) return <OfflineScreen />;
   // global guard: lock the app while a new release is installed — on open / resume (forced), before
@@ -122,7 +124,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  if (!booted) return <Splash label="Đang chuẩn bị dữ liệu…" />;
+  if (!booted && !warm) return <Splash label="Đang chuẩn bị dữ liệu…" />;
   return <Ctx.Provider value={{ userId: session.user.id, signOut }}>{children}</Ctx.Provider>;
 }
 
