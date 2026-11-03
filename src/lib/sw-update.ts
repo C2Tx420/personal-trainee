@@ -19,6 +19,8 @@ const CHECK_EVERY_MS = 30 * 60_000;
 const APPLY_TIMEOUT_MS = 6000;
 /** Same target build forced this many times without landing on it → stop forcing (no reload loop). */
 const MAX_ATTEMPTS = 2;
+/** Login / PIN wait this long at most for the first version check (slow network → show them anyway). */
+const ENTRY_CHECK_TIMEOUT_MS = 3000;
 
 export type Release = { version: string; sha: string; builtAt: string };
 
@@ -26,8 +28,13 @@ export type Release = { version: string; sha: string; builtAt: string };
 export const CURRENT_RELEASE: Release = { version: APP_VERSION, sha: GIT_SHA, builtAt: BUILD_TIME };
 
 let needRefresh = false;
+// reloaded MAX_ATTEMPTS times for the same build and still not on it → only on screen change, never before the PIN
+let stalled = false;
 let forced = false;
 let applying = false;
+// false until the first check on open settles: the login / PIN screen waits for it, so a newer
+// build is caught before he starts typing instead of yanking the PIN screen away mid-entry
+let entryChecked = true;
 let latest: Release | null = null;
 let registration: ServiceWorkerRegistration | undefined;
 const listeners = new Set<() => void>();
@@ -80,11 +87,18 @@ async function checkOnEnter() {
   if (attempts(next!) >= MAX_ATTEMPTS) {
     // already reloaded for it and still not running it → fall back to "next screen change"
     needRefresh = true;
+    stalled = true;
   } else if (!inWorkout()) {
     forced = true;
   }
   emit();
   void registration?.update().catch(() => undefined);
+}
+
+function markEntryChecked() {
+  if (entryChecked) return;
+  entryChecked = true;
+  emit();
 }
 
 export function startSwUpdates(): void {
@@ -102,7 +116,7 @@ export function startSwUpdates(): void {
     onNeedRefresh() {
       needRefresh = true;
       emit();
-      if (!latest) void fetchLatest().then((next) => ((latest = next), emit()));
+      if (!latest) void fetchLatest().then((next) => ((latest = next), (stalled = !!next && attempts(next) >= MAX_ATTEMPTS), emit()));
     },
     onRegisteredSW(_url, reg) {
       if (!reg) return;
@@ -113,7 +127,9 @@ export function startSwUpdates(): void {
     },
   });
 
-  void checkOnEnter();
+  entryChecked = false;
+  setTimeout(markEntryChecked, ENTRY_CHECK_TIMEOUT_MS);
+  void checkOnEnter().finally(markEntryChecked);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void checkOnEnter();
   });
@@ -198,8 +214,17 @@ const subscribe = (l: () => void) => {
   return () => listeners.delete(l);
 };
 
-export function useSwUpdate(): { needRefresh: boolean; forced: boolean; applying: boolean; latest: Release | null } {
+export function useSwUpdate(): {
+  needRefresh: boolean;
+  stalled: boolean;
+  forced: boolean;
+  applying: boolean;
+  latest: Release | null;
+  entryChecked: boolean;
+} {
   return {
+    stalled: useSyncExternalStore(subscribe, () => stalled),
+    entryChecked: useSyncExternalStore(subscribe, () => entryChecked),
     needRefresh: useSyncExternalStore(subscribe, () => needRefresh),
     forced: useSyncExternalStore(subscribe, () => forced),
     applying: useSyncExternalStore(subscribe, () => applying),
