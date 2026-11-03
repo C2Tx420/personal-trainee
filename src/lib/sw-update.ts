@@ -28,7 +28,7 @@ export type Release = { version: string; sha: string; builtAt: string };
 export const CURRENT_RELEASE: Release = { version: APP_VERSION, sha: GIT_SHA, builtAt: BUILD_TIME };
 
 let needRefresh = false;
-// reloaded MAX_ATTEMPTS times for the same build and still not on it → only on screen change, never before the PIN
+// reloaded MAX_ATTEMPTS times for the same build and still not on it → no more automatic reloads
 let stalled = false;
 let forced = false;
 let applying = false;
@@ -84,10 +84,11 @@ async function checkOnEnter() {
   const next = await fetchLatest();
   if (!isNewer(next)) return;
   latest = next;
-  if (attempts(next!) >= MAX_ATTEMPTS) {
-    // already reloaded for it and still not running it → fall back to "next screen change"
+  stalled = attempts(next!) >= MAX_ATTEMPTS;
+  if (stalled) {
+    // already reloaded for it and still not running it → stop reloading; the waiting worker
+    // takes over on its own the next time the app is fully closed and reopened
     needRefresh = true;
-    stalled = true;
   } else if (!inWorkout()) {
     forced = true;
   }
@@ -172,7 +173,8 @@ export function applyOnNavigation(router: NavRouter): void {
   router.subscribe((s) => {
     if (s.location.key === last) return;
     last = s.location.key;
-    if (!needRefresh || s.location.pathname.startsWith('/workout')) return;
+    // stalled: reloading on every screen change never lands on the new build → don't try again
+    if (!needRefresh || stalled || s.location.pathname.startsWith('/workout')) return;
     rememberUnlock(); // the router only renders once the PIN is entered
     applySwUpdate();
   });
