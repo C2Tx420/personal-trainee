@@ -93,10 +93,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (!online && (session === undefined || !booted)) return <OfflineScreen />;
   // global guard: lock the app while a new release is installed — on open / resume (forced), before
   // the login / PIN, or after a screen change in the app (applying)
-  if (update.applying || update.forced || (update.needRefresh && (!session || locked))) {
+  if (update.applying || update.forced || (update.needRefresh && !update.stalled && (!session || locked))) {
     return <ForceUpdate keepUnlocked={!!session && !locked} />;
   }
-  if (session === undefined) return <Splash />;
+  // first open: hold the login / PIN until the version check settles (≤ 3 s), so the update
+  // screen never replaces them mid-entry
+  if (session === undefined || (!update.entryChecked && (!session || locked))) return <Splash />;
   if (!session) return <LoginPage />;
   if (locked) {
     return (

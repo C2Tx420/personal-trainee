@@ -399,6 +399,9 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await page.clock.setSystemTime(new Date());
   await reloadAndUnlock(page, '/');
   await expect(page.getByText('Có 1 lộ trình mới chờ duyệt')).toBeVisible();
+  // real clock ≥ a week after the fake 27/10 → the "Để sau" snooze from test 02 has run out
+  const pushPrompt = page.getByRole('dialog', { name: 'Bật nhắc nhở' });
+  if (await pushPrompt.isVisible()) await pushPrompt.getByRole('button', { name: 'Để sau' }).click();
 
   // Week reviewed → the reflection is locked
   await nav(page, `/training/session/${psql("select id from workout_sessions where session_date = '2026-10-27' and kind = 'pull'")}`);
