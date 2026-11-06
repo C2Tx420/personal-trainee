@@ -3,7 +3,8 @@
     "ab crunch",
     "abdominal crunch",
     "gập bụng",
-    "máy bụng"
+    "máy bụng",
+    "Máy gập bụng"
   ],
   "secondary_muscles": [],
   "load_step_kg": 4.5,
@@ -18,7 +19,7 @@
     "Bật nhanh lên"
   ],
   "slug": "ab_crunch_machine",
-  "name_vi": "Máy gập bụng",
+  "name_vi": "Ab Crunch Machine",
   "primary_muscle": "abs",
   "movement_pattern": "core",
   "kind": "core",

@@ -2,7 +2,8 @@
   "aliases": [
     "reverse pec deck",
     "bay ngược",
-    "rear delt fly"
+    "rear delt fly",
+    "Máy bay ngược (vai sau)"
   ],
   "secondary_muscles": [
     "upper_back"
@@ -17,7 +18,7 @@
     "Nhún vai"
   ],
   "slug": "reverse_pec_deck",
-  "name_vi": "Máy bay ngược (vai sau)",
+  "name_vi": "Reverse Pec Deck",
   "primary_muscle": "rear_delt",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

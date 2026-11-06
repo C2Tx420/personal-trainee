@@ -2,7 +2,8 @@
   "aliases": [
     "đẩy vai",
     "shoulder press",
-    "đẩy vai máy"
+    "đẩy vai máy",
+    "Máy đẩy vai"
   ],
   "secondary_muscles": [
     "side_delt",
@@ -20,7 +21,7 @@
     "Hạ quá thấp dưới cằm"
   ],
   "slug": "machine_shoulder_press",
-  "name_vi": "Máy đẩy vai",
+  "name_vi": "Machine Shoulder Press",
   "primary_muscle": "front_delt",
   "movement_pattern": "vertical_push",
   "kind": "compound",

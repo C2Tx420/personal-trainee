@@ -2,7 +2,8 @@
   "aliases": [
     "zone 2",
     "zone2",
-    "đạp xe"
+    "đạp xe",
+    "Cardio zone 2"
   ],
   "secondary_muscles": [],
   "load_step_kg": 0,
@@ -13,7 +14,7 @@
   ],
   "common_mistakes": [],
   "slug": "zone2_cardio",
-  "name_vi": "Cardio zone 2",
+  "name_vi": "Zone 2 Cardio",
   "primary_muscle": "cardio",
   "movement_pattern": "cardio",
   "kind": "cardio",

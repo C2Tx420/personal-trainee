@@ -10,6 +10,15 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-05',
+    date: '05/11/2026',
+    title: 'Tên bài tập tiếng Anh',
+    plan: 'v2.7',
+    items: [
+      { icon: '🔤', title: 'Tên bài tiếng Anh', body: 'Tất cả bài tập đổi sang tên tiếng Anh như ở phòng tập (vd. Machine Chest Press, Cable Lat Pulldown). Tên tiếng Việt cũ vẫn nằm trong "Tên gọi khác" — gõ tiếng Việt khi tìm, đổi bài hay ghi nhanh vẫn ra đúng bài. Hướng dẫn kỹ thuật giữ tiếng Việt.', to: '/exercises' },
+    ],
+  },
+  {
     id: '2026-11-02.3',
     date: '02/11/2026',
     title: 'Cảm nhận sau buổi tập',

@@ -4,7 +4,8 @@
     "ohp",
     "military press",
     "đẩy vai đòn",
-    "đẩy vai đứng"
+    "đẩy vai đứng",
+    "Đẩy vai tạ đòn đứng"
   ],
   "secondary_muscles": [
     "side_delt",
@@ -23,7 +24,7 @@
     "Đẩy đòn vòng ra trước mặt"
   ],
   "slug": "overhead_press",
-  "name_vi": "Đẩy vai tạ đòn đứng",
+  "name_vi": "Barbell Overhead Press",
   "primary_muscle": "front_delt",
   "movement_pattern": "vertical_push",
   "kind": "compound",

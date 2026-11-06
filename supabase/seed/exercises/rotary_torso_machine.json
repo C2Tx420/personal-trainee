@@ -3,7 +3,8 @@
     "rotary torso",
     "xoay thân",
     "xoay eo",
-    "máy xoay eo"
+    "máy xoay eo",
+    "Máy xoay thân"
   ],
   "secondary_muscles": [
     "abs"
@@ -20,7 +21,7 @@
     "Tạ quá nặng làm xoắn lưng dưới"
   ],
   "slug": "rotary_torso_machine",
-  "name_vi": "Máy xoay thân",
+  "name_vi": "Rotary Torso Machine",
   "primary_muscle": "obliques",
   "movement_pattern": "core",
   "kind": "core",

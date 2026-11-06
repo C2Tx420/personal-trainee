@@ -6,7 +6,8 @@
     "chèo tựa ngực",
     "t-bar máy",
     "máy chèo ngồi",
-    "seated row machine"
+    "seated row machine",
+    "Máy chèo tựa ngực"
   ],
   "secondary_muscles": [
     "lats",
@@ -24,7 +25,7 @@
     "Nhấc ngực khỏi đệm để giật tạ"
   ],
   "slug": "chest_supported_machine_row",
-  "name_vi": "Máy chèo tựa ngực",
+  "name_vi": "Chest-Supported Machine Row",
   "primary_muscle": "upper_back",
   "movement_pattern": "horizontal_pull",
   "kind": "compound",

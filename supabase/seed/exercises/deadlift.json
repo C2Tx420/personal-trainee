@@ -2,7 +2,8 @@
   "aliases": [
     "deadlift",
     "dl",
-    "kéo đất"
+    "kéo đất",
+    "Deadlift tạ đòn"
   ],
   "secondary_muscles": [
     "hamstrings",
@@ -24,7 +25,7 @@
     "Giật đòn khỏi sàn"
   ],
   "slug": "deadlift",
-  "name_vi": "Deadlift tạ đòn",
+  "name_vi": "Barbell Deadlift",
   "primary_muscle": "glutes",
   "movement_pattern": "hinge",
   "kind": "compound",

@@ -1,7 +1,8 @@
 {
   "aliases": [
     "nâng vai cáp",
-    "cable lateral raise"
+    "cable lateral raise",
+    "Nâng vai bên cáp"
   ],
   "secondary_muscles": [],
   "load_step_kg": 2.5,
@@ -15,7 +16,7 @@
     "Kéo bằng thân người"
   ],
   "slug": "cable_lateral_raise",
-  "name_vi": "Nâng vai bên cáp",
+  "name_vi": "Cable Lateral Raise",
   "primary_muscle": "side_delt",
   "movement_pattern": "isolation_push",
   "kind": "isolation",

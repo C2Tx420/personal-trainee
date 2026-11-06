@@ -3,7 +3,8 @@
     "leg extension",
     "đá đùi",
     "đá đùi trước",
-    "duỗi gối"
+    "duỗi gối",
+    "Máy đá đùi trước"
   ],
   "secondary_muscles": [],
   "load_step_kg": 4.5,
@@ -18,7 +19,7 @@
     "Vung chân lấy đà"
   ],
   "slug": "leg_extension",
-  "name_vi": "Máy đá đùi trước",
+  "name_vi": "Leg Extension",
   "primary_muscle": "quads",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

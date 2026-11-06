@@ -2,7 +2,8 @@
   "aliases": [
     "dumbbell curl",
     "cuốn tạ đơn",
-    "curl"
+    "curl",
+    "Curl tạ đơn"
   ],
   "secondary_muscles": [
     "forearms"
@@ -17,7 +18,7 @@
     "Đung đưa lấy đà"
   ],
   "slug": "db_curl",
-  "name_vi": "Curl tạ đơn",
+  "name_vi": "Dumbbell Curl",
   "primary_muscle": "biceps",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

@@ -2,7 +2,8 @@
   "aliases": [
     "calf raise",
     "nhón bắp chân",
-    "bắp chân"
+    "bắp chân",
+    "Máy nhón bắp chân"
   ],
   "secondary_muscles": [],
   "load_step_kg": 5,
@@ -15,7 +16,7 @@
     "Nhún nhanh không hết tầm"
   ],
   "slug": "calf_raise",
-  "name_vi": "Máy nhón bắp chân",
+  "name_vi": "Machine Calf Raise",
   "primary_muscle": "calves",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

@@ -1,7 +1,8 @@
 {
   "aliases": [
     "đi bộ",
-    "walk"
+    "walk",
+    "Đi bộ ngoài trời"
   ],
   "secondary_muscles": [],
   "load_step_kg": 0,
@@ -11,7 +12,7 @@
   ],
   "common_mistakes": [],
   "slug": "walk",
-  "name_vi": "Đi bộ ngoài trời",
+  "name_vi": "Outdoor Walk",
   "primary_muscle": "cardio",
   "movement_pattern": "cardio",
   "kind": "cardio",

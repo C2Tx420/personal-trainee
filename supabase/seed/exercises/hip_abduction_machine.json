@@ -4,7 +4,8 @@
     "abductor",
     "dạng hông",
     "mở đùi",
-    "máy dạng hông"
+    "máy dạng hông",
+    "Máy dạng hông (mông bên)"
   ],
   "secondary_muscles": [],
   "load_step_kg": 4.5,
@@ -19,7 +20,7 @@
     "Bật nhanh không kiểm soát"
   ],
   "slug": "hip_abduction_machine",
-  "name_vi": "Máy dạng hông (mông bên)",
+  "name_vi": "Hip Abduction Machine",
   "primary_muscle": "glutes",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

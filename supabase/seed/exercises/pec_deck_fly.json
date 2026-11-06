@@ -5,7 +5,8 @@
     "pec deck",
     "ép ngực",
     "máy ép ngực",
-    "fly"
+    "fly",
+    "Máy ép ngực (pec deck)"
   ],
   "secondary_muscles": [
     "front_delt"
@@ -22,7 +23,7 @@
     "Mở quá rộng ra sau vai"
   ],
   "slug": "pec_deck_fly",
-  "name_vi": "Máy ép ngực (pec deck)",
+  "name_vi": "Pec Deck Fly",
   "primary_muscle": "chest",
   "movement_pattern": "isolation_push",
   "kind": "isolation",

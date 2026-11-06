@@ -2,7 +2,8 @@
   "aliases": [
     "back extension",
     "duỗi lưng",
-    "hyperextension"
+    "hyperextension",
+    "Máy duỗi lưng 45°"
   ],
   "secondary_muscles": [
     "glutes",
@@ -19,7 +20,7 @@
     "Ưỡn lưng quá mức ở đỉnh"
   ],
   "slug": "back_extension_45",
-  "name_vi": "Máy duỗi lưng 45°",
+  "name_vi": "45° Back Extension",
   "primary_muscle": "lower_back",
   "movement_pattern": "hinge",
   "kind": "isolation",

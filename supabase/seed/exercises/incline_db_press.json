@@ -2,7 +2,8 @@
   "aliases": [
     "incline dumbbell press",
     "đẩy ngực dốc",
-    "incline"
+    "incline",
+    "Đẩy ngực dốc tạ đơn"
   ],
   "secondary_muscles": [
     "front_delt",
@@ -19,7 +20,7 @@
     "Ghế dốc quá cao thành bài vai"
   ],
   "slug": "incline_db_press",
-  "name_vi": "Đẩy ngực dốc tạ đơn",
+  "name_vi": "Incline Dumbbell Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

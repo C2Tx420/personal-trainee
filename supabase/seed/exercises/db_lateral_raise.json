@@ -3,7 +3,8 @@
     "nâng vai bên",
     "lateral raise",
     "dang tay",
-    "nâng tạ đơn bên"
+    "nâng tạ đơn bên",
+    "Nâng tạ đơn sang bên"
   ],
   "secondary_muscles": [],
   "load_step_kg": 1,
@@ -18,7 +19,7 @@
     "Nhún vai"
   ],
   "slug": "db_lateral_raise",
-  "name_vi": "Nâng tạ đơn sang bên",
+  "name_vi": "Dumbbell Lateral Raise",
   "primary_muscle": "side_delt",
   "movement_pattern": "isolation_push",
   "kind": "isolation",

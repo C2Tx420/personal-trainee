@@ -2,7 +2,8 @@
   "aliases": [
     "hip thrust",
     "đẩy hông",
-    "hip thrust đòn"
+    "hip thrust đòn",
+    "Hip thrust tạ đòn"
   ],
   "secondary_muscles": [
     "hamstrings"
@@ -19,7 +20,7 @@
     "Bàn chân đặt quá xa"
   ],
   "slug": "hip_thrust",
-  "name_vi": "Hip thrust tạ đòn",
+  "name_vi": "Barbell Hip Thrust",
   "primary_muscle": "glutes",
   "movement_pattern": "hinge",
   "kind": "compound",

@@ -1,7 +1,8 @@
 {
   "aliases": [
     "back squat",
-    "squat"
+    "squat",
+    "Squat tạ đòn"
   ],
   "secondary_muscles": [
     "glutes",
@@ -17,7 +18,7 @@
     "Cong lưng dưới ở đáy"
   ],
   "slug": "back_squat",
-  "name_vi": "Squat tạ đòn",
+  "name_vi": "Barbell Back Squat",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",

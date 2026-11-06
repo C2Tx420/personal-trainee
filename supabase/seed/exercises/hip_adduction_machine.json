@@ -4,7 +4,8 @@
     "adductor",
     "khép đùi",
     "đùi trong",
-    "máy khép đùi"
+    "máy khép đùi",
+    "Máy khép đùi (đùi trong)"
   ],
   "secondary_muscles": [],
   "load_step_kg": 4.5,
@@ -19,7 +20,7 @@
     "Bật nhanh không kiểm soát"
   ],
   "slug": "hip_adduction_machine",
-  "name_vi": "Máy khép đùi (đùi trong)",
+  "name_vi": "Hip Adduction Machine",
   "primary_muscle": "adductors",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",
