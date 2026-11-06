@@ -7,6 +7,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.7 · Latest migration: 20261106000100
 
 ### Changed
+- Warm-ups: % warm-ups stay ≥ 1 step below the working load (`capBelow` in `stack.ts`); `suggestWarmup` gives the new default (compound 50% × 8 + 75% × 4, one 75% × 5 set when both land on the same load, none for isolation / assisted / timed) — used when adding an exercise in the plan editor and by the coach.
 - Sets per muscle (`muscleSets` / `weeklyMuscleSets` in `analytics.ts`: primary +1, secondary +0.5, cardio and warm-ups excluded): "Hiệp theo nhóm cơ" card on the Training tab (10–20 reference band, average of the previous 4 weeks) and `training.muscle_sets` in the weekly report.
 - `deloadOptions` (`analytics.ts`): deload choices on the real load grid at ~90% of the recent best e1RM (lb pins / kg steps; assisted = more assistance); the weekly report adds `training.stalled[].deload_options`.
 - Stricter draft checks (`src/engine/draft-validate.ts`): errors for a new load off the lb-stack ladder, an exercise twice in one session, a fixed warm-up ≥ the working load; warnings for > 1 step vs the active plan, > 6 changes, more load where he wrote "đau" in the last 4 weeks, and an off-ladder load copied unchanged. `submit-draft` stops on errors and needs `--accept-warnings` for warnings; the review screen lists them without blocking.
