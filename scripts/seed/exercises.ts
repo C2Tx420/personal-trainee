@@ -6,7 +6,7 @@ import type { ExerciseDef } from '../../src/engine/plan-schema';
  */
 type Def = Omit<ExerciseDef, 'illustration_svg'>;
 
-const m = (d: Partial<Def> & Pick<Def, 'slug' | 'primary_muscle' | 'movement_pattern' | 'kind' | 'equipment'> & { name: string }): Def & { name: string } => ({
+const m = (d: Partial<Def> & Pick<Def, 'slug' | 'name' | 'primary_muscle' | 'movement_pattern' | 'kind' | 'equipment'>): Def => ({
   aliases: [],
   secondary_muscles: [],
   load_step_kg: 5,
@@ -16,7 +16,7 @@ const m = (d: Partial<Def> & Pick<Def, 'slug' | 'primary_muscle' | 'movement_pat
   ...d,
 });
 
-export const EXERCISES: (Def & { name: string })[] = [
+export const EXERCISES: Def[] = [
   // ───────── Push
   m({
     slug: 'machine_chest_press', name: 'Machine Chest Press', aliases: ['đẩy ngực', 'đẩy ngực máy', 'chest press', 'máy đẩy ngực ngồi', 'Máy đẩy ngực'],

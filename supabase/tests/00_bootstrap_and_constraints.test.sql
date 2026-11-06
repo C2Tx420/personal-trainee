@@ -85,17 +85,15 @@ select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
   null, true);
 select is((select is_assisted from public.exercises where slug = 'pull_up'), true, 'upsert có is_assisted thì đặt cờ');
 
--- name / name_vi stay in sync during the transition (release N of plan v2.7 B13)
-select is((select count(*)::int from public.exercises where name is distinct from name_vi), 0, 'name = name_vi cho mọi bài');
-update public.exercises set name_vi = 'Old Client Name' where slug = 'leg_press';
-select is((select name from public.exercises where slug = 'leg_press'), 'Old Client Name', 'app cũ ghi name_vi → name theo');
-update public.exercises set name = 'Leg Press' where slug = 'leg_press';
-select is((select name_vi from public.exercises where slug = 'leg_press'), 'Leg Press', 'ghi name → name_vi theo');
+-- name_vi dropped (release N+1 of plan v2.7 B13); drafts that still carry name_vi upsert fine
+select hasnt_column('public', 'exercises', 'name_vi', 'cột name_vi đã bỏ');
+select col_not_null('public', 'exercises', 'name', 'name bắt buộc');
 select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
-  (select jsonb_build_array((e - 'name_vi') || jsonb_build_object('slug', 'test_name_only', 'name', 'Name Only'))
+  (select jsonb_build_array((e - 'name') || jsonb_build_object('slug', 'test_old_draft', 'name_vi', 'Old Draft Name'))
    from jsonb_array_elements(public._seed_payload()->'exercises') e where e->>'slug' = 'leg_press'),
   null, false);
-select is((select name_vi || '|' || name from public.exercises where slug = 'test_name_only'), 'Name Only|Name Only', 'upsert chỉ có name → cả 2 cột');
+select is((select name from public.exercises where slug = 'test_old_draft'), 'Old Draft Name', 'draft cũ chỉ có name_vi → name');
+select is((select count(*)::int from public.exercises where name is null), 0, 'mọi bài có name');
 
 -- Immutability
 select throws_ok(

@@ -175,7 +175,7 @@ describe('plan-diff', () => {
     b.templates[1].items[0].exercise = 'assisted_pull_up';
     b.templates[1].items[1].target_kg = 35;
     b.nutrition.calories_kcal = 1800;
-    b.exercise_upserts = [{ slug: 'cable_fly', name_vi: 'Ép ngực cáp', aliases: [], primary_muscle: 'chest', secondary_muscles: [], movement_pattern: 'isolation_push', kind: 'isolation', equipment: 'cable', load_step_kg: 2.5, is_time_based: false, cues: [], common_mistakes: [] }];
+    b.exercise_upserts = [{ slug: 'cable_fly', name: 'Ép ngực cáp', aliases: [], primary_muscle: 'chest', secondary_muscles: [], movement_pattern: 'isolation_push', kind: 'isolation', equipment: 'cable', load_step_kg: 2.5, is_time_based: false, cues: [], common_mistakes: [] }];
     const d = diffPlans(a, b, names);
     expect(d.find((x) => x.kind === 'replaced')?.text).toBe('lat_pulldown → assisted_pull_up');
     expect(d.find((x) => x.kind === 'target_kg')?.text).toContain('30 kg → 35 kg');

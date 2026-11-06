@@ -28,6 +28,9 @@ export type BackupTable = (typeof BACKUP_TABLES)[number];
 /** Tables that are read-only for the client (RLS) — not importable, rebuilt when a plan is approved. */
 const READ_ONLY_TABLES: BackupTable[] = ['session_templates', 'session_template_items', 'review_notes'];
 
+/** Columns renamed since a backup could have been made — old name → new name (plan v2.7 §16 B13). */
+const RENAMED: Partial<Record<BackupTable, Record<string, string>>> = { exercises: { name_vi: 'name' } };
+
 /** Generated columns — dropped on import. */
 const GENERATED: Partial<Record<BackupTable, string[]>> = { plan_versions: ['calories_kcal'] };
 
@@ -63,7 +66,21 @@ export function planImport(raw: unknown): { plan: ImportPlan; counts: Record<str
       continue;
     }
     const drop = GENERATED[t] ?? [];
-    plan.push({ table: t, rows: rows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !drop.includes(k) && k !== 'user_id'))) });
+    const renamed = RENAMED[t] ?? {};
+    plan.push({
+      table: t,
+      rows: rows.map((r) => {
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(r)) {
+          if (drop.includes(k) || k === 'user_id') continue;
+          const to = renamed[k];
+          if (to) {
+            if (out[to] === undefined && r[to] === undefined) out[to] = v;
+          } else out[k] = v;
+        }
+        return out;
+      }),
+    });
   }
   return { plan, counts, skipped };
 }
