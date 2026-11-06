@@ -7,7 +7,7 @@ import { arg, connect } from './db';
  * Submit a plan draft for approval (§7.5). Can only call coach_submit_draft —
  * the draft is always status=draft, created_by=claude_code, and cannot activate itself.
  *
- *   pnpm run submit-draft --file draft.json --note "Reason + data…" [--based-on active|<uuid>]
+ *   pnpm run submit-draft --file draft.json --note "Reason + data…" [--based-on active|<uuid>] [--allow-pending]
  */
 const file = arg('file');
 const note = arg('note');
@@ -26,6 +26,17 @@ for (const e of content.exercise_upserts) {
 }
 if (errors.length) {
   console.error('Draft không hợp lệ:\n- ' + errors.join('\n- '));
+  await sql.end();
+  process.exit(1);
+}
+
+// one pending draft at a time: a second one goes stale as soon as either is approved (01–02/11/2026)
+const pending = await sql`select id, version_no from plan_versions where status = 'draft' order by version_no`;
+if (pending.length && !process.argv.includes('--allow-pending')) {
+  console.error(
+    `Đang có ${pending.length} bản nháp chờ duyệt (${pending.map((p) => `v${p.version_no} ${p.id}`).join(', ')}).\n` +
+      'Nhờ anh từ chối bản cũ trong app trước, hoặc chạy lại với --allow-pending (app sẽ nhắc anh từ chối bản cũ).',
+  );
   await sql.end();
   process.exit(1);
 }

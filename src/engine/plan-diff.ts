@@ -186,6 +186,27 @@ export function rejectedSummary(plans: PlanVersionLite[], names: (slug: string) 
     });
 }
 
+export type DraftWarnings = {
+  /** built on a plan that is no longer the active one (the id it was built on) */
+  staleBase: string | null;
+  /** other drafts waiting for approval */
+  otherDrafts: PlanVersionLite[];
+  /** this is the newest pending draft */
+  newest: boolean;
+};
+
+/** Stale-draft checks for the review screen (built on an old plan, or several drafts pending). */
+export function draftWarnings(draft: PlanVersionLite, plans: PlanVersionLite[]): DraftWarnings {
+  if (draft.status !== 'draft') return { staleBase: null, otherDrafts: [], newest: false };
+  const active = plans.find((p) => p.status === 'active');
+  const otherDrafts = plans.filter((p) => p.status === 'draft' && p.id !== draft.id);
+  return {
+    staleBase: active && draft.based_on_version_id && draft.based_on_version_id !== active.id ? draft.based_on_version_id : null,
+    otherDrafts,
+    newest: otherDrafts.every((p) => p.version_no < draft.version_no),
+  };
+}
+
 // ───────────────────────── Per-session view (plan review screen)
 
 export type ItemChange = { kind: 'sets' | 'reps' | 'rest' | 'target_kg' | 'warmup_sets'; text: string; dir?: 'up' | 'down' };

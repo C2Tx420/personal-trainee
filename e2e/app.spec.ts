@@ -404,13 +404,21 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   );
   execSync(`pnpm exec tsx scripts/add-review-note.ts --week 2026-10-26 --file "${noteFile}" --plan ${out.draft_id}`, { cwd: path.join(ROOT, 'coach'), env: COACH_ENV });
 
+  // a second draft while one is pending: refused, unless --allow-pending (the app then offers to reject the older one)
+  const submit2 = (flag: string) =>
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Bản sửa lại: kéo xô 32,5kg; ép ngực cáp thay pec deck" ${flag}`, {
+      cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8', stdio: 'pipe',
+    });
+  expect(() => submit2('')).toThrow(/bản nháp chờ duyệt/);
+  submit2('--allow-pending');
+
   // The coach role cannot activate a plan
   expect(() => execSync(`psql "postgresql://coach_readonly:coach-local-only@127.0.0.1:54322/postgres" -c "update plan_versions set status='active'"`, { stdio: 'pipe' })).toThrow();
 
   // approve_plan_version checks "from today" against the server's date → back to the real clock
   await page.clock.setSystemTime(new Date());
   await reloadAndUnlock(page, '/');
-  await expect(page.getByText('Có 1 lộ trình mới chờ duyệt')).toBeVisible();
+  await expect(page.getByText('Có 2 lộ trình mới chờ duyệt')).toBeVisible();
   // real clock ≥ a week after the fake 27/10 → the "Để sau" snooze from test 02 has run out
   const pushPrompt = page.getByRole('dialog', { name: 'Bật nhắc nhở' });
   if (await pushPrompt.isVisible()) await pushPrompt.getByRole('button', { name: 'Để sau' }).click();
@@ -424,15 +432,18 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await nav(page, '/');
   await expect(page.getByText('Nhận xét tuần mới từ coach')).toBeVisible();
   await shot(page, '30-today-draft', 'Hôm nay: banner lộ trình chờ duyệt + nhận xét coach');
-  await page.getByText('Có 1 lộ trình mới chờ duyệt').click();
+  await page.getByText('Có 2 lộ trình mới chờ duyệt').click();
   await expect(page.getByText(/→ 32,5 kg/)).toBeVisible();
+  await expect(page.getByText(/Còn 1 bản nháp cũ hơn đang chờ/)).toBeVisible();
+  await page.getByRole('button', { name: 'Từ chối bản cũ' }).click();
+  await expect(page.getByText(/bản nháp cũ hơn/)).toHaveCount(0);
   await shot(page, '31-plan-diff', 'Duyệt lộ trình: thay đổi theo buổi, tăng/giảm tạ, thư viện gọn, calo');
   await page.getByRole('button', { name: 'Duyệt', exact: true }).click();
   await shot(page, '32-approve', 'Duyệt: áp dụng hôm nay hoặc chọn ngày');
   await page.getByRole('dialog').getByRole('button', { name: 'Duyệt', exact: true }).click();
   await expect(page.getByText('Đã duyệt — áp dụng từ hôm nay')).toBeVisible();
   await shot(page, '33-approved', 'Đã duyệt → bản mới đang dùng, bản cũ lưu trữ');
-  expect(psql("select version_no || ':' || status from plan_versions order by version_no")).toBe('1:archived\n2:active');
+  expect(psql("select version_no || ':' || status from plan_versions order by version_no")).toBe('1:archived\n2:rejected\n3:active');
   expect(psql("select is_provisional::text || ':' || name_vi from exercises where slug like 'user_%'")).toBe('false:Máy chèo ngồi Impulse');
 });
 

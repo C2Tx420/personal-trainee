@@ -16,6 +16,7 @@ export const RELEASES: WhatsNewRelease[] = [
     plan: 'v2.7',
     items: [
       { icon: '🪢', title: 'Máy trợ lực tính đúng chiều', body: 'Kéo xà / dip trợ lực: kg là trợ lực nên kg thấp hơn mới là khoẻ hơn. Kỷ lục 🏆, "↑ hơn lần trước", gợi ý tạ và thẻ Tiến độ giờ tính đúng chiều; không còn làm nóng theo %. Bài khác cũng là máy trợ lực thì bật "Máy trợ lực" ở trang bài.', to: '/exercises/assisted_pull_up' },
+      { icon: '🗂️', title: 'Cảnh báo bản nháp cũ', body: 'Duyệt lộ trình: nếu bản nháp soạn trên lộ trình cũ, hoặc đang có 2 bản nháp chờ, app báo ngay và có nút "Từ chối bản cũ" — không còn duyệt nhầm bản cũ như hôm 01/11.', to: '/more/plans' },
       { icon: '📈', title: 'Biểu đồ e1RM', body: 'Tab Tập → Biểu đồ theo bài có thêm nút e1RM: sức mạnh ước tính từ kg × lần, so được cả khi anh đổi tạ hay đổi số lần. Chỉ để xem xu hướng, không phải mức tạ 1 lần thật.', to: '/training' },
       { icon: '🔤', title: 'Tên bài tiếng Anh', body: 'Tất cả bài tập đổi sang tên tiếng Anh như ở phòng tập (vd. Machine Chest Press, Cable Lat Pulldown). Tên tiếng Việt cũ vẫn nằm trong "Tên gọi khác" — gõ tiếng Việt khi tìm, đổi bài hay ghi nhanh vẫn ra đúng bài. Hướng dẫn kỹ thuật giữ tiếng Việt.', to: '/exercises' },
     ],

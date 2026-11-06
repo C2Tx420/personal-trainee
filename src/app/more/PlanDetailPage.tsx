@@ -4,7 +4,7 @@ import { approvePlan, rejectPlan } from '@/data/api';
 import { qk, useExerciseMaps, useInvalidate, usePlans } from '@/data/queries';
 import { addDays, formatVN, todayVN, WEEKDAY_LABEL, WEEKDAYS } from '@/engine/dates';
 import { formatNumberVN } from '@/engine/math';
-import { diffPlans, type SessionItemView, type SessionView, sessionChanges } from '@/engine/plan-diff';
+import { diffPlans, draftWarnings, type SessionItemView, type SessionView, sessionChanges } from '@/engine/plan-diff';
 import type { PlanContent } from '@/engine/plan-schema';
 import { validatePlanRules } from '@/engine/plan-schema';
 import type { ExerciseRow } from '@/engine/types';
@@ -35,7 +35,10 @@ export function PlanDetailPage() {
   const p = plans.data?.find((x) => x.id === id);
   if (!p) return <Page title="Lộ trình" back="/more/plans"><Empty>Không tìm thấy</Empty></Page>;
   const active = plans.data!.find((x) => x.status === 'active');
-  const base = plans.data!.find((x) => x.id === p.based_on_version_id) ?? (p.status === 'draft' ? active : undefined);
+  const warn = draftWarnings(p, plans.data!);
+  // a draft built on an old plan is compared with the plan in use now — that is what approving replaces
+  const base = (warn.staleBase ? active : plans.data!.find((x) => x.id === p.based_on_version_id)) ?? (p.status === 'draft' ? active : undefined);
+  const newestDraft = warn.newest ? null : [...warn.otherDrafts].sort((a, b) => b.version_no - a.version_no)[0];
   const names = (s: string) => ex.bySlug.get(s)?.name_vi ?? p.content.exercise_upserts.find((e) => e.slug === s)?.name_vi ?? s;
   // exercises that existed before this version was approved (ones created by this version still count as "new")
   const createdByThis = (e: { created_at?: string; updated_by_plan_version_id?: string | null }) =>
@@ -60,6 +63,19 @@ export function PlanDetailPage() {
       setResult(r === 'active' ? 'Đã duyệt — áp dụng từ hôm nay' : `Đã duyệt — áp dụng từ ${formatVN(date, true)}`);
       setApproveOpen(false);
       await invalidate(qk.plans, qk.activePlan, qk.exercises);
+    } catch (e) {
+      setError(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function rejectOlderDrafts() {
+    setBusy(true);
+    setError(null);
+    try {
+      for (const d of warn.otherDrafts) await rejectPlan(d.id, 'Có bản nháp mới hơn');
+      await invalidate(qk.plans);
     } catch (e) {
       setError(e);
     } finally {
@@ -106,6 +122,29 @@ export function PlanDetailPage() {
         )}
       </Card>
       {result && <Banner tone="ok">{result}</Banner>}
+      {warn.staleBase && (
+        <Banner tone="warn">
+          Bản nháp này soạn trên {labels.label(warn.staleBase)?.title.toLowerCase() ?? 'lộ trình cũ'}, nhưng lộ trình đang dùng đã là{' '}
+          {activeLabel?.title.toLowerCase() ?? 'bản mới hơn'}. Thay đổi bên dưới so với lộ trình đang dùng — duyệt sẽ thay luôn những gì đã đổi sau đó.
+        </Banner>
+      )}
+      {warn.otherDrafts.length > 0 && warn.newest && (
+        <Banner
+          tone="warn"
+          action={
+            <Button size="sm" variant="danger" disabled={busy} onClick={() => void rejectOlderDrafts()}>
+              Từ chối bản cũ
+            </Button>
+          }
+        >
+          Còn {warn.otherDrafts.length} bản nháp cũ hơn đang chờ — duyệt bản mới nhất này và từ chối bản cũ.
+        </Banner>
+      )}
+      {newestDraft && (
+        <Banner tone="warn" onClick={() => nav(`/more/plans/${newestDraft.id}`)} action={<b>Xem ›</b>}>
+          Đã có bản nháp mới hơn ({labels.label(newestDraft.id)?.title.toLowerCase() ?? 'bản mới'}) — nên từ chối bản này.
+        </Banner>
+      )}
       {issues.filter((i) => i.level === 'error').map((i) => <Banner key={i.message} tone="bad">{i.message}</Banner>)}
       {error ? <ErrorBox error={error} /> : null}
       {p.status === 'active' && <Button block className="mb-3" onClick={() => nav(`/more/plans/${p.id}/edit`)}>Sửa → tạo bản mới cho tuần này</Button>}

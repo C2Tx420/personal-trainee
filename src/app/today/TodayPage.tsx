@@ -56,7 +56,8 @@ export function TodayPage() {
   const ffm = inbody.data ? latestFfm(inbody.data) : null;
   const progress = lastWeight && goals.data ? goals.data.map((g) => goalProgress(g, lastWeight.weight_kg, today, trend, ffm)) : [];
   const goal = activeGoal(progress);
-  const drafts = (plans.data ?? []).filter((p) => p.status === 'draft');
+  // newest first: the banner opens the newest draft (it offers to reject older ones)
+  const drafts = (plans.data ?? []).filter((p) => p.status === 'draft').sort((a, b) => b.version_no - a.version_no);
   const unread = (reviews.data ?? []).filter((r) => !r.is_read);
   const conflict = todayConflictWarning(
     content,
