@@ -34,7 +34,7 @@ export function BackfillPage() {
           pick: e ? { exercise: e } : null,
           templateItemPosition: i,
           note: '',
-          sets: plannedSets(it, e?.load_step_kg ?? 2.5, null).map((p) => ({
+          sets: plannedSets(it, e?.load_step_kg ?? 2.5, null, !!e?.is_assisted).map((p) => ({
             key: newKey(),
             set_type: p.setType,
             kg: p.targetKg,

@@ -18,6 +18,7 @@ import { fmtKg, itemSummary } from '../shared';
 import { REFLECTION_PLACEHOLDER } from '../training/ReflectionCard';
 import { ExercisePicker, type PickResult } from './ExercisePicker';
 import { RecordsCard } from './RecordsCard';
+import { TrendCard } from './TrendCard';
 import { RestOverlay } from './RestOverlay';
 import { SetCard } from './SetCard';
 import { SubstituteSheet } from './SubstituteSheet';
@@ -206,6 +207,7 @@ export function WorkoutFlowPage() {
           <Stat label="Thời gian" value={`${sum.durationMin ?? '—'} phút`} sub={sum.warmupDone === null ? undefined : sum.warmupDone ? 'Có khởi động' : 'Bỏ khởi động'} />
         </div>
         <RecordsCard records={records} byId={ex.byId} />
+        <TrendCard items={items} sets={sets} byId={ex.byId} lastFor={(exId) => lastFor(exId)?.sets ?? null} />
         {sum.itemsSubstituted.length > 0 && (
           <Card>
             <div className="mb-1 font-semibold">Đổi bài</div>

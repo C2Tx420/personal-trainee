@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { deleteSession, saveSet } from '@/data/api';
 import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail, useWeights } from '@/data/queries';
 import { formatVN, WEEKDAY_LABEL, weekdayOf } from '@/engine/dates';
-import { formatSet } from '@/engine/progression';
+import { formatSet, lastPerformance } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
 import { reflectionLocked, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
@@ -13,6 +13,7 @@ import { sessionSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Skeleton, Stat } from '@/ui/components';
 import { fmtKg } from '../shared';
 import { RecordsCard } from '../workout/RecordsCard';
+import { TrendCard } from '../workout/TrendCard';
 import { SetCard } from '../workout/SetCard';
 import { ReflectionCard } from './ReflectionCard';
 
@@ -65,6 +66,18 @@ export function SessionDetailPage() {
         </div>
       )}
       <RecordsCard records={records} byId={ex.byId} />
+      <TrendCard
+        items={items}
+        sets={sets}
+        byId={ex.byId}
+        lastFor={(exId) =>
+          lastPerformance(
+            (history.data ?? [])
+              .filter((h) => h.sessionId !== id && h.date <= session.session_date)
+              .map((h) => ({ date: h.date, sets: h.sets.filter((s) => s.exercise_id === exId) })),
+          )?.sets ?? null
+        }
+      />
       {session.status === 'completed' && reviews.data && (
         <ReflectionCard session={session} locked={reflectionLocked(session.session_date, reviewedWeeks(reviews.data))} />
       )}
