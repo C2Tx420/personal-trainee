@@ -261,6 +261,19 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   await nav(page, '/training/backfill');
   await page.getByRole('button', { name: /Điền theo lộ trình/ }).click();
   await shot(page, '21-backfill', 'Ghi bù: điền theo lộ trình rồi sửa số');
+  // a second Push → each working set vs the same set on 26/10 (27×12 ×3); then delete it again
+  const kgBoxes = page.getByRole('textbox', { name: 'kg', exact: true });
+  await kgBoxes.nth(2).fill('27');
+  await kgBoxes.nth(3).fill('27');
+  await kgBoxes.nth(4).fill('23');
+  await page.getByRole('button', { name: 'Lưu buổi ghi bù' }).click();
+  await expect(page.getByRole('heading', { name: /Push · 27\/10/ })).toBeVisible();
+  await expect(page.getByTestId('set-trends')).toContainText('Machine Chest Press');
+  await expect(page.getByLabel('hiệp 1: same, hiệp 2: same, hiệp 3: down')).toBeVisible();
+  await shot(page, '21b-set-trends', 'So với lần trước: ↑ = ↓ từng hiệp chính');
+  await page.getByRole('button', { name: 'Xoá buổi này' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Xoá', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Tập' })).toBeVisible();
 
   await nav(page, '/training/simple/badminton');
   await expect(page.getByText(/≈ 463 kcal/)).toBeVisible();

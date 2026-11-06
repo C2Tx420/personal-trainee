@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { averageMuscleSets, deloadOptions, e1rm, e1rmBySession, muscleSets, stallCount, weeklyMuscleSets } from './analytics';
+import { averageMuscleSets, deloadOptions, e1rm, e1rmBySession, muscleSets, setTrend, stallCount, weeklyMuscleSets } from './analytics';
 import type { SessionRow, SetRow } from './types';
 
 const set = (kg: number | null, reps: number, o: Partial<SetRow> = {}): SetRow => ({
@@ -81,5 +81,20 @@ describe('muscleSets', () => {
     expect(w1.chest).toBe(1);
     expect(w2.chest).toBe(2);
     expect(averageMuscleSets([w1, w2])).toMatchObject({ chest: 1.5, triceps: 0.8 });
+  });
+});
+
+describe('setTrend', () => {
+  it('load first, then reps; missing set last time → new', () => {
+    const last = [set(27, 10, { set_index: 1 }), set(27, 10, { set_index: 2 }), set(27, 9, { set_index: 3 })];
+    const cur = [set(32, 8, { set_index: 1 }), set(27, 10, { set_index: 2 }), set(27, 8, { set_index: 3 }), set(27, 8, { set_index: 4 })];
+    expect(setTrend(cur, last).map((t) => t.trend)).toEqual(['up', 'same', 'down', 'new']);
+    expect(setTrend(cur, null).map((t) => t.trend)).toEqual(['new', 'new', 'new', 'new']);
+    // kg forgotten on one side → not comparable
+    expect(setTrend([set(null, 12)], [set(27, 12)])[0].trend).toBe('new');
+    expect(setTrend([set(null, 12)], [set(null, 10)])[0].trend).toBe('up');
+  });
+  it('assisted: less assistance = up', () => {
+    expect(setTrend([set(21, 6)], [set(27, 6)], true)[0].trend).toBe('up');
   });
 });

@@ -1,5 +1,5 @@
 import { addDays, type IsoDate } from './dates';
-import { byHardest, effectiveLoad, sameLoad } from './load';
+import { byHardest, effectiveLoad, harder, sameLoad } from './load';
 import { round } from './math';
 import { isLbStack, stackStep } from './stack';
 import type { SessionRow, SetRow } from './types';
@@ -207,4 +207,33 @@ export function averageMuscleSets(all: Record<string, number>[]): Record<string,
   for (const w of weeks) for (const [k, v] of Object.entries(w)) out[k] = (out[k] ?? 0) + v;
   for (const k of Object.keys(out)) out[k] = round(out[k] / weeks.length, 1);
   return out;
+}
+
+// ───────────────────────── Per-set trend vs last time (§16 B10)
+
+export type SetTrend = 'up' | 'same' | 'down' | 'new';
+export const TREND_ICON: Record<SetTrend, string> = { up: '↑', same: '=', down: '↓', new: '·' };
+
+/**
+ * Each completed working set vs the same set (by index) last session: load first (the right way round on
+ * assisted machines), then reps (seconds on timed sets). No such set last time, or kg on only one
+ * side (a set logged without kg can't be compared) → 'new'.
+ */
+export function setTrend(current: SetRow[], last: SetRow[] | null, assisted = false): { setId: string; setIndex: number; trend: SetTrend }[] {
+  const work = (xs: SetRow[]) => xs.filter((s) => s.completed && s.set_type === 'working').sort((a, b) => a.set_index - b.set_index);
+  const prev = work(last ?? []);
+  return work(current).map((s) => {
+    const p = prev.find((x) => x.set_index === s.set_index);
+    let trend: SetTrend = 'new';
+    if (p && (s.weight_kg === null) === (p.weight_kg === null)) {
+      if (s.weight_kg !== null && p.weight_kg !== null && !sameLoad(s.weight_kg, p.weight_kg)) {
+        trend = harder(s.weight_kg, p.weight_kg, assisted) ? 'up' : 'down';
+      } else {
+        const a = s.reps ?? s.seconds ?? 0;
+        const b = p.reps ?? p.seconds ?? 0;
+        trend = a > b ? 'up' : a < b ? 'down' : 'same';
+      }
+    }
+    return { setId: s.id, setIndex: s.set_index, trend };
+  });
 }
