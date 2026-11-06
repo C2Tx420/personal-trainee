@@ -17,10 +17,10 @@ export function itemSummary(it: PlanItem): string {
 export function ExerciseLine({ ex, item, right }: { ex: ExerciseRow | undefined; item: PlanItem; right?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 py-2">
-      <ExerciseImg svg={ex?.illustration_svg} name={ex?.name_vi ?? item.exercise} className="w-20 shrink-0" />
+      <ExerciseImg svg={ex?.illustration_svg} name={ex?.name ?? item.exercise} className="w-20 shrink-0" />
       <div className="min-w-0 flex-1">
         <div className="truncate font-medium">
-          {ex?.name_vi ?? item.exercise}
+          {ex?.name ?? item.exercise}
           {ex && !ex.available_at_gym && <span className="ml-1 text-xs text-warn">(không có máy)</span>}
         </div>
         <div className="tabular text-sm text-muted">{itemSummary(item)}</div>

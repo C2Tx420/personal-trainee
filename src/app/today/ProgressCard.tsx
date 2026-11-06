@@ -71,7 +71,7 @@ export function ProgressCard({
           ) : (
             lifts.map((l) => (
               <div key={l.exerciseId} className={row}>
-                <span className="min-w-0 truncate text-muted">{byId.get(l.exerciseId)?.name_vi ?? '?'}</span>
+                <span className="min-w-0 truncate text-muted">{byId.get(l.exerciseId)?.name ?? '?'}</span>
                 <span className="shrink-0">
                   {l.first.kg === l.last.kg ? (
                     <>

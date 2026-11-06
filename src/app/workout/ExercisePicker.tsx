@@ -25,14 +25,14 @@ export function ExercisePicker({
   label?: string;
   exclude?: ExerciseRow;
 }) {
-  const [text, setText] = useState(value && 'exercise' in value ? value.exercise.name_vi : value?.newName ?? '');
+  const [text, setText] = useState(value && 'exercise' in value ? value.exercise.name : value?.newName ?? '');
   const results = useMemo(() => searchExercises(text, library, 7).filter((e) => e.id !== exclude?.id).slice(0, 6), [text, library, exclude]);
   const exact = exactMatch(text, library);
   const isExcluded = !!exact && exact.id === exclude?.id;
   const selectedId = value && 'exercise' in value ? value.exercise.id : null;
 
   const pick = (e: ExerciseRow) => {
-    setText(e.name_vi);
+    setText(e.name);
     onChange({ exercise: e });
   };
 
@@ -62,7 +62,7 @@ export function ExercisePicker({
               onClick={() => pick(e)}
               className={cx('rounded-full border px-3 py-1.5 text-sm', selectedId === e.id ? 'border-accent/50 bg-accent-soft text-accent' : 'border-white/10 bg-white/[0.05]')}
             >
-              {e.name_vi}
+              {e.name}
             </button>
           ))}
         </div>
@@ -71,9 +71,9 @@ export function ExercisePicker({
         <div className="glass mt-2 divide-y divide-white/[0.06] overflow-hidden rounded-ctl">
           {results.map((e) => (
             <button key={e.id} type="button" onClick={() => pick(e)} className="flex w-full items-center gap-3 px-3 py-2 text-left active:bg-white/5">
-              <ExerciseImg svg={e.illustration_svg} name={e.name_vi} className="w-16 shrink-0" />
+              <ExerciseImg svg={e.illustration_svg} name={e.name} className="w-16 shrink-0" />
               <span className={cx('flex-1 text-sm', selectedId === e.id && 'font-semibold text-accent')}>
-                {e.name_vi}
+                {e.name}
                 {!e.available_at_gym && <span className="ml-1 text-xs text-warn">(không có máy)</span>}
                 {e.is_provisional && <span className="ml-1 text-xs text-muted">(bài tạm)</span>}
               </span>
@@ -81,7 +81,7 @@ export function ExercisePicker({
           ))}
           {isExcluded && (
             <div className="px-3 py-2 text-sm text-warn">
-              “{text.trim()}” chính là bài đang đổi ({exclude?.name_vi}) — gõ tên máy / bài khác anh sẽ tập
+              “{text.trim()}” chính là bài đang đổi ({exclude?.name}) — gõ tên máy / bài khác anh sẽ tập
             </div>
           )}
           {!exact && (

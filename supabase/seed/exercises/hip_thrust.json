@@ -20,7 +20,7 @@
     "Bàn chân đặt quá xa"
   ],
   "slug": "hip_thrust",
-  "name_vi": "Barbell Hip Thrust",
+  "name": "Barbell Hip Thrust",
   "primary_muscle": "glutes",
   "movement_pattern": "hinge",
   "kind": "compound",

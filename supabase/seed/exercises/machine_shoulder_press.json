@@ -21,7 +21,7 @@
     "Hạ quá thấp dưới cằm"
   ],
   "slug": "machine_shoulder_press",
-  "name_vi": "Machine Shoulder Press",
+  "name": "Machine Shoulder Press",
   "primary_muscle": "front_delt",
   "movement_pattern": "vertical_push",
   "kind": "compound",

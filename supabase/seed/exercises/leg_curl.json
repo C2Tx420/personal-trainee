@@ -17,7 +17,7 @@
     "Nhấc hông lên"
   ],
   "slug": "leg_curl",
-  "name_vi": "Leg Curl",
+  "name": "Leg Curl",
   "primary_muscle": "hamstrings",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

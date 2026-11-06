@@ -21,7 +21,7 @@
     "Khoá gối khi duỗi"
   ],
   "slug": "leg_press",
-  "name_vi": "Leg Press",
+  "name": "Leg Press",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",

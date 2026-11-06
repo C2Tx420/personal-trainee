@@ -66,8 +66,8 @@ export function PlanEditPage() {
             return (
               <Card key={it.exercise}>
                 <div className="mb-2 flex items-center gap-2">
-                  <ExerciseImg svg={e?.illustration_svg} name={e?.name_vi ?? ''} className="w-16 shrink-0" />
-                  <div className="min-w-0 flex-1 font-semibold">{e?.name_vi ?? it.exercise}</div>
+                  <ExerciseImg svg={e?.illustration_svg} name={e?.name ?? ''} className="w-16 shrink-0" />
+                  <div className="min-w-0 flex-1 font-semibold">{e?.name ?? it.exercise}</div>
                   <Button size="sm" variant="ghost" aria-label="Lên" disabled={ii === 0} onClick={() => set((d) => { const a = d.templates[ti].items; [a[ii - 1], a[ii]] = [a[ii], a[ii - 1]]; })}>↑</Button>
                   <Button size="sm" variant="ghost" aria-label="Xuống" disabled={ii === t.items.length - 1} onClick={() => set((d) => { const a = d.templates[ti].items; [a[ii + 1], a[ii]] = [a[ii], a[ii + 1]]; })}>↓</Button>
                   <Button size="sm" variant="ghost" aria-label="Bỏ bài" onClick={() => set((d) => void d.templates[ti].items.splice(ii, 1))}>✕</Button>

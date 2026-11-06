@@ -20,7 +20,7 @@
     "Ưỡn lưng quá mức ở đỉnh"
   ],
   "slug": "back_extension_45",
-  "name_vi": "45° Back Extension",
+  "name": "45° Back Extension",
   "primary_muscle": "lower_back",
   "movement_pattern": "hinge",
   "kind": "isolation",

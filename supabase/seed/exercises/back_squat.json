@@ -18,7 +18,7 @@
     "Cong lưng dưới ở đáy"
   ],
   "slug": "back_squat",
-  "name_vi": "Barbell Back Squat",
+  "name": "Barbell Back Squat",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",

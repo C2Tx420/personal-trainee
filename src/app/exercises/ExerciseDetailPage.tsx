@@ -24,8 +24,8 @@ export function ExerciseDetailPage() {
   const uses = (plan.data?.content.templates ?? []).flatMap((t) => t.items.filter((i) => i.exercise === slug).map((i) => ({ t: t.name, i })));
 
   return (
-    <Page title={e.name_vi} back="/exercises">
-      <ExerciseImg svg={e.illustration_svg} name={e.name_vi} className="mb-3" />
+    <Page title={e.name} back="/exercises">
+      <ExerciseImg svg={e.illustration_svg} name={e.name} className="mb-3" />
       <div className="mb-3 flex flex-wrap gap-1.5">
         <Badge tone="accent">{MUSCLE_LABEL[e.primary_muscle] ?? e.primary_muscle}</Badge>
         {e.secondary_muscles.map((m) => <Badge key={m}>{MUSCLE_LABEL[m] ?? m}</Badge>)}

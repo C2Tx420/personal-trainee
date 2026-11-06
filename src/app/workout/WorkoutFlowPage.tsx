@@ -268,14 +268,14 @@ export function WorkoutFlowPage() {
         : null;
     body = (
       <div>
-        <ExerciseImg svg={exercise?.illustration_svg} name={exercise?.name_vi ?? ''} className={cx('mb-3', step.type === 'set' && 'mx-auto max-w-[260px]')} />
+        <ExerciseImg svg={exercise?.illustration_svg} name={exercise?.name ?? ''} className={cx('mb-3', step.type === 'set' && 'mx-auto max-w-[260px]')} />
         <div className="mb-1 flex items-start justify-between gap-2">
-          <h2 className="text-[26px] leading-tight font-bold tracking-tight">{exercise?.name_vi}</h2>
+          <h2 className="text-[26px] leading-tight font-bold tracking-tight">{exercise?.name}</h2>
           {exercise?.is_provisional && <Badge tone="info">bài tạm</Badge>}
         </div>
         {item.substitution_reason && (
           <p className="mb-1 text-sm text-info">
-            Thay cho {planned?.name_vi} · {SUBSTITUTION_LABEL[item.substitution_reason]}
+            Thay cho {planned?.name} · {SUBSTITUTION_LABEL[item.substitution_reason]}
             {item.substitution_note ? ` — ${item.substitution_note}` : ''}
           </p>
         )}
@@ -383,7 +383,7 @@ export function WorkoutFlowPage() {
       {showRest && lastDone && (
         <RestOverlay
           endsAt={restEndsAt}
-          next={step.type === 'set' ? `${ex.byId.get(step.item.exercise_id)?.name_vi} · ${setLabel(step.planned, step.workingTotal)}` : step.type === 'intro' ? `Bài tiếp: ${ex.byId.get(step.item.exercise_id)?.name_vi}` : ''}
+          next={step.type === 'set' ? `${ex.byId.get(step.item.exercise_id)?.name} · ${setLabel(step.planned, step.workingTotal)}` : step.type === 'intro' ? `Bài tiếp: ${ex.byId.get(step.item.exercise_id)?.name}` : ''}
           onAdd30={() => setRestExtra((x) => x + 30_000)}
           onSkip={() => setRestDismissed(lastDone.id)}
         />
@@ -443,9 +443,9 @@ export function WorkoutFlowPage() {
                 }}
                 className="flex w-full items-center gap-3 px-3 py-2.5 text-left disabled:opacity-60"
               >
-                <ExerciseImg svg={e?.illustration_svg} name={e?.name_vi ?? ''} className="w-14 shrink-0" />
+                <ExerciseImg svg={e?.illustration_svg} name={e?.name ?? ''} className="w-14 shrink-0" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium">{e?.name_vi}</span>
+                  <span className="block truncate font-medium">{e?.name}</span>
                   <span className="tabular text-xs text-muted">{itemSummary(item.target)}</span>
                 </span>
                 <Badge tone={badge === 'done' ? 'ok' : badge === 'current' ? 'accent' : badge === 'skipped' ? 'bad' : badge === 'substituted' ? 'info' : 'muted'}>{label}</Badge>

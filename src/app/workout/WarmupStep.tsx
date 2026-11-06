@@ -62,8 +62,8 @@ export function WarmupStep({
       <h2 className="mb-3 text-[26px] font-bold tracking-tight">Khởi động</h2>
       {warmup?.cardio && (
         <Card>
-          <ExerciseImg svg={cardioExercise?.illustration_svg} name={cardioExercise?.name_vi ?? ''} className="mb-3" />
-          <div className="mb-1 font-semibold">{cardioExercise?.name_vi ?? warmup.cardio.exercise}</div>
+          <ExerciseImg svg={cardioExercise?.illustration_svg} name={cardioExercise?.name ?? ''} className="mb-3" />
+          <div className="mb-1 font-semibold">{cardioExercise?.name ?? warmup.cardio.exercise}</div>
           <div className="mb-3 text-sm text-muted">
             {plannedMin} phút · {String(warmup.cardio.speed_kmh_min).replace('.', ',')}–{warmup.cardio.speed_kmh_max} km/h
           </div>

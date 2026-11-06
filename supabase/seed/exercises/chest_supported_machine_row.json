@@ -25,7 +25,7 @@
     "Nhấc ngực khỏi đệm để giật tạ"
   ],
   "slug": "chest_supported_machine_row",
-  "name_vi": "Chest-Supported Machine Row",
+  "name": "Chest-Supported Machine Row",
   "primary_muscle": "upper_back",
   "movement_pattern": "horizontal_pull",
   "kind": "compound",

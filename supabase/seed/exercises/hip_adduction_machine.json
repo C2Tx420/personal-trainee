@@ -20,7 +20,7 @@
     "Bật nhanh không kiểm soát"
   ],
   "slug": "hip_adduction_machine",
-  "name_vi": "Hip Adduction Machine",
+  "name": "Hip Adduction Machine",
   "primary_muscle": "adductors",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

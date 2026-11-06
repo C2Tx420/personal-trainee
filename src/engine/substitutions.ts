@@ -3,7 +3,7 @@ import type { ExerciseRow } from './types';
 
 type Ex = Pick<
   ExerciseRow,
-  'id' | 'slug' | 'name_vi' | 'aliases' | 'primary_muscle' | 'movement_pattern' | 'available_at_gym' | 'archived'
+  'id' | 'slug' | 'name' | 'aliases' | 'primary_muscle' | 'movement_pattern' | 'available_at_gym' | 'archived'
 >;
 
 /**
@@ -34,7 +34,7 @@ export function searchExercises<T extends Ex>(query: string, library: T[], limit
   const scored = library
     .filter((e) => !e.archived)
     .map((e) => {
-      const names = [e.name_vi, ...e.aliases].map(normalizeVi);
+      const names = [e.name, ...e.aliases].map(normalizeVi);
       let score = 0;
       for (const n of names) {
         if (n === q) score = Math.max(score, 100);
@@ -52,5 +52,5 @@ export function searchExercises<T extends Ex>(query: string, library: T[], limit
 /** Exercise matching a name/alias exactly (decides whether a provisional exercise is needed). */
 export function exactMatch<T extends Ex>(query: string, library: T[]): T | undefined {
   const q = normalizeVi(query);
-  return library.find((e) => [e.name_vi, ...e.aliases].some((n) => normalizeVi(n) === q));
+  return library.find((e) => [e.name, ...e.aliases].some((n) => normalizeVi(n) === q));
 }

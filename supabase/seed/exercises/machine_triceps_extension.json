@@ -20,7 +20,7 @@
     "Dùng vai đẩy"
   ],
   "slug": "machine_triceps_extension",
-  "name_vi": "Machine Triceps Extension",
+  "name": "Machine Triceps Extension",
   "primary_muscle": "triceps",
   "movement_pattern": "isolation_push",
   "kind": "isolation",

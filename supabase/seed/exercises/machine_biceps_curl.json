@@ -19,7 +19,7 @@
     "Nhấc người khỏi ghế"
   ],
   "slug": "machine_biceps_curl",
-  "name_vi": "Machine Biceps Curl",
+  "name": "Machine Biceps Curl",
   "primary_muscle": "biceps",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

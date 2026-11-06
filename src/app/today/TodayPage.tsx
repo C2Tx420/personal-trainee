@@ -203,7 +203,7 @@ export function TodayPage() {
             </div>
             {tmpl.warmup.cardio && (
               <p className="mb-2 text-sm text-muted">
-                Khởi động: {ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name_vi} {tmpl.warmup.cardio.minutes}' · {String(tmpl.warmup.cardio.speed_kmh_min).replace('.', ',')}–
+                Khởi động: {ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name} {tmpl.warmup.cardio.minutes}' · {String(tmpl.warmup.cardio.speed_kmh_min).replace('.', ',')}–
                 {tmpl.warmup.cardio.speed_kmh_max} km/h
               </p>
             )}

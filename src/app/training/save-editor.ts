@@ -23,7 +23,7 @@ export async function saveEditor(args: {
     if (!it.pick) throw new Error('Còn bài chưa chọn — chọn bài cho các dòng màu vàng');
     const ex: ExerciseRow = 'exercise' in it.pick ? it.pick.exercise : await createProvisionalExercise(it.pick.newName, null, null);
     // the user picked an exercise for an unknown name → save that name as an alias for next time
-    if (it.rawName && 'exercise' in it.pick && ![ex.name_vi, ...ex.aliases].some((n) => normalizeVi(n) === normalizeVi(it.rawName!))) {
+    if (it.rawName && 'exercise' in it.pick && ![ex.name, ...ex.aliases].some((n) => normalizeVi(n) === normalizeVi(it.rawName!))) {
       await supabase.from('exercises').update({ aliases: [...ex.aliases, it.rawName] }).eq('id', ex.id);
     }
     const tplPos = template?.items.findIndex((t) => t.exercise === ex.slug || t.alternatives.includes(ex.slug)) ?? -1;

@@ -49,10 +49,10 @@ export function SessionEditor({
         return (
           <Card key={it.key} className={cx(unmatched && 'border-warn bg-warn-soft/40')}>
             <div className="mb-2 flex items-center gap-3">
-              {ex && <ExerciseImg svg={ex.illustration_svg} name={ex.name_vi} className="w-20 shrink-0" />}
+              {ex && <ExerciseImg svg={ex.illustration_svg} name={ex.name} className="w-20 shrink-0" />}
               <div className="min-w-0 flex-1">
                 <div className="text-xs text-muted">Bài {idx + 1}{it.rawName ? ` · anh ghi “${it.rawName}”` : ''}</div>
-                <div className="font-semibold">{ex?.name_vi ?? (it.pick && 'newName' in it.pick ? `${it.pick.newName} (bài tạm mới)` : 'Chưa khớp bài — chọn bên dưới')}</div>
+                <div className="font-semibold">{ex?.name ?? (it.pick && 'newName' in it.pick ? `${it.pick.newName} (bài tạm mới)` : 'Chưa khớp bài — chọn bên dưới')}</div>
               </div>
               <Button size="sm" variant="ghost" aria-label="Xoá bài" onClick={() => onChange(items.filter((x) => x.key !== it.key))}>✕</Button>
             </div>

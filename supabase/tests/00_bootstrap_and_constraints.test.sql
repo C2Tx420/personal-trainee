@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(31);
+select plan(35);
 
 -- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
@@ -84,6 +84,18 @@ select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
   (select jsonb_build_array(e || '{"is_assisted": true}') from jsonb_array_elements(public._seed_payload()->'exercises') e where e->>'slug' = 'pull_up'),
   null, true);
 select is((select is_assisted from public.exercises where slug = 'pull_up'), true, 'upsert có is_assisted thì đặt cờ');
+
+-- name / name_vi stay in sync during the transition (release N of plan v2.7 B13)
+select is((select count(*)::int from public.exercises where name is distinct from name_vi), 0, 'name = name_vi cho mọi bài');
+update public.exercises set name_vi = 'Old Client Name' where slug = 'leg_press';
+select is((select name from public.exercises where slug = 'leg_press'), 'Old Client Name', 'app cũ ghi name_vi → name theo');
+update public.exercises set name = 'Leg Press' where slug = 'leg_press';
+select is((select name_vi from public.exercises where slug = 'leg_press'), 'Leg Press', 'ghi name → name_vi theo');
+select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
+  (select jsonb_build_array((e - 'name_vi') || jsonb_build_object('slug', 'test_name_only', 'name', 'Name Only'))
+   from jsonb_array_elements(public._seed_payload()->'exercises') e where e->>'slug' = 'leg_press'),
+  null, false);
+select is((select name_vi || '|' || name from public.exercises where slug = 'test_name_only'), 'Name Only|Name Only', 'upsert chỉ có name → cả 2 cột');
 
 -- Immutability
 select throws_ok(

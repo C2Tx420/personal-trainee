@@ -20,7 +20,7 @@
     "Bật nhanh không kiểm soát"
   ],
   "slug": "hip_abduction_machine",
-  "name_vi": "Hip Abduction Machine",
+  "name": "Hip Abduction Machine",
   "primary_muscle": "glutes",
   "movement_pattern": "isolation_legs",
   "kind": "isolation",

@@ -20,13 +20,13 @@ for (const ex of EXERCISES) {
     errors.push(`${ex.slug}: thiếu tư thế trong poses.ts`);
     continue;
   }
-  const svg = renderSvg(ex.name_vi, d, ex.primary_muscle, ex.secondary_muscles);
+  const svg = renderSvg(ex.name, d, ex.primary_muscle, ex.secondary_muscles);
   const issues = validateSvg(svg);
   if (issues.length) errors.push(`${ex.slug}: ${issues.join(', ')}`);
   fs.writeFileSync(path.join(OUT, `${ex.slug}.svg`), svg + '\n');
   fs.writeFileSync(path.join(OUT, `${ex.slug}.json`), JSON.stringify(ex, null, 2) + '\n');
   cards.push(
-    `<figure><img src="${ex.slug}.svg" alt=""><figcaption>${ex.name_vi}<small>${ex.slug} · ${(svg.length / 1024).toFixed(1)} KB</small></figcaption></figure>`,
+    `<figure><img src="${ex.slug}.svg" alt=""><figcaption>${ex.name}<small>${ex.slug} · ${(svg.length / 1024).toFixed(1)} KB</small></figcaption></figure>`,
   );
 }
 

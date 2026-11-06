@@ -7,6 +7,9 @@ import type { SessionKind } from './schedule';
 export type ExerciseRow = {
   id: string;
   slug: string;
+  /** display name (English since 05/11/2026) */
+  name: string;
+  /** @deprecated same value as `name`, kept in sync by a trigger; dropped in release N+1 (plan v2.7 §16 B13) */
   name_vi: string;
   aliases: string[];
   primary_muscle: string;

@@ -27,7 +27,9 @@ const EQUIPMENT = ['machine', 'cable', 'dumbbell', 'barbell', 'bodyweight', 'smi
 
 export const exerciseDefSchema = z.object({
   slug: slugSchema,
-  name_vi: z.string().min(2),
+  /** display name; older drafts / seed use `name_vi` (same meaning) — read it with `defName()` */
+  name: z.string().min(2).optional(),
+  name_vi: z.string().min(2).optional(),
   aliases: z.array(z.string()).default([]),
   primary_muscle: z.enum(MUSCLES),
   secondary_muscles: z.array(z.enum(MUSCLES)).default([]),
@@ -45,8 +47,11 @@ export const exerciseDefSchema = z.object({
   /** assisted machine (kg = assistance). Optional with no default: an upsert without it keeps the current value. */
   is_assisted: z.boolean().optional(),
   canonical_slug: slugSchema.nullable().optional(),
-});
+}).refine((d) => !!(d.name ?? d.name_vi), 'bài cần name');
 export type ExerciseDef = z.infer<typeof exerciseDefSchema>;
+
+/** Display name of an exercise definition (`name`, or `name_vi` from older drafts). */
+export const defName = (d: { slug: string; name?: string; name_vi?: string }): string => d.name ?? d.name_vi ?? d.slug;
 
 const warmupSetSchema = z
   .object({

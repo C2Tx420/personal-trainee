@@ -19,7 +19,7 @@
     "Cong lưng dưới"
   ],
   "slug": "barbell_row",
-  "name_vi": "Barbell Row",
+  "name": "Barbell Row",
   "primary_muscle": "upper_back",
   "movement_pattern": "horizontal_pull",
   "kind": "compound",

@@ -34,7 +34,7 @@ const [goals, plans, weights, meas, inbody, sessions, exercises] = await Promise
   sql`select *, log_date::text as log_date_s from body_measurements order by log_date`,
   sql`select *, measured_on::text as measured_on_s from inbody_logs order by measured_on`,
   sql`select *, session_date::text as session_date_s from workout_sessions where session_date >= ${from8w} order by session_date`,
-  sql`select id, slug, name_vi, primary_muscle, secondary_muscles, kind, equipment, load_step_kg::float as load_step_kg, is_assisted, available_at_gym, unavailable_note, is_provisional, archived,
+  sql`select id, slug, coalesce(name, name_vi) as name, primary_muscle, secondary_muscles, kind, equipment, load_step_kg::float as load_step_kg, is_assisted, available_at_gym, unavailable_note, is_provisional, archived,
              canonical_exercise_id, (illustration_svg is not null) as has_illustration, aliases
       from exercises order by slug`,
 ]);
@@ -119,7 +119,7 @@ const setsDetail = trainedEx.map((exId) => {
   const notes = [...exSets.map((s) => s.note ?? ''), ...iRows.filter((i) => i.exercise_id === exId).map((i) => i.note ?? '')];
   return {
     exercise: ex.slug,
-    name: ex.name_vi,
+    name: ex.name,
     is_assisted: !!ex.is_assisted,
     target: plannedTarget(ex.slug as string),
     sessions: bySession,
@@ -160,7 +160,7 @@ const report = {
   week: { start: ws, end: we, reviewed: phaseWeek(ws), next_plan: phaseWeek(addDays(ws, 7)) },
   active_plan: { id: active.id, version_no: active.version_no, effective_from: active.effective_from, calories_kcal: content.nutrition.calories_kcal, content },
   pending_drafts: plans.filter((p) => p.status === 'draft').map((p) => ({ id: p.id, version_no: p.version_no, created_by: p.created_by, change_note: p.change_note })),
-  rejected_recent: rejectedSummary(plans as never, (s) => (exBySlug.get(s)?.name_vi as string) ?? s),
+  rejected_recent: rejectedSummary(plans as never, (s) => (exBySlug.get(s)?.name as string) ?? s),
   goals: goalRows.map((g) => {
     const p = goalProgress(g, lastW, we, trend, ffm);
     return { name: g.name, target_date: g.target_date, target_kg: [g.target_weight_min, g.target_weight_max], days_left: p.daysLeft, weeks_left: p.weeksLeft, gap_kg: p.gapKg, required_kg_per_week: p.requiredKgPerWeek, status: p.status, unsafe: p.unsafe, est_body_fat_pct: p.estimatedBodyFatPct };
@@ -229,10 +229,10 @@ const report = {
     schedule_violations: actualLegsBadmintonConflicts(weekSessions.map((s) => ({ date: s.session_date, kind: s.kind }))),
   },
   exercises: exercises.map((e) => ({
-    slug: e.slug, name_vi: e.name_vi, in_templates: content.templates.filter((t) => t.items.some((i) => i.exercise === e.slug)).map((t) => t.key),
+    slug: e.slug, name: e.name, in_templates: content.templates.filter((t) => t.items.some((i) => i.exercise === e.slug)).map((t) => t.key),
     has_illustration: e.has_illustration, available_at_gym: e.available_at_gym, unavailable_note: e.unavailable_note, is_provisional: e.is_provisional, archived: e.archived,
   })),
-  provisional_exercises: exercises.filter((e) => e.is_provisional).map((e) => ({ slug: e.slug, name_vi: e.name_vi, aliases: e.aliases })),
+  provisional_exercises: exercises.filter((e) => e.is_provisional).map((e) => ({ slug: e.slug, name: e.name, aliases: e.aliases })),
   constraint_checks: {
     calories_floor_ok: content.nutrition.calories_kcal >= 1700,
     legs_badminton_gap_ok: legsBadmintonAdjacency(content.schedule).length === 0,

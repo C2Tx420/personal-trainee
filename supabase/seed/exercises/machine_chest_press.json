@@ -23,7 +23,7 @@
     "Thả tạ rơi tự do khi về"
   ],
   "slug": "machine_chest_press",
-  "name_vi": "Machine Chest Press",
+  "name": "Machine Chest Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

@@ -11,7 +11,7 @@ export function RecordsCard({ records, byId }: { records: PersonalRecord[]; byId
       <div className="mb-1 font-semibold text-ok">🏆 Kỷ lục mới</div>
       {records.map((r) => (
         <div key={r.setId} className="tabular text-sm" data-testid="record">
-          {byId.get(r.exerciseId)?.name_vi ?? '?'}: <b>{fmtKg(r.kg)} kg × {r.reps}</b>
+          {byId.get(r.exerciseId)?.name ?? '?'}: <b>{fmtKg(r.kg)} kg × {r.reps}</b>
           <span className="text-muted">
             {r.kind === 'kg'
               ? byId.get(r.exerciseId)?.is_assisted

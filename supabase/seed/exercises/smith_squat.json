@@ -16,7 +16,7 @@
     "Chân đặt quá sát thanh"
   ],
   "slug": "smith_squat",
-  "name_vi": "Smith Machine Squat",
+  "name": "Smith Machine Squat",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",
