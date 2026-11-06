@@ -59,7 +59,10 @@ function matchItems(ai: PlanItem[], bi: PlanItem[]) {
 }
 
 const kgSpec = (i: PlanItem) =>
-  i.target_kg_per_set ? i.target_kg_per_set.map((x) => String(x).replace('.', ',')).join('/') + ' kg' : kg(i.target_kg);
+  i.target_kg_per_set
+    ? i.target_kg_per_set.map((x) => String(x).replace('.', ',')).join('/') + ' kg'
+    : kg(i.target_kg) + (i.backoff_steps && i.target_kg !== null ? `, hiệp sau −${i.backoff_steps} nấc` : '');
+const kgKey = (i: PlanItem) => JSON.stringify(i.target_kg_per_set) + i.target_kg + ':' + (i.backoff_steps ?? 0);
 
 function warmupText(t: PlanTemplate, names: (s: string) => string) {
   return [t.warmup.cardio ? `${names(t.warmup.cardio.exercise)} ${t.warmup.cardio.minutes}'` : 'không cardio', ...t.warmup.mobility].join(' · ');
@@ -88,7 +91,7 @@ function diffTemplate(a: PlanTemplate | undefined, b: PlanTemplate | undefined, 
     if (o.rest_sec_min !== n.rest_sec_min || o.rest_sec_max !== n.rest_sec_max) {
       out.push({ kind: 'rest', scope, text: `${nm}: nghỉ ${o.rest_sec_min}–${o.rest_sec_max}s → ${n.rest_sec_min}–${n.rest_sec_max}s` });
     }
-    if (JSON.stringify(o.target_kg_per_set) + o.target_kg !== JSON.stringify(n.target_kg_per_set) + n.target_kg) {
+    if (kgKey(o) !== kgKey(n)) {
       out.push({ kind: 'target_kg', scope, text: `${nm}: ${kgSpec(o)} → ${kgSpec(n)}` });
     }
     if (JSON.stringify(o.warmup_sets) !== JSON.stringify(n.warmup_sets)) {
@@ -235,7 +238,7 @@ const firstKg = (i: PlanItem) => i.target_kg_per_set?.[0] ?? i.target_kg;
 
 function itemChanges(o: PlanItem, n: PlanItem, assisted: boolean): ItemChange[] {
   const out: ItemChange[] = [];
-  if (JSON.stringify(o.target_kg_per_set) + o.target_kg !== JSON.stringify(n.target_kg_per_set) + n.target_kg) {
+  if (kgKey(o) !== kgKey(n)) {
     const a = firstKg(o);
     const b = firstKg(n);
     // up = harder: more kg, or less assistance on assisted machines

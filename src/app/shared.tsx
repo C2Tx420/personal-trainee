@@ -9,7 +9,7 @@ export function itemSummary(it: PlanItem): string {
   const kg = it.target_kg_per_set
     ? ` · ${it.target_kg_per_set.join('/')} kg`
     : it.target_kg !== null && it.unit === 'reps'
-      ? ` · ${String(it.target_kg).replace('.', ',')} kg`
+      ? ` · ${String(it.target_kg).replace('.', ',')} kg${it.backoff_steps ? `, hiệp sau −${it.backoff_steps} nấc` : ''}`
       : '';
   return `${warm}${it.sets} × ${reps}${kg}`;
 }

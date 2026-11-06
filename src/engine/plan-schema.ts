@@ -70,6 +70,8 @@ export const planItemSchema = z
     rest_sec_max: z.number().int().positive(),
     target_kg: z.number().nonnegative().nullable().default(null),
     target_kg_per_set: z.array(z.number().nonnegative()).nullable().default(null),
+    /** sets 2+ are this many load steps lighter than set 1 (more assistance on assisted machines) — §16 B9 */
+    backoff_steps: z.number().int().min(0).max(2).optional(),
     coach_note: z.string().default(''),
     note: z.string().default(''),
   })
@@ -78,7 +80,8 @@ export const planItemSchema = z
   .refine(
     (i) => i.target_kg_per_set === null || i.target_kg_per_set.length === i.sets,
     'target_kg_per_set phải có đúng số phần tử = sets',
-  );
+  )
+  .refine((i) => !((i.backoff_steps ?? 0) > 0 && i.target_kg_per_set !== null), 'không dùng chung backoff_steps với target_kg_per_set');
 export type PlanItem = z.infer<typeof planItemSchema>;
 
 const cardioWarmupSchema = z.object({
