@@ -9,6 +9,7 @@ import { missingReflection, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { topSetSeries, volumeKg, weeklyVolumeByExercise, weekSummary } from '@/engine/workout-summary';
 import { SimpleBars, SimpleLine } from '@/ui/charts';
+import { MuscleSetsCard } from './MuscleSetsCard';
 import { Badge, Button, Card, Empty, ErrorBox, Page, ProgressBar, SectionTitle, Segmented, Skeleton, Stat } from '@/ui/components';
 
 export function TrainingPage() {
@@ -74,6 +75,8 @@ export function TrainingPage() {
           </div>
         </Card>
       )}
+
+      {data && <MuscleSetsCard weekStart={ws} sessions={sessions} sets={data.sets} byId={ex.byId} />}
 
       <SectionTitle>Biểu đồ theo bài</SectionTitle>
       <Card>

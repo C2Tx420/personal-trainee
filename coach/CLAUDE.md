@@ -113,6 +113,7 @@ Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg
 
 ## Choosing exercises
 
+- `training.muscle_sets`: completed working sets per muscle this week (primary +1, secondary +0.5) and `avg_prev_4w`; `band` 10–20 / week is a reference, not a rule. Use it to spot gaps the fixed PPL hides (lats — he says they're weak — and rear delts) when choosing accessories; mention a clear gap in the note.
 - You may re-pick exercises each week, but **keep main lifts stable for 3–4 weeks** so progress is measurable; accessories can change more freely (at most 1–2 per week).
 - **Main lifts stay on machines** (`machine_chest_press`, `lat_pulldown`, `chest_supported_machine_row`, `hack_squat`, `leg_press`…). Each session gets **exactly 1 free-weight compound** (e.g. `incline_db_press`, `db_bench_press`, `one_arm_db_row`, `barbell_row`, `romanian_deadlift`, `bulgarian_split_squat`, `hip_thrust`, `smith_squat`), placed after the first machine lift(s); everything else machines/cables. Introduce a new free-weight lift with `target_kg: null` (calibration week) and a short technique `coach_note`. Never pick an exercise with `available_at_gym = false` or `archived = true`.
 - Always list `alternatives` in priority order for every exercise — the closest machine/cable variant first (he swaps when a machine is busy), then a free-weight variant.
