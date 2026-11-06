@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAN_V1 } from '../../scripts/seed/plan-v1';
 import type { Goal } from './goals';
-import { rejectedSummary, sessionChanges } from './plan-diff';
+import { draftWarnings, rejectedSummary, sessionChanges } from './plan-diff';
 import { parsePlanContent } from './plan-schema';
 import { planLabels, planWeek } from './plan-week';
 import { canReflect, missingReflection, reflectionLocked, reviewedWeeks } from './reflection';
@@ -106,5 +106,21 @@ describe('rejectedSummary (coach report)', () => {
     expect(out[0]).toMatchObject({ version_no: 2, rejected_reason: 'chưa muốn' });
     expect(out[0].changes?.some((c) => c.includes('1800'))).toBe(true);
     expect(rejectedSummary([{ ...rej, based_on_version_id: null }], (s) => s)[0].changes).toBeNull();
+  });
+});
+
+describe('draftWarnings (stale drafts)', () => {
+  const pv = (id: string, version_no: number, status: string, based_on_version_id: string | null = null) =>
+    ({ id, version_no, status, change_note: '', content: null, based_on_version_id });
+  it('built on a plan that is no longer active → stale', () => {
+    const plans = [pv('v1', 1, 'archived'), pv('v2', 2, 'active', 'v1'), pv('v3', 3, 'draft', 'v1')];
+    expect(draftWarnings(plans[2], plans)).toEqual({ staleBase: 'v1', otherDrafts: [], newest: true });
+    expect(draftWarnings(pv('v4', 4, 'draft', 'v2'), plans).staleBase).toBeNull();
+  });
+  it('several drafts pending → the newest offers to reject the older ones', () => {
+    const plans = [pv('v1', 1, 'active'), pv('v2', 2, 'draft', 'v1'), pv('v3', 3, 'draft', 'v1')];
+    expect(draftWarnings(plans[2], plans)).toMatchObject({ newest: true, otherDrafts: [{ id: 'v2' }] });
+    expect(draftWarnings(plans[1], plans)).toMatchObject({ newest: false, otherDrafts: [{ id: 'v3' }] });
+    expect(draftWarnings(plans[0], plans)).toEqual({ staleBase: null, otherDrafts: [], newest: false });
   });
 });

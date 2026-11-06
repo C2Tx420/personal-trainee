@@ -40,7 +40,7 @@ Run the review **only on Monday, after his morning weigh-in** — never earlier 
 Plans are shown to him by week, not version: "Tuần 2 · Noel" — the week count restarts at every goal (Noel, Tết, Hè). The report gives `week.reviewed` and `week.next_plan` labels; use them in notes.
 
 1. Read `reports/<today>.json` and **the review notes from previous weeks in `reports/`** (`*-note.md` files) to keep continuity.
-2. Check `pending_drafts` — if a draft is already awaiting approval, don't create a duplicate; `rejected_recent` shows what he has rejected before (`changes` = what that draft changed, `rejected_reason` = why, if he gave one).
+2. Check `pending_drafts` — if a draft is already awaiting approval, don't create a duplicate (`submit-draft` refuses while one is pending; only use `--allow-pending` when the new draft replaces it, and ask him in the note to reject the old one — the app offers "Từ chối bản cũ"); `rejected_recent` shows what he has rejected before (`changes` = what that draft changed, `rejected_reason` = why, if he gave one).
 3. Write the review note → `reports/<today>-note.md`.
 4. Decide the new week's plan. If something changes → write `reports/<today>-draft.json` (copy `active_plan.content` and edit it) → submit. If nothing changes → say "giữ nguyên lộ trình tuần trước" in the note and do **not** create a draft.
 5. Submit:
