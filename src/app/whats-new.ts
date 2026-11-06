@@ -10,20 +10,20 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
-    id: '2026-11-05',
-    date: '05/11/2026',
-    title: 'Tên bài tiếng Anh, máy trợ lực',
+    id: '2026-11-06',
+    date: '06/11/2026',
+    title: 'Tên tiếng Anh, máy trợ lực, so với lần trước',
     plan: 'v2.7',
     items: [
+      { icon: '🔤', title: 'Tên bài tiếng Anh', body: 'Tất cả bài tập đổi sang tên tiếng Anh như ở phòng tập (vd. Machine Chest Press, Cable Lat Pulldown). Tên tiếng Việt cũ vẫn nằm trong "Tên gọi khác" — gõ tiếng Việt khi tìm, đổi bài hay ghi nhanh vẫn ra đúng bài. Hướng dẫn kỹ thuật giữ tiếng Việt.', to: '/exercises' },
       { icon: '🪢', title: 'Máy trợ lực tính đúng chiều', body: 'Kéo xà / dip trợ lực: kg là trợ lực nên kg thấp hơn mới là khoẻ hơn. Kỷ lục 🏆, "↑ hơn lần trước", gợi ý tạ và thẻ Tiến độ giờ tính đúng chiều; không còn làm nóng theo %. Bài khác cũng là máy trợ lực thì bật "Máy trợ lực" ở trang bài.', to: '/exercises/assisted_pull_up' },
-      { icon: '🗂️', title: 'Cảnh báo bản nháp cũ', body: 'Duyệt lộ trình: nếu bản nháp soạn trên lộ trình cũ, hoặc đang có 2 bản nháp chờ, app báo ngay và có nút "Từ chối bản cũ" — không còn duyệt nhầm bản cũ như hôm 01/11.', to: '/more/plans' },
-      { icon: '💪', title: 'Hiệp theo nhóm cơ', body: 'Tab Tập có thẻ mới: tuần này mỗi nhóm cơ được bao nhiêu hiệp (nhóm chính 1, nhóm phụ 0,5), vùng xanh 10–20 hiệp là tham khảo, kèm TB 4 tuần trước. Thấy ngay nhóm nào đang thiếu, ví dụ xô hay vai sau.', to: '/training' },
-      { icon: '🔥', title: 'Làm nóng nhẹ hơn', body: 'Bài đa khớp làm nóng 2 hiệp ít lần dần: 50% × 8 rồi 75% × 4 (vd. máy đẩy ngực 27 kg → 14 × 8, 18 × 4) thay cho 2 hiệp gần bằng hiệp chính. Coach đổi lộ trình sang kiểu này ở lần review tới. Kg làm nóng luôn nhẹ hơn hiệp chính ít nhất 1 nấc.' },
       { icon: '↕️', title: 'So với lần trước', body: 'Tổng kết buổi và chi tiết buổi có thẻ ↑ = ↓ cho từng hiệp chính so với đúng hiệp đó buổi trước — thấy ngay hiệp nào bị tụt (thường là hiệp cuối).', to: '/training' },
       { icon: '🧐', title: 'Hỏi lại khi gõ số lạ', body: 'Gõ 300 thay vì 30, 120 lần, hay 25 kg trên máy nấc lb → app hỏi lại một lần ("Đúng rồi — lưu" hoặc Sửa) khi bấm Xong hiệp; ghi nhanh / ghi bù hiện cảnh báo vàng ngay dưới hiệp. Không chặn — số đúng thì cứ lưu.' },
-      { icon: '⏰', title: 'Nhắc khi chưa ghi buổi', body: '21:00 ngày có buổi tạ mà chưa ghi gì → nhắc: tập rồi thì ghi bù, nghỉ thì bấm "Nghỉ buổi này" để coach biết. Không nhắc sau 22:30, bỏ 3 buổi liền thì thôi nhắc. Đổi giờ hoặc tắt ở Thêm → Nhắc nhở.', to: '/more/reminders' },
+      { icon: '💪', title: 'Hiệp theo nhóm cơ', body: 'Tab Tập có thẻ mới: tuần này mỗi nhóm cơ được bao nhiêu hiệp (nhóm chính 1, nhóm phụ 0,5), vùng xanh 10–20 hiệp là tham khảo, kèm TB 4 tuần trước. Thấy ngay nhóm nào đang thiếu, ví dụ xô hay vai sau.', to: '/training' },
       { icon: '📈', title: 'Biểu đồ e1RM', body: 'Tab Tập → Biểu đồ theo bài có thêm nút e1RM: sức mạnh ước tính từ kg × lần, so được cả khi anh đổi tạ hay đổi số lần. Chỉ để xem xu hướng, không phải mức tạ 1 lần thật.', to: '/training' },
-      { icon: '🔤', title: 'Tên bài tiếng Anh', body: 'Tất cả bài tập đổi sang tên tiếng Anh như ở phòng tập (vd. Machine Chest Press, Cable Lat Pulldown). Tên tiếng Việt cũ vẫn nằm trong "Tên gọi khác" — gõ tiếng Việt khi tìm, đổi bài hay ghi nhanh vẫn ra đúng bài. Hướng dẫn kỹ thuật giữ tiếng Việt.', to: '/exercises' },
+      { icon: '🔥', title: 'Làm nóng nhẹ hơn', body: 'Bài đa khớp làm nóng 2 hiệp ít lần dần: 50% × 8 rồi 75% × 4 (vd. máy đẩy ngực 27 kg → 14 × 8, 18 × 4) thay cho 2 hiệp gần bằng hiệp chính. Coach đổi lộ trình sang kiểu này ở lần review tới. Kg làm nóng luôn nhẹ hơn hiệp chính ít nhất 1 nấc.' },
+      { icon: '⏰', title: 'Nhắc khi chưa ghi buổi', body: '21:00 ngày có buổi tạ mà chưa ghi gì → nhắc: tập rồi thì ghi bù, nghỉ thì bấm "Nghỉ buổi này" để coach biết. Không nhắc sau 22:30, bỏ 3 buổi liền thì thôi nhắc. Đổi giờ hoặc tắt ở Thêm → Nhắc nhở.', to: '/more/reminders' },
+      { icon: '🗂️', title: 'Cảnh báo bản nháp cũ', body: 'Duyệt lộ trình: nếu bản nháp soạn trên lộ trình cũ, hoặc đang có 2 bản nháp chờ, app báo ngay và có nút "Từ chối bản cũ" — không còn duyệt nhầm bản cũ như hôm 01/11.', to: '/more/plans' },
     ],
   },
   {
