@@ -393,7 +393,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   const draftFile = path.join(ROOT, 'test-results', 'coach-draft.json');
   fs.writeFileSync(draftFile, JSON.stringify(content));
   const out = JSON.parse(
-    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32,5kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850"`, {
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32,5kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850; curl giữ 15kg — sẽ chỉnh theo nấc lb" --accept-warnings`, {
       cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8',
     }),
   );
@@ -406,7 +406,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
 
   // a second draft while one is pending: refused, unless --allow-pending (the app then offers to reject the older one)
   const submit2 = (flag: string) =>
-    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Bản sửa lại: kéo xô 32,5kg; ép ngực cáp thay pec deck" ${flag}`, {
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Bản sửa lại: kéo xô 32,5kg; ép ngực cáp thay pec deck" --accept-warnings ${flag}`, {
       cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8', stdio: 'pipe',
     });
   expect(() => submit2('')).toThrow(/bản nháp chờ duyệt/);
@@ -435,6 +435,8 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await page.getByText('Có 2 lộ trình mới chờ duyệt').click();
   await expect(page.getByText(/→ 32,5 kg/)).toBeVisible();
   await expect(page.getByText(/Còn 1 bản nháp cũ hơn đang chờ/)).toBeVisible();
+  // stricter draft checks are shown (not blocking): the curl machine is an lb stack, 15 kg is off the ladder
+  await expect(page.getByText(/Machine Biceps Curl" là máy nấc lb/)).toBeVisible();
   await page.getByRole('button', { name: 'Từ chối bản cũ' }).click();
   await expect(page.getByText(/bản nháp cũ hơn/)).toHaveCount(0);
   await shot(page, '31-plan-diff', 'Duyệt lộ trình: thay đổi theo buổi, tăng/giảm tạ, thư viện gọn, calo');
