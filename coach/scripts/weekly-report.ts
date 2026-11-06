@@ -1,6 +1,7 @@
 import { addDays, diffDays, type IsoDate, todayVN, weekdayOf, weekStart } from '../../src/engine/dates';
 import { goalProgress, type Goal } from '../../src/engine/goals';
 import { compareInbody, inbodyDue, type InbodyLog, latestFfm } from '../../src/engine/inbody';
+import { e1rmBySession, stallCount } from '../../src/engine/analytics';
 import { round } from '../../src/engine/math';
 import { rejectedSummary } from '../../src/engine/plan-diff';
 import { legsBadmintonAdjacency, parsePlanContent } from '../../src/engine/plan-schema';
@@ -109,6 +110,8 @@ const setsDetail = trainedEx.map((exId) => {
       };
     });
   const working = exSets.filter((s) => s.set_type === 'working');
+  const assisted = !!ex.is_assisted;
+  const perSession = [...new Set(exSets.map((s) => s.session_id))].map((sid) => ({ date: dateOf.get(sid) as IsoDate, sets: exSets.filter((s) => s.session_id === sid) }));
   const withTarget = working.filter((s) => s.target_rep_min !== null);
   const hit = withTarget.filter((s) => s.reps !== null && s.target_rep_min !== null && s.reps >= s.target_rep_min && (s.target_kg === null || (s.weight_kg ?? 0) >= s.target_kg));
   const notes = [...exSets.map((s) => s.note ?? ''), ...iRows.filter((i) => i.exercise_id === exId).map((i) => i.note ?? '')];
@@ -121,6 +124,10 @@ const setsDetail = trainedEx.map((exId) => {
     hit_target_pct: withTarget.length ? Math.round((hit.length / withTarget.length) * 100) : null,
     missing_kg_sets: working.filter((s) => s.weight_kg === null && s.seconds === null).length,
     pain_mentions: notes.filter((t) => /đau|dau/i.test(t)).length,
+    // best e1RM per session (Epley, ≤ 15 reps; assisted = body weight − assistance) — trend only, not a real 1RM
+    e1rm_by_session: e1rmBySession(perSession, assisted, lastW || null),
+    // sessions in a row stuck at the same load (missed rep_max, no more total reps) — see coach/CLAUDE.md
+    stall_sessions: stallCount(perSession, assisted, plannedTarget(ex.slug as string)?.rep_max ?? null),
   };
 });
 
@@ -196,6 +203,7 @@ const report = {
     volume_by_exercise_8w: trainedEx.map((id) => ({ exercise: slugOf(id), weekly_kg: weeklyVolumeByExercise(new Set([id]), sRows, setRows, weekStarts8, loads).map((v) => v.volume) })),
     sets_detail_4w: setsDetail,
     progression_ready: progressionReady,
+    stalled: setsDetail.filter((d) => d.stall_sessions >= 2).map((d) => ({ exercise: d.exercise, sessions: d.stall_sessions })),
     schedule_violations: actualLegsBadmintonConflicts(weekSessions.map((s) => ({ date: s.session_date, kind: s.kind }))),
   },
   exercises: exercises.map((e) => ({

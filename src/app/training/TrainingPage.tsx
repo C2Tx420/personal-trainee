@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useActivePlan, useExerciseMaps, useReviews, useTraining, useWeights } from '@/data/queries';
 import { addDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
+import { e1rmSeries } from '@/engine/analytics';
 import { loadContext } from '@/engine/load';
 import { formatNumberVN } from '@/engine/math';
 import { missingReflection, reviewedWeeks } from '@/engine/reflection';
@@ -20,6 +21,7 @@ export function TrainingPage() {
   const today = todayVN();
   const [weeks, setWeeks] = useState<'4' | '8'>('4');
   const [exId, setExId] = useState<string>('');
+  const [metric, setMetric] = useState<'kg' | 'e1rm'>('kg');
 
   const data = training.data;
   const trainedExercises = useMemo(() => {
@@ -43,6 +45,9 @@ export function TrainingPage() {
   const vol = data ? weeklyVolumeByExercise(group, sessions, data.sets, weekStarts, loads).map((v) => ({ label: formatVN(v.week), volume: v.volume })) : [];
   const top = data
     ? topSetSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted).map((t) => ({ label: formatVN(t.date), top: t.topKg, target: t.targetKg }))
+    : [];
+  const e1 = data
+    ? e1rmSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted, loads.bodyKg).map((t) => ({ label: formatVN(t.date), e1rm: t.e1rm }))
     : [];
 
   return (
@@ -84,10 +89,26 @@ export function TrainingPage() {
             <Segmented value={weeks} onChange={setWeeks} options={[{ value: '4', label: '4 tuần' }, { value: '8', label: '8 tuần' }]} />
             <div className="mb-1 text-sm font-medium">Khối lượng mỗi tuần (kg)</div>
             <SimpleBars data={vol} dataKey="volume" name="Khối lượng" />
-            <div className="mt-3 mb-1 text-sm font-medium">
-              {selectedAssisted ? 'Kg trợ lực ít nhất vs mục tiêu (thấp hơn = khoẻ hơn)' : 'Tạ hiệp chính nặng nhất vs mục tiêu'}
+            <div className="mt-4">
+              <Segmented value={metric} onChange={setMetric} options={[{ value: 'kg', label: 'Tạ' }, { value: 'e1rm', label: 'e1RM' }]} />
             </div>
-            {top.length ? (
+            <div className="mb-1 text-sm font-medium">
+              {metric === 'e1rm'
+                ? 'Sức mạnh ước tính (e1RM)'
+                : selectedAssisted
+                  ? 'Kg trợ lực ít nhất vs mục tiêu (thấp hơn = khoẻ hơn)'
+                  : 'Tạ hiệp chính nặng nhất vs mục tiêu'}
+            </div>
+            {metric === 'e1rm' ? (
+              e1.length ? (
+                <>
+                  <SimpleLine data={e1} lines={[{ key: 'e1rm', name: 'e1RM' }]} unit="kg" />
+                  <p className="mt-1 text-xs text-muted">Ước tính từ kg × lần (hiệp ≤ 15 lần) — để xem xu hướng, không phải mức tạ 1 lần thật.</p>
+                </>
+              ) : (
+                <Empty>Chưa đủ số liệu (cần hiệp có kg, ≤ 15 lần{selectedAssisted ? ', và cân nặng' : ''})</Empty>
+              )
+            ) : top.length ? (
               <SimpleLine data={top} lines={[{ key: 'top', name: 'Thực tế' }, { key: 'target', name: 'Mục tiêu', color: 'var(--ok)', dashed: true }]} unit="kg" />
             ) : (
               <Empty>Chưa có buổi trong khoảng này</Empty>
