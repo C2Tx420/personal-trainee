@@ -1,7 +1,7 @@
 import { addDays, diffDays, type IsoDate, todayVN, weekdayOf, weekStart } from '../../src/engine/dates';
 import { goalProgress, type Goal } from '../../src/engine/goals';
 import { compareInbody, inbodyDue, type InbodyLog, latestFfm } from '../../src/engine/inbody';
-import { deloadOptions, e1rmBySession, stallCount } from '../../src/engine/analytics';
+import { averageMuscleSets, deloadOptions, e1rmBySession, MUSCLE_SETS_BAND, stallCount, weeklyMuscleSets } from '../../src/engine/analytics';
 import { round } from '../../src/engine/math';
 import { rejectedSummary } from '../../src/engine/plan-diff';
 import { legsBadmintonAdjacency, parsePlanContent } from '../../src/engine/plan-schema';
@@ -205,6 +205,13 @@ const report = {
     volume_by_exercise_8w: trainedEx.map((id) => ({ exercise: slugOf(id), weekly_kg: weeklyVolumeByExercise(new Set([id]), sRows, setRows, weekStarts8, loads).map((v) => v.volume) })),
     sets_detail_4w: setsDetail,
     progression_ready: progressionReady,
+    // completed working sets per muscle (primary +1, secondary +0.5); reference band per week
+    muscle_sets: {
+      band: MUSCLE_SETS_BAND,
+      week: weeklyMuscleSets(ws, sRows, setRows, exById as never),
+      // average of the 4 weeks BEFORE the reviewed one (weeks without training left out)
+      avg_prev_4w: averageMuscleSets([1, 2, 3, 4].map((i) => weeklyMuscleSets(addDays(ws, -7 * i), sRows, setRows, exById as never))),
+    },
     stalled: setsDetail
       .filter((d) => d.stall_sessions >= 2)
       .map((d) => {

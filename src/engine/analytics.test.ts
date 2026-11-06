@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { deloadOptions, e1rm, e1rmBySession, stallCount } from './analytics';
-import type { SetRow } from './types';
+import { averageMuscleSets, deloadOptions, e1rm, e1rmBySession, muscleSets, stallCount, weeklyMuscleSets } from './analytics';
+import type { SessionRow, SetRow } from './types';
 
 const set = (kg: number | null, reps: number, o: Partial<SetRow> = {}): SetRow => ({
   id: crypto.randomUUID(), session_id: 's', session_item_id: 'i', exercise_id: 'e', set_index: 1, set_type: 'working',
@@ -57,5 +57,29 @@ describe('deloadOptions', () => {
     const o = deloadOptions({ sessions, loadStepKg: 4.5, repMin: 6, repMax: 8, assisted: true, bodyKg: 80 });
     expect(o.length).toBe(2);
     expect(o.every((x) => x.kg >= 21)).toBe(true);
+  });
+});
+
+describe('muscleSets', () => {
+  const ex = new Map([
+    ['press', { primary_muscle: 'chest', secondary_muscles: ['front_delt', 'triceps'], kind: 'compound' }],
+    ['walk', { primary_muscle: 'cardio', secondary_muscles: [], kind: 'cardio' }],
+    ['dup', { primary_muscle: 'quads', secondary_muscles: [], kind: 'compound', canonical_exercise_id: 'press' }],
+  ]);
+  it('primary +1, secondary +0.5; warm-ups, cardio, unticked sets ignored; provisional → canonical', () => {
+    const sets = [
+      set(27, 10, { exercise_id: 'press' }), set(27, 10, { exercise_id: 'press' }), set(20, 10, { exercise_id: 'press', set_type: 'warmup' }),
+      set(27, 10, { exercise_id: 'press', completed: false }), set(null, 0, { exercise_id: 'walk' }), set(30, 8, { exercise_id: 'dup' }),
+    ];
+    expect(muscleSets(sets, ex)).toEqual({ chest: 3, front_delt: 1.5, triceps: 1.5 });
+  });
+  it('weekly + 4-week average', () => {
+    const sessions = [{ id: 'w1', session_date: '2026-10-27', status: 'completed' }, { id: 'w2', session_date: '2026-11-03', status: 'completed' }] as SessionRow[];
+    const sets = [set(27, 10, { exercise_id: 'press', session_id: 'w1' }), set(27, 10, { exercise_id: 'press', session_id: 'w2' }), set(27, 10, { exercise_id: 'press', session_id: 'w2' })];
+    const w1 = weeklyMuscleSets('2026-10-26', sessions, sets, ex);
+    const w2 = weeklyMuscleSets('2026-11-02', sessions, sets, ex);
+    expect(w1.chest).toBe(1);
+    expect(w2.chest).toBe(2);
+    expect(averageMuscleSets([w1, w2])).toMatchObject({ chest: 1.5, triceps: 0.8 });
   });
 });

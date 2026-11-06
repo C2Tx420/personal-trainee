@@ -240,6 +240,7 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   await page.getByRole('tab', { name: 'e1RM' }).click();
   await expect(page.getByText('Sức mạnh ước tính (e1RM)')).toBeVisible();
   await page.getByRole('tab', { name: 'Tạ', exact: true }).click();
+  await expect(page.getByTestId('muscle-sets')).toContainText('Ngực');
   await shot(page, '18-training', 'Tập: tổng kết tuần, khối lượng theo bài, tạ vs mục tiêu, lịch sử');
 
   await page.getByRole('button', { name: 'Ghi nhanh', exact: true }).click();

@@ -1,4 +1,4 @@
-import type { IsoDate } from './dates';
+import { addDays, type IsoDate } from './dates';
 import { byHardest, effectiveLoad, sameLoad } from './load';
 import { round } from './math';
 import { isLbStack, stackStep } from './stack';
@@ -154,5 +154,57 @@ export function deloadOptions(args: {
 function stackSteps(kg: number, n: number): number {
   let out = kg;
   for (let i = 0; i < Math.abs(n); i++) out = stackStep(out, n > 0 ? 1 : -1);
+  return out;
+}
+
+// ───────────────────────── Sets per muscle (§16 B4)
+
+/** Weekly sets per muscle, reference band (10–20 hard sets / week per muscle). */
+export const MUSCLE_SETS_BAND = { low: 10, high: 20 } as const;
+export const SECONDARY_SET_WEIGHT = 0.5;
+
+type MuscleInfo = { primary_muscle: string; secondary_muscles: string[]; kind?: string };
+
+/**
+ * Completed working sets per muscle: the primary muscle +1, each secondary +0.5. Warm-ups and
+ * cardio exercises don't count; timed sets (plank) do. Provisional exercises count as their canonical one.
+ */
+export function muscleSets(
+  sets: SetRow[],
+  exercises: Map<string, MuscleInfo & { canonical_exercise_id?: string | null }>,
+  secondaryWeight = SECONDARY_SET_WEIGHT,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const s of sets) {
+    if (!s.completed || s.set_type !== 'working') continue;
+    const own = exercises.get(s.exercise_id);
+    const e = (own?.canonical_exercise_id && exercises.get(own.canonical_exercise_id)) || own;
+    if (!e || e.kind === 'cardio' || e.primary_muscle === 'cardio') continue;
+    out[e.primary_muscle] = (out[e.primary_muscle] ?? 0) + 1;
+    for (const m of e.secondary_muscles) if (m !== e.primary_muscle) out[m] = (out[m] ?? 0) + secondaryWeight;
+  }
+  for (const k of Object.keys(out)) out[k] = round(out[k], 1);
+  return out;
+}
+
+/** Sets per muscle for the week starting `weekStartDate` (completed sessions only). */
+export function weeklyMuscleSets(
+  weekStartDate: IsoDate,
+  sessions: SessionRow[],
+  sets: SetRow[],
+  exercises: Map<string, MuscleInfo & { canonical_exercise_id?: string | null }>,
+): Record<string, number> {
+  const end = addDays(weekStartDate, 6);
+  const ids = new Set(sessions.filter((s) => s.status === 'completed' && s.session_date >= weekStartDate && s.session_date <= end).map((s) => s.id));
+  return muscleSets(sets.filter((s) => ids.has(s.session_id)), exercises);
+}
+
+/** Average of several weekly muscle-set maps (missing = 0); weeks with no training are left out. */
+export function averageMuscleSets(all: Record<string, number>[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  const weeks = all.filter((w) => Object.keys(w).length > 0);
+  if (!weeks.length) return out;
+  for (const w of weeks) for (const [k, v] of Object.entries(w)) out[k] = (out[k] ?? 0) + v;
+  for (const k of Object.keys(out)) out[k] = round(out[k] / weeks.length, 1);
   return out;
 }
