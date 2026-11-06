@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAN_V1 } from '../../scripts/seed/plan-v1';
 import type { Goal } from './goals';
-import { sessionChanges } from './plan-diff';
+import { rejectedSummary, sessionChanges } from './plan-diff';
 import { parsePlanContent } from './plan-schema';
 import { planLabels, planWeek } from './plan-week';
 import { canReflect, missingReflection, reflectionLocked, reviewedWeeks } from './reflection';
@@ -92,5 +92,19 @@ describe('cảm nhận sau buổi', () => {
     expect(missingReflection({ status: 'completed', session_date: '2026-11-03', reflection: '  ' }, reviewed)).toBe(true);
     expect(missingReflection({ status: 'completed', session_date: '2026-11-03', reflection: 'Khoẻ' }, reviewed)).toBe(false);
     expect(missingReflection({ status: 'completed', session_date: '2026-10-28', reflection: null }, reviewed)).toBe(false);
+  });
+});
+
+describe('rejectedSummary (coach report)', () => {
+  it('lists what a rejected draft changed vs its base', () => {
+    const base = { id: 'a', version_no: 1, status: 'active', change_note: '', content: PLAN_V1, based_on_version_id: null };
+    const draft = structuredClone(PLAN_V1);
+    draft.nutrition.calories_kcal = 1800;
+    const rej = { id: 'b', version_no: 2, status: 'rejected', change_note: 'giảm calo', rejected_reason: 'chưa muốn', content: draft, based_on_version_id: 'a' };
+    const out = rejectedSummary([base, rej], (s) => s);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ version_no: 2, rejected_reason: 'chưa muốn' });
+    expect(out[0].changes?.some((c) => c.includes('1800'))).toBe(true);
+    expect(rejectedSummary([{ ...rej, based_on_version_id: null }], (s) => s)[0].changes).toBeNull();
   });
 });

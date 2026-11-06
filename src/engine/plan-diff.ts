@@ -1,6 +1,6 @@
 import { WEEKDAY_LABEL, WEEKDAYS } from './dates';
 import type { DayPlan, ExerciseDef, PlanContent, PlanItem, PlanTemplate } from './plan-schema';
-import { legsBadmintonAdjacency } from './plan-schema';
+import { legsBadmintonAdjacency, parsePlanContent } from './plan-schema';
 
 export type DiffKind =
   | 'added'
@@ -154,6 +154,36 @@ export function diffPlans(
     if (na[k] !== nb[k]) out.push({ kind: 'nutrition', scope: 'Macro tham khảo', text: `${label}: ${na[k]} → ${nb[k]} g` });
   }
   return out;
+}
+
+/** A plan version row as the coach report reads it. */
+export type PlanVersionLite = {
+  id: string;
+  version_no: number;
+  status: string;
+  change_note: string;
+  rejected_reason?: string | null;
+  content: unknown;
+  based_on_version_id: string | null;
+};
+
+/**
+ * The last `n` rejected drafts with what each one changed vs the plan it was built on
+ * (so the coach does not re-propose them without new data).
+ */
+export function rejectedSummary(plans: PlanVersionLite[], names: (slug: string) => string, n = 3) {
+  return plans
+    .filter((p) => p.status === 'rejected')
+    .slice(-n)
+    .map((p) => {
+      const base = plans.find((x) => x.id === p.based_on_version_id);
+      return {
+        version_no: p.version_no,
+        change_note: p.change_note,
+        rejected_reason: p.rejected_reason ?? null,
+        changes: base ? diffPlans(parsePlanContent(base.content), parsePlanContent(p.content), names).map((d) => `${d.scope}: ${d.text}`) : null,
+      };
+    });
 }
 
 // ───────────────────────── Per-session view (plan review screen)
