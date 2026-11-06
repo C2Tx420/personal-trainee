@@ -34,7 +34,7 @@ const [goals, plans, weights, meas, inbody, sessions, exercises] = await Promise
   sql`select *, log_date::text as log_date_s from body_measurements order by log_date`,
   sql`select *, measured_on::text as measured_on_s from inbody_logs order by measured_on`,
   sql`select *, session_date::text as session_date_s from workout_sessions where session_date >= ${from8w} order by session_date`,
-  sql`select id, slug, coalesce(name, name_vi) as name, primary_muscle, secondary_muscles, kind, equipment, load_step_kg::float as load_step_kg, is_assisted, available_at_gym, unavailable_note, is_provisional, archived,
+  sql`select id, slug, name, primary_muscle, secondary_muscles, kind, equipment, load_step_kg::float as load_step_kg, is_assisted, available_at_gym, unavailable_note, is_provisional, archived,
              canonical_exercise_id, (illustration_svg is not null) as has_illustration, aliases
       from exercises order by slug`,
 ]);

@@ -1382,7 +1382,6 @@
       }
     },
     "exercise_upserts": {
-      "default": [],
       "type": "array",
       "items": {
         "type": "object",

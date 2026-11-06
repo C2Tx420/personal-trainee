@@ -1,6 +1,6 @@
 import { WEEKDAY_LABEL, WEEKDAYS } from './dates';
 import type { DayPlan, ExerciseDef, PlanContent, PlanItem, PlanTemplate } from './plan-schema';
-import { defName, legsBadmintonAdjacency, parsePlanContent } from './plan-schema';
+import { legsBadmintonAdjacency, parsePlanContent } from './plan-schema';
 
 export type DiffKind =
   | 'added'
@@ -115,7 +115,7 @@ function diffExercises(a: ExerciseDef[], b: ExerciseDef[], knownBefore: Set<stri
     return {
       kind: isNew ? 'exercise_new' : 'exercise_edit',
       scope: 'Thư viện bài tập',
-      text: isNew ? `Bài mới: ${defName(e)}` : `Sửa bài: ${defName(e)}`,
+      text: isNew ? `Bài mới: ${e.name}` : `Sửa bài: ${e.name}`,
       slug: e.slug,
     };
   });

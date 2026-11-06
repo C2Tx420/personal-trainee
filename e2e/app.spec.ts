@@ -397,6 +397,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   const svg = (slug: string, name: string) => fs.readFileSync(path.join(ROOT, 'supabase/seed/exercises', `${slug}.svg`), 'utf8').trim().replace(/aria-label="[^"]*"/, `aria-label="${name}"`);
   content.exercise_upserts = [
     {
+      // `name_vi` on purpose: drafts written before the rename must still be accepted (plan v2.7 B13)
       slug: 'cable_fly', name_vi: 'Ép ngực cáp', aliases: ['cable fly', 'ép ngực cáp'], primary_muscle: 'chest', secondary_muscles: ['front_delt'],
       movement_pattern: 'isolation_push', kind: 'isolation', equipment: 'cable', load_step_kg: 2.5, is_time_based: false,
       cues: ['Khuỷu hơi cong cố định', 'Ép tay về giữa ngực, siết 1 giây'], common_mistakes: ['Biến thành động tác đẩy'], illustration_svg: svg('pec_deck_fly', 'Ép ngực cáp'),
@@ -463,7 +464,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await expect(page.getByText('Đã duyệt — áp dụng từ hôm nay')).toBeVisible();
   await shot(page, '33-approved', 'Đã duyệt → bản mới đang dùng, bản cũ lưu trữ');
   expect(psql("select version_no || ':' || status from plan_versions order by version_no")).toBe('1:archived\n2:rejected\n3:active');
-  expect(psql("select is_provisional::text || ':' || name_vi from exercises where slug like 'user_%'")).toBe('false:Máy chèo ngồi Impulse');
+  expect(psql("select is_provisional::text || ':' || name from exercises where slug like 'user_%'")).toBe('false:Máy chèo ngồi Impulse');
 });
 
 test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu', async () => {
@@ -489,7 +490,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
   await expect(page.getByTestId('version-line')).toContainText('Plan v2.7');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261106000300');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261113000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();
   await expect(page.getByText('Bản đầu tiên')).toBeVisible();

@@ -33,3 +33,13 @@ describe('backup pt-backup/1', () => {
     expect(() => planImport({ schema: 'khac' })).toThrow('pt-backup/1');
   });
 });
+
+describe('import: renamed columns (plan v2.7 B13)', () => {
+  it('an old backup with exercises.name_vi imports as name', () => {
+    const raw = { schema: 'pt-backup/1', exported_at: '2026-11-01T00:00:00Z', app_version: '0.1.0', tables: {
+      exercises: [{ id: 'e1', slug: 'leg_press', name_vi: 'Máy đạp đùi', user_id: 'u' }, { id: 'e2', slug: 'x', name: 'New', name_vi: 'Old' }],
+    } };
+    const ex = planImport(raw).plan.find((p) => p.table === 'exercises')!.rows;
+    expect(ex).toEqual([{ id: 'e1', slug: 'leg_press', name: 'Máy đạp đùi' }, { id: 'e2', slug: 'x', name: 'New' }]);
+  });
+});

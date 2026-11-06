@@ -19,7 +19,7 @@ if (!file || !note) {
 
 const content = planContentSchema.parse(JSON.parse(fs.readFileSync(file, 'utf8')));
 const sql = connect();
-const lib = await sql`select slug, coalesce(name, name_vi) as name, load_step_kg::float as load_step_kg, is_assisted from exercises`;
+const lib = await sql`select slug, name, load_step_kg::float as load_step_kg, is_assisted from exercises`;
 const slugs = lib.map((r) => r.slug as string);
 const errors = validatePlanRules(content, slugs).filter((i) => i.level === 'error').map((i) => i.message);
 // stricter checks vs the active plan (§16 B6); "đau" in a set / exercise note in the last 4 weeks

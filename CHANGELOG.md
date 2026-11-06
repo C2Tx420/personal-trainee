@@ -4,9 +4,10 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 
 ## [Unreleased]
 
-Plan: v2.7 · Latest migration: 20261106000300
+Plan: v2.7 · Latest migration: 20261113000100
 
 ### Changed
+- Rename release N+1 (branch `feat/v2.7-drop-name-vi`, migration `20261113000100` — deploy ≥ 1 week after release N): drops the sync trigger and `exercises.name_vi`, `name` is `not null`. Drafts and backups that still carry `name_vi` are read as `name` (`exerciseDefSchema` transform, `RENAMED` in `src/export/backup.ts`, `_upsert_exercises` fallback).
 - Exercise display name column `name` (migration `20261106000300`, release N of a two-step rename): `name` is filled from `name_vi`, the trigger `exercises_name_sync` keeps both equal whichever one a client writes, and `_upsert_exercises` accepts either. App, seed JSON, coach report and `coach/CLAUDE.md` use `name` (`defName()` for draft upserts that still carry `name_vi`). Release N+1 drops `name_vi` once this one has run on production for ≥ 1 week.
 - "Bỏ buổi" reminder (`missed_workout`, migration `20261106000200` extends the kind check and adds the row for existing users; default 21:00, on): on a lifting day with nothing logged, never after 22:30, quiet after 3 lifting days missed in a row (`liftingTodayContext` in `supabase/functions/_shared/reminders.ts`, used by `send-reminders`). Generic text, no numbers.
 - Typo guard (`suspiciousSet` in `analytics.ts`): kg > 1.5× / < 0.4× the heaviest working set ever, reps > 2× the target max (and > 20), or a kg between two pins on an lb stack. The set card asks once on "Xong hiệp" ("Đúng rồi — lưu" / Sửa); Quick log and Backfill show a warning under the set. Never blocks.

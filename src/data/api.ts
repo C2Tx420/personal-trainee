@@ -289,7 +289,6 @@ export async function createProvisionalExercise(name: string, like: ExerciseRow 
       .insert({
         slug,
         name: name.trim(),
-        name_vi: name.trim(), // until release N+1 drops the column (plan v2.7 §16 B13)
         aliases: [name.trim()],
         primary_muscle: like?.primary_muscle ?? 'chest',
         secondary_muscles: like?.secondary_muscles ?? [],
