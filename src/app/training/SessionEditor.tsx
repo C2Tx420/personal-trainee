@@ -1,4 +1,5 @@
-import type { ExerciseRow } from '@/engine/types';
+import { suspiciousSet } from '@/engine/analytics';
+import type { ExerciseRow, SetRow } from '@/engine/types';
 import { Button, Card, Chip, cx, ExerciseImg, Input } from '@/ui/components';
 import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 
@@ -27,10 +28,13 @@ export function SessionEditor({
   items,
   onChange,
   library,
+  history = [],
 }: {
   items: EditorItem[];
   onChange: (items: EditorItem[]) => void;
   library: ExerciseRow[];
+  /** earlier logged sets (all exercises) — for the typo guard */
+  history?: SetRow[];
 }) {
   const update = (key: string, patch: Partial<EditorItem>) => onChange(items.map((i) => (i.key === key ? { ...i, ...patch } : i)));
   const updateSet = (ik: string, sk: string, patch: Partial<EditorSet>) =>
@@ -58,28 +62,37 @@ export function SessionEditor({
               </div>
             )}
             <div className="space-y-2">
-              {it.sets.map((s, si) => (
-                <div key={s.key} className="flex items-center gap-2" data-index={si}>
-                  <button
-                    type="button"
-                    onClick={() => updateSet(it.key, s.key, { set_type: s.set_type === 'warmup' ? 'working' : 'warmup' })}
-                    className={cx('h-10 w-24 shrink-0 rounded-lg text-xs font-semibold', s.set_type === 'warmup' ? 'bg-card-2 text-muted' : 'bg-accent-soft text-accent')}
-                  >
-                    {s.set_type === 'warmup' ? 'Làm nóng' : 'Chính'} {it.sets.slice(0, si + 1).filter((x) => x.set_type === s.set_type).length}
-                  </button>
-                  {!timeBased && (
-                    <Input aria-label="kg" inputMode="decimal" placeholder="kg" value={s.kg ?? ''} onChange={(e) => updateSet(it.key, s.key, { kg: toNum(e.target.value) })} />
-                  )}
-                  <Input
-                    aria-label={timeBased ? 'giây' : 'lần'}
-                    inputMode="numeric"
-                    placeholder={timeBased ? 'giây' : 'lần'}
-                    value={(timeBased ? s.seconds : s.reps) ?? ''}
-                    onChange={(e) => updateSet(it.key, s.key, timeBased ? { seconds: toNum(e.target.value) } : { reps: toNum(e.target.value) })}
-                  />
-                  <button aria-label="Xoá hiệp" className="px-2 text-muted" onClick={() => update(it.key, { sets: it.sets.filter((x) => x.key !== s.key) })}>✕</button>
-                </div>
-              ))}
+              {it.sets.map((s, si) => {
+                const typo =
+                  ex && !timeBased && s.set_type === 'working'
+                    ? suspiciousSet({ kg: s.kg, reps: s.reps }, history.filter((h) => h.exercise_id === ex.id), { loadStepKg: ex.load_step_kg })
+                    : null;
+                return (
+                  <div key={s.key}>
+                    <div className="flex items-center gap-2" data-index={si}>
+                      <button
+                        type="button"
+                        onClick={() => updateSet(it.key, s.key, { set_type: s.set_type === 'warmup' ? 'working' : 'warmup' })}
+                        className={cx('h-10 w-24 shrink-0 rounded-lg text-xs font-semibold', s.set_type === 'warmup' ? 'bg-card-2 text-muted' : 'bg-accent-soft text-accent')}
+                      >
+                        {s.set_type === 'warmup' ? 'Làm nóng' : 'Chính'} {it.sets.slice(0, si + 1).filter((x) => x.set_type === s.set_type).length}
+                      </button>
+                      {!timeBased && (
+                        <Input aria-label="kg" inputMode="decimal" placeholder="kg" value={s.kg ?? ''} onChange={(e) => updateSet(it.key, s.key, { kg: toNum(e.target.value) })} />
+                      )}
+                      <Input
+                        aria-label={timeBased ? 'giây' : 'lần'}
+                        inputMode="numeric"
+                        placeholder={timeBased ? 'giây' : 'lần'}
+                        value={(timeBased ? s.seconds : s.reps) ?? ''}
+                        onChange={(e) => updateSet(it.key, s.key, timeBased ? { seconds: toNum(e.target.value) } : { reps: toNum(e.target.value) })}
+                      />
+                      <button aria-label="Xoá hiệp" className="px-2 text-muted" onClick={() => update(it.key, { sets: it.sets.filter((x) => x.key !== s.key) })}>✕</button>
+                    </div>
+                    {typo && <p className="mt-1 text-xs text-warn" data-testid="typo-guard">Kiểm tra lại: {typo}</p>}
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-2 flex gap-2">
               <Chip

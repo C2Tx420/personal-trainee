@@ -7,6 +7,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.7 · Latest migration: 20261106000100
 
 ### Changed
+- Typo guard (`suspiciousSet` in `analytics.ts`): kg > 1.5× / < 0.4× the heaviest working set ever, reps > 2× the target max (and > 20), or a kg between two pins on an lb stack. The set card asks once on "Xong hiệp" ("Đúng rồi — lưu" / Sửa); Quick log and Backfill show a warning under the set. Never blocks.
 - "So với lần trước" card (session summary + session detail): one ↑ / = / ↓ per working set vs the same set last session (`setTrend` in `analytics.ts`: load first, assisted the right way round, then reps; kg on only one side → not compared). Backfill pre-fills assisted machines without % warm-ups.
 - Plan items accept optional `backoff_steps` (0–2): working sets 2+ are that many load steps lighter than set 1 (pins on lb stacks, more assistance on assisted machines; `backoffKg` in `warmup.ts`), so raising `target_kg` carries the back-off sets. Not allowed together with `target_kg_per_set`; shown in the plan diff and item summary.
 - Warm-ups: % warm-ups stay ≥ 1 step below the working load (`capBelow` in `stack.ts`); `suggestWarmup` gives the new default (compound 50% × 8 + 75% × 4, one 75% × 5 set when both land on the same load, none for isolation / assisted / timed) — used when adding an exercise in the plan editor and by the coach.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { averageMuscleSets, deloadOptions, e1rm, e1rmBySession, muscleSets, setTrend, stallCount, weeklyMuscleSets } from './analytics';
+import { averageMuscleSets, deloadOptions, e1rm, e1rmBySession, muscleSets, setTrend, stallCount, suspiciousSet, weeklyMuscleSets } from './analytics';
 import type { SessionRow, SetRow } from './types';
 
 const set = (kg: number | null, reps: number, o: Partial<SetRow> = {}): SetRow => ({
@@ -96,5 +96,21 @@ describe('setTrend', () => {
   });
   it('assisted: less assistance = up', () => {
     expect(setTrend([set(21, 6)], [set(27, 6)], true)[0].trend).toBe('up');
+  });
+});
+
+describe('suspiciousSet', () => {
+  const hist = [set(40, 12), set(36, 10)];
+  it('kg far above / below what he has done', () => {
+    expect(suspiciousSet({ kg: 200, reps: 12 }, hist)).toContain('Nặng nhất từng tập 40');
+    expect(suspiciousSet({ kg: 4, reps: 12 }, hist)).toContain('Thường tập tới 40');
+    expect(suspiciousSet({ kg: 45, reps: 12 }, hist)).toBeNull();
+    expect(suspiciousSet({ kg: 200, reps: 12 }, [])).toBeNull(); // first time: nothing to compare
+  });
+  it('reps typo; lb stack between pins', () => {
+    expect(suspiciousSet({ kg: 40, reps: 120 }, hist, { repMax: 12 })).toContain('120 lần');
+    expect(suspiciousSet({ kg: 40, reps: 15 }, hist, { repMax: 12 })).toBeNull();
+    expect(suspiciousSet({ kg: 25, reps: 10 }, [], { loadStepKg: 4.5 })).toContain('nấc gần nhất 27');
+    expect(suspiciousSet({ kg: 27, reps: 10 }, [], { loadStepKg: 4.5 })).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { addDays, type IsoDate } from './dates';
 import { byHardest, effectiveLoad, harder, sameLoad } from './load';
 import { round } from './math';
-import { isLbStack, stackStep } from './stack';
+import { isLbStack, kgToLb, lbToKg, stackStep } from './stack';
 import type { SessionRow, SetRow } from './types';
 
 /**
@@ -236,4 +236,37 @@ export function setTrend(current: SetRow[], last: SetRow[] | null, assisted = fa
     }
     return { setId: s.id, setIndex: s.set_index, trend };
   });
+}
+
+// ───────────────────────── Typo guard (§16 B11)
+
+/**
+ * A number that looks like a typo (300 for 30, 8 for 80, 120 reps…), against this exercise's earlier
+ * working sets: kg > 1.5× or < 0.4× the heaviest ever, reps > 2× the target max (or the most ever) and
+ * > 20, or a kg between two pins on an lb stack. Returns a short Vietnamese prompt, or null.
+ * Never blocks — the UI asks once ("Đúng rồi") and saves.
+ */
+export function suspiciousSet(
+  input: { kg: number | null; reps: number | null },
+  history: SetRow[],
+  opts: { repMax?: number | null; loadStepKg?: number } = {},
+): string | null {
+  const prev = loaded(history);
+  const fmt = (n: number) => String(n).replace('.', ',');
+  if (input.kg !== null && input.kg > 0) {
+    if (opts.loadStepKg !== undefined && isLbStack(opts.loadStepKg)) {
+      const pin = lbToKg(kgToLb(input.kg));
+      if (Math.abs(pin - input.kg) > 0.01) return `${fmt(input.kg)} kg không có trên máy nấc lb — nấc gần nhất ${pin} kg (${kgToLb(input.kg)} lb)`;
+    }
+    if (prev.length) {
+      const max = Math.max(...prev.map((s) => s.weight_kg));
+      if (max > 0 && input.kg > max * 1.5) return `${fmt(input.kg)} kg? Nặng nhất từng tập ${fmt(max)} kg`;
+      if (max > 0 && input.kg < max * 0.4) return `${fmt(input.kg)} kg? Thường tập tới ${fmt(max)} kg`;
+    }
+  }
+  if (input.reps !== null) {
+    const ref = opts.repMax ?? (prev.length ? Math.max(...prev.map((s) => s.reps)) : null);
+    if (ref && input.reps > 20 && input.reps > ref * 2) return `${input.reps} lần? ${opts.repMax ? `Mục tiêu tối đa ${opts.repMax}` : `Nhiều nhất từng tập ${ref}`} lần`;
+  }
+  return null;
 }

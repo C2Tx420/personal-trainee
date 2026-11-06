@@ -62,6 +62,11 @@ export function WorkoutFlowPage() {
 
   const refresh = useCallback(() => invalidate(qk.session(id), qk.training, qk.inProgress, qk.exercises, qk.history(exIds)), [invalidate, id, exIds]);
 
+  /** earlier sets of an exercise in other sessions (typo guard) */
+  const pastSets = useCallback(
+    (exerciseId: string) => (history.data ?? []).filter((h) => h.sessionId !== id).flatMap((h) => h.sets.filter((s) => s.exercise_id === exerciseId)),
+    [history.data, id],
+  );
   const lastFor = useCallback(
     (exerciseId: string) =>
       lastPerformance(
@@ -310,6 +315,7 @@ export function WorkoutFlowPage() {
                 workingTotal={step.workingTotal}
                 initialKg={prefillKg(step.planned, doneHere, last)}
                 lastSet={lastSet}
+                history={pastSets(item.exercise_id)}
                 initialReason={
                   step.planned.setType === 'working'
                     ? (doneHere.filter((s) => s.set_type === 'working').sort((a, b) => a.set_index - b.set_index).at(-1)?.kg_change_reason ?? null)
@@ -404,6 +410,7 @@ export function WorkoutFlowPage() {
           <SetCard
             item={editItem}
             exercise={ex.byId.get(editItem.exercise_id)!}
+            history={pastSets(editItem.exercise_id)}
             planned={editPlanned}
             workingTotal={editItem.target.sets}
             initialKg={editSet.weight_kg}

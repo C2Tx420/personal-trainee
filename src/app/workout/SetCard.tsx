@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type SetInput } from '@/data/api';
+import { suspiciousSet } from '@/engine/analytics';
 import { harder, sameLoad } from '@/engine/load';
 import { formatSet, kgDeviates } from '@/engine/progression';
 import { isLbStack, kgToLb, pinsAround, stackStep } from '@/engine/stack';
@@ -23,6 +24,7 @@ export function SetCard({
   initialReason = null,
   existing,
   lastSet,
+  history = [],
   onSave,
   saveLabel = 'Xong hiệp',
 }: {
@@ -35,6 +37,8 @@ export function SetCard({
   initialReason?: KgChangeReason | null;
   existing?: SetRow;
   lastSet?: SetRow | null;
+  /** earlier working sets of this exercise (other sessions) — for the typo guard */
+  history?: SetRow[];
   onSave: (s: SetInput) => Promise<void>;
   saveLabel?: string;
 }) {
@@ -48,6 +52,9 @@ export function SetCard({
   const [reasonNote, setReasonNote] = useState(existing?.kg_change_note ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // typo guard: ask once per value ("Đúng rồi — lưu"), never block
+  const [confirmed, setConfirmed] = useState<string | null>(null);
+  const [asking, setAsking] = useState(false);
 
   const deviates = !timeBased && planned.setType === 'working' && kgDeviates(planned.targetKg, kg);
   const belowReps = !timeBased && reps !== null && reps < planned.repMin;
@@ -56,7 +63,21 @@ export function SetCard({
     !!lastSet && !timeBased && kg !== null && reps !== null && lastSet.weight_kg !== null && lastSet.reps !== null &&
     (harder(kg, lastSet.weight_kg, !!exercise.is_assisted) || (sameLoad(kg, lastSet.weight_kg) && reps > lastSet.reps));
 
-  async function save() {
+  const suspicious =
+    planned.setType === 'working' && !timeBased
+      ? suspiciousSet({ kg, reps }, history, { repMax: planned.repMax, loadStepKg: exercise.load_step_kg })
+      : null;
+  const valueKey = `${kg}|${reps}`;
+  const askFirst = !!suspicious && confirmed !== valueKey;
+
+  async function save(force = false) {
+    if (askFirst && !force) {
+      setConfirmed(null);
+      setError(null);
+      setAsking(true);
+      return;
+    }
+    setAsking(false);
     setBusy(true);
     setError(null);
     try {
@@ -190,6 +211,24 @@ export function SetCard({
         </button>
       </div>
       {showNote && <Input className="mt-2" placeholder="Ghi chú hiệp (vd. đau vai trái)" value={note} onChange={(e) => setNote(e.target.value)} />}
+      {suspicious && asking && (
+        <div className="mt-3 rounded-ctl border border-warn/25 bg-warn-soft p-3" data-testid="typo-guard">
+          <div className="mb-2 text-sm font-semibold text-warn">Kiểm tra lại: {suspicious}</div>
+          <div className="grid grid-cols-2 gap-2">
+            <Button size="sm" variant="ghost" onClick={() => setAsking(false)}>Sửa</Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                setConfirmed(valueKey);
+                void save(true);
+              }}
+            >
+              Đúng rồi — lưu
+            </Button>
+          </div>
+        </div>
+      )}
       {error && <p className="mt-2 rounded-ctl border border-bad/25 bg-bad-soft p-2.5 text-sm text-bad">{error}</p>}
       <Button variant={planned.setType === 'warmup' ? 'secondary' : 'primary'} size="xl" block className="mt-4" disabled={busy} onClick={() => void save()}>
         {busy ? 'Đang lưu…' : saveLabel}
