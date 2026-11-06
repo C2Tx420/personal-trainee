@@ -1,7 +1,7 @@
 import { addDays, diffDays, type IsoDate, todayVN, weekdayOf, weekStart } from '../../src/engine/dates';
 import { goalProgress, type Goal } from '../../src/engine/goals';
 import { compareInbody, inbodyDue, type InbodyLog, latestFfm } from '../../src/engine/inbody';
-import { e1rmBySession, stallCount } from '../../src/engine/analytics';
+import { deloadOptions, e1rmBySession, stallCount } from '../../src/engine/analytics';
 import { round } from '../../src/engine/math';
 import { rejectedSummary } from '../../src/engine/plan-diff';
 import { legsBadmintonAdjacency, parsePlanContent } from '../../src/engine/plan-schema';
@@ -89,6 +89,7 @@ const plannedTarget = (slug: string) => {
   return null;
 };
 
+const perSessionBySlug = new Map<string, { date: IsoDate; sets: SetRow[] }[]>();
 const setsDetail = trainedEx.map((exId) => {
   const ex = exById.get(exId)!;
   const exSets = setRows.filter((s) => s.exercise_id === exId && recentIds.has(s.session_id) && s.completed);
@@ -112,6 +113,7 @@ const setsDetail = trainedEx.map((exId) => {
   const working = exSets.filter((s) => s.set_type === 'working');
   const assisted = !!ex.is_assisted;
   const perSession = [...new Set(exSets.map((s) => s.session_id))].map((sid) => ({ date: dateOf.get(sid) as IsoDate, sets: exSets.filter((s) => s.session_id === sid) }));
+  perSessionBySlug.set(ex.slug as string, perSession);
   const withTarget = working.filter((s) => s.target_rep_min !== null);
   const hit = withTarget.filter((s) => s.reps !== null && s.target_rep_min !== null && s.reps >= s.target_rep_min && (s.target_kg === null || (s.weight_kg ?? 0) >= s.target_kg));
   const notes = [...exSets.map((s) => s.note ?? ''), ...iRows.filter((i) => i.exercise_id === exId).map((i) => i.note ?? '')];
@@ -203,7 +205,20 @@ const report = {
     volume_by_exercise_8w: trainedEx.map((id) => ({ exercise: slugOf(id), weekly_kg: weeklyVolumeByExercise(new Set([id]), sRows, setRows, weekStarts8, loads).map((v) => v.volume) })),
     sets_detail_4w: setsDetail,
     progression_ready: progressionReady,
-    stalled: setsDetail.filter((d) => d.stall_sessions >= 2).map((d) => ({ exercise: d.exercise, sessions: d.stall_sessions })),
+    stalled: setsDetail
+      .filter((d) => d.stall_sessions >= 2)
+      .map((d) => {
+        const ex = exBySlug.get(d.exercise as string);
+        const t = d.target;
+        return {
+          exercise: d.exercise,
+          sessions: d.stall_sessions,
+          // ~90% of the recent best e1RM on the real load grid (lb pins / kg steps) — pick one, or explain why not
+          deload_options: t
+            ? deloadOptions({ sessions: perSessionBySlug.get(d.exercise as string) ?? [], loadStepKg: Number(ex?.load_step_kg ?? 2.5), repMin: t.rep_min, repMax: t.rep_max, assisted: d.is_assisted, bodyKg: lastW || null })
+            : [],
+        };
+      }),
     schedule_violations: actualLegsBadmintonConflicts(weekSessions.map((s) => ({ date: s.session_date, kind: s.kind }))),
   },
   exercises: exercises.map((e) => ({

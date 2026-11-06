@@ -1,6 +1,7 @@
 import type { IsoDate } from './dates';
 import { byHardest, effectiveLoad, sameLoad } from './load';
 import { round } from './math';
+import { isLbStack, stackStep } from './stack';
 import type { SessionRow, SetRow } from './types';
 
 /**
@@ -99,4 +100,59 @@ export function stallCount(sessions: ExerciseSession[], assisted = false, repMax
     count++;
   }
   return count;
+}
+
+export type DeloadOption = { kg: number; reps: number; e1rm: number };
+
+/**
+ * Deload choices on the real load grid (plan v2.7 §16 B3): aim at ~90% of the best e1RM of the last
+ * two sessions, try every (load, reps) with the load at or below the current one (lb pins or kg steps;
+ * on assisted machines: at or above the current assistance) and reps in [repMin, repMax]; return the
+ * `count` closest, preferring fewer rep changes, then the harder load.
+ * Needs body weight on assisted machines (null → []).
+ */
+export function deloadOptions(args: {
+  sessions: ExerciseSession[];
+  loadStepKg: number;
+  repMin: number;
+  repMax: number;
+  assisted?: boolean;
+  bodyKg?: number | null;
+  pct?: number;
+  count?: number;
+}): DeloadOption[] {
+  const { loadStepKg, repMin, repMax, assisted = false, bodyKg = null, pct = 0.9, count = 2 } = args;
+  const recent = [...args.sessions].sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-2);
+  const best = Math.max(...recent.map((s) => bestE1rm(s.sets, assisted, bodyKg) ?? 0));
+  const last = loaded(recent.at(-1)?.sets ?? []);
+  if (!best || !last.length) return [];
+  const current = sessionLoad(last, assisted);
+  const lastReps = Math.max(...last.filter((s) => sameLoad(s.weight_kg, current)).map((s) => s.reps));
+  const target = best * pct;
+
+  // candidate loads: the current one and up to 4 steps easier
+  const loads: number[] = [];
+  for (let i = 0; i <= 4; i++) {
+    const kg = isLbStack(loadStepKg) ? stackSteps(current, assisted ? i : -i) : round(current + (assisted ? i : -i) * loadStepKg, 2);
+    if (kg > 0 && !loads.some((l) => sameLoad(l, kg))) loads.push(kg);
+  }
+  const options: (DeloadOption & { score: number })[] = [];
+  for (const kg of loads) {
+    for (let reps = repMin; reps <= repMax; reps++) {
+      const est = e1rm(kg, reps, assisted, bodyKg);
+      if (est === null || (sameLoad(kg, current) && reps >= lastReps)) continue; // same load, same or more reps is not a deload
+      options.push({ kg, reps, e1rm: est, score: Math.abs(est - target) });
+    }
+  }
+  return options
+    .sort((a, b) => a.score - b.score || Math.abs(a.reps - lastReps) - Math.abs(b.reps - lastReps) || byHardest(assisted)(a.kg, b.kg))
+    .slice(0, count)
+    .map(({ kg, reps, e1rm: v }) => ({ kg, reps, e1rm: v }));
+}
+
+/** `n` pins away from a kg value on an lb stack (n < 0 = lighter). */
+function stackSteps(kg: number, n: number): number {
+  let out = kg;
+  for (let i = 0; i < Math.abs(n); i++) out = stackStep(out, n > 0 ? 1 : -1);
+  return out;
 }

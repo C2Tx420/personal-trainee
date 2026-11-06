@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { e1rm, e1rmBySession, stallCount } from './analytics';
+import { deloadOptions, e1rm, e1rmBySession, stallCount } from './analytics';
 import type { SetRow } from './types';
 
 const set = (kg: number | null, reps: number, o: Partial<SetRow> = {}): SetRow => ({
@@ -38,5 +38,24 @@ describe('stallCount', () => {
     expect(stallCount([s('a', set(27, 8, { target_kg: 23 })), s('b', set(27, 8, { target_kg: 27 }))])).toBe(1);
     expect(stallCount([s('a', set(27, 8, { target_rep_max: null }))])).toBe(0);
     expect(stallCount([s('a', set(27, 8, { target_rep_max: null }))], false, 12)).toBe(1);
+  });
+});
+
+describe('deloadOptions', () => {
+  it('lb stack 27×8 stuck (10–12 reps) → 23×10, then 23×11', () => {
+    const o = deloadOptions({ sessions: [s('a', set(27, 8), set(27, 8)), s('b', set(27, 8), set(27, 7))], loadStepKg: 4.5, repMin: 10, repMax: 12 });
+    expect(o).toEqual([{ kg: 23, reps: 10, e1rm: 30.7 }, { kg: 23, reps: 11, e1rm: 31.4 }]);
+  });
+  it('kg machine (step 5): stays on the 5 kg grid', () => {
+    const o = deloadOptions({ sessions: [s('a', set(40, 8, { target_rep_max: 10 }))], loadStepKg: 5, repMin: 8, repMax: 10 });
+    expect(o.every((x) => x.kg % 5 === 0 && x.kg <= 40)).toBe(true);
+    expect(o[0]).toMatchObject({ kg: 35, reps: 9 });
+  });
+  it('assisted: more assistance, needs body weight', () => {
+    const sessions = [s('a', set(21, 6, { target_rep_max: 8 }))];
+    expect(deloadOptions({ sessions, loadStepKg: 4.5, repMin: 6, repMax: 8, assisted: true, bodyKg: null })).toEqual([]);
+    const o = deloadOptions({ sessions, loadStepKg: 4.5, repMin: 6, repMax: 8, assisted: true, bodyKg: 80 });
+    expect(o.length).toBe(2);
+    expect(o.every((x) => x.kg >= 21)).toBe(true);
   });
 });

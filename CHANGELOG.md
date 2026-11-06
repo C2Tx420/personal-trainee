@@ -7,6 +7,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.7 · Latest migration: 20261106000100
 
 ### Changed
+- `deloadOptions` (`analytics.ts`): deload choices on the real load grid at ~90% of the recent best e1RM (lb pins / kg steps; assisted = more assistance); the weekly report adds `training.stalled[].deload_options`.
 - Stricter draft checks (`src/engine/draft-validate.ts`): errors for a new load off the lb-stack ladder, an exercise twice in one session, a fixed warm-up ≥ the working load; warnings for > 1 step vs the active plan, > 6 changes, more load where he wrote "đau" in the last 4 weeks, and an off-ladder load copied unchanged. `submit-draft` stops on errors and needs `--accept-warnings` for warnings; the review screen lists them without blocking.
 - Stale drafts (`draftWarnings` in `plan-diff.ts`): the review screen warns when a draft was built on a plan that is no longer active (and diffs it against the active one), and when several drafts are pending — the newest offers "Từ chối bản cũ", older ones link to the newest. The Today banner opens the newest draft. `submit-draft` refuses while a draft is pending unless `--allow-pending`.
 - e1RM + stall count (`src/engine/analytics.ts`): Epley e1RM (≤ 15 reps, assisted = body weight − assistance) and `stallCount` (sessions in a row stuck at the same load). Weekly report adds `sets_detail_4w[].e1rm_by_session`, `stall_sessions` and `training.stalled`; the coach's "missed ≥ 2 sessions" rule uses it. Training tab chart gets a Tạ / e1RM switch.
