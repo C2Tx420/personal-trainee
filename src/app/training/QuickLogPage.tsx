@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { qk, useActivePlan, useExerciseMaps, useInvalidate } from '@/data/queries';
+import { qk, useActivePlan, useExerciseMaps, useInvalidate, useTraining } from '@/data/queries';
 import { formatVN, todayVN } from '@/engine/dates';
 import { expandSets, type ParsedLog, parseQuickLog, suggestWarmup } from '@/engine/quick-log-parser';
 import { SESSION_KIND_LABEL, SESSION_KINDS, type SessionKind } from '@/engine/schedule';
@@ -22,6 +22,7 @@ export function QuickLogPage() {
   const nav = useNavigate();
   const invalidate = useInvalidate();
   const ex = useExerciseMaps();
+  const training = useTraining();
   const plan = useActivePlan();
   const [text, setText] = useState('');
   const [parsed, setParsed] = useState<ParsedLog | null>(null);
@@ -120,7 +121,7 @@ export function QuickLogPage() {
             </Banner>
           )}
           {parsed.unparsed.length > 0 && <Banner tone="warn">Không hiểu: {parsed.unparsed.join(' · ')}</Banner>}
-          <SessionEditor items={items} onChange={setItems} library={ex.list} />
+          <SessionEditor items={items} onChange={setItems} library={ex.list} history={training.data?.sets} />
           {error ? <ErrorBox error={error} /> : null}
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Button onClick={() => setParsed(null)}>← Sửa chữ</Button>

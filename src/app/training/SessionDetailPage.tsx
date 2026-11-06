@@ -158,6 +158,7 @@ export function SessionDetailPage() {
           <SetCard
             item={editItem}
             exercise={ex.byId.get(editItem.exercise_id)!}
+            history={(history.data ?? []).filter((h) => h.sessionId !== id).flatMap((h) => h.sets.filter((s) => s.exercise_id === editItem.exercise_id))}
             planned={{ setType: edit.set_type, index: edit.set_index, targetKg: edit.target_kg, repMin: edit.target_rep_min ?? editItem.target.rep_min, repMax: edit.target_rep_max ?? editItem.target.rep_max }}
             workingTotal={editItem.target.sets}
             initialKg={edit.weight_kg}

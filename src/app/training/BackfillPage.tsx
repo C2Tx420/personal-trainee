@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { qk, useActivePlan, useExerciseMaps, useInvalidate } from '@/data/queries';
+import { qk, useActivePlan, useExerciseMaps, useInvalidate, useTraining } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
 import { SESSION_KIND_LABEL, SESSION_KINDS, type SessionKind, templateForKind } from '@/engine/schedule';
 import { plannedSets } from '@/engine/warmup';
@@ -13,6 +13,7 @@ export function BackfillPage() {
   const nav = useNavigate();
   const invalidate = useInvalidate();
   const ex = useExerciseMaps();
+  const training = useTraining();
   const plan = useActivePlan();
   const [date, setDate] = useState(todayVN());
   const [kind, setKind] = useState<SessionKind>('push');
@@ -89,7 +90,7 @@ export function BackfillPage() {
         </Field>
         <Button block onClick={fromTemplate}>Điền theo lộ trình {SESSION_KIND_LABEL[kind]}</Button>
       </Card>
-      <SessionEditor items={items} onChange={setItems} library={ex.list} />
+      <SessionEditor items={items} onChange={setItems} library={ex.list} history={training.data?.sets} />
       {error ? <ErrorBox error={error} /> : null}
       <Button variant="primary" size="lg" block className="mt-3" disabled={busy || items.length === 0} onClick={() => void save()}>
         {busy ? 'Đang lưu…' : 'Lưu buổi ghi bù'}

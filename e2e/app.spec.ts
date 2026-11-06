@@ -265,7 +265,10 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   const kgBoxes = page.getByRole('textbox', { name: 'kg', exact: true });
   await kgBoxes.nth(2).fill('27');
   await kgBoxes.nth(3).fill('27');
+  await kgBoxes.nth(4).fill('230'); // typo → asked to check, not blocked
+  await expect(page.getByTestId('typo-guard')).toContainText('230 kg? Nặng nhất từng tập 27 kg');
   await kgBoxes.nth(4).fill('23');
+  await expect(page.getByTestId('typo-guard')).toHaveCount(0);
   await page.getByRole('button', { name: 'Lưu buổi ghi bù' }).click();
   await expect(page.getByRole('heading', { name: /Push · 27\/10/ })).toBeVisible();
   await expect(page.getByTestId('set-trends')).toContainText('Machine Chest Press');
