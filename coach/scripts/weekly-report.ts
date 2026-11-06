@@ -2,6 +2,7 @@ import { addDays, diffDays, type IsoDate, todayVN, weekdayOf, weekStart } from '
 import { goalProgress, type Goal } from '../../src/engine/goals';
 import { compareInbody, inbodyDue, type InbodyLog, latestFfm } from '../../src/engine/inbody';
 import { round } from '../../src/engine/math';
+import { rejectedSummary } from '../../src/engine/plan-diff';
 import { legsBadmintonAdjacency, parsePlanContent } from '../../src/engine/plan-schema';
 import { planWeek, programStartOf } from '../../src/engine/plan-week';
 import { actualLegsBadmintonConflicts } from '../../src/engine/schedule';
@@ -27,7 +28,7 @@ const n = (v: unknown) => (v === null || v === undefined ? null : Number(v));
 
 const [goals, plans, weights, meas, inbody, sessions, exercises] = await Promise.all([
   sql`select *, target_date::text as target_date_s from goals order by ordinal`,
-  sql`select id, version_no, status, effective_from::text as effective_from, created_by, change_note, content, based_on_version_id, created_at from plan_versions order by version_no`,
+  sql`select id, version_no, status, effective_from::text as effective_from, created_by, change_note, rejected_reason, content, based_on_version_id, created_at from plan_versions order by version_no`,
   sql`select log_date::text, weight_kg from weight_logs order by log_date, logged_at`,
   sql`select *, log_date::text as log_date_s from body_measurements order by log_date`,
   sql`select *, measured_on::text as measured_on_s from inbody_logs order by measured_on`,
@@ -45,6 +46,7 @@ const active = plans.find((p) => p.status === 'active');
 if (!active) throw new Error('Không có lộ trình active');
 const content = parsePlanContent(active.content);
 const exById = new Map(exercises.map((e) => [e.id as string, e]));
+const exBySlug = new Map(exercises.map((e) => [e.slug as string, e]));
 const slugOf = (id: string | null) => (id ? (exById.get(id)?.slug as string) : null);
 
 const sRows = sessions.map(({ session_date_s, ...s }) => ({ ...s, session_date: session_date_s })) as unknown as SessionRow[];
@@ -149,7 +151,7 @@ const report = {
   week: { start: ws, end: we, reviewed: phaseWeek(ws), next_plan: phaseWeek(addDays(ws, 7)) },
   active_plan: { id: active.id, version_no: active.version_no, effective_from: active.effective_from, calories_kcal: content.nutrition.calories_kcal, content },
   pending_drafts: plans.filter((p) => p.status === 'draft').map((p) => ({ id: p.id, version_no: p.version_no, created_by: p.created_by, change_note: p.change_note })),
-  rejected_recent: plans.filter((p) => p.status === 'rejected').slice(-3).map((p) => ({ version_no: p.version_no, change_note: p.change_note })),
+  rejected_recent: rejectedSummary(plans as never, (s) => (exBySlug.get(s)?.name_vi as string) ?? s),
   goals: goalRows.map((g) => {
     const p = goalProgress(g, lastW, we, trend, ffm);
     return { name: g.name, target_date: g.target_date, target_kg: [g.target_weight_min, g.target_weight_max], days_left: p.daysLeft, weeks_left: p.weeksLeft, gap_kg: p.gapKg, required_kg_per_week: p.requiredKgPerWeek, status: p.status, unsafe: p.unsafe, est_body_fat_pct: p.estimatedBodyFatPct };
