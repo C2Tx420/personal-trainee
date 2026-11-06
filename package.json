@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "seed:build": "tsx scripts/build-seed.ts",
     "svg:build": "tsx scripts/svg/build-svgs.ts",
-    "e2e": "playwright test",
+    "e2e": "tsx scripts/e2e.ts",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "icons:build": "tsx scripts/make-icons.ts",

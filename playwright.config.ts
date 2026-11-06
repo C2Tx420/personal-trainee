@@ -4,6 +4,12 @@ import { defineConfig } from '@playwright/test';
  * Full-flow E2E against local Supabase (supabase start) + local Edge Functions.
  * Per-screen screenshots go to e2e/screenshots/ (gitignored — contains health data).
  */
+// Never build the e2e app against production (`.env.local` points there) — use `pnpm run e2e`.
+const supabaseUrl = process.env.VITE_SUPABASE_URL ?? '';
+if (!/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(supabaseUrl)) {
+  throw new Error(`E2E chỉ chạy với Supabase local (VITE_SUPABASE_URL="${supabaseUrl}"). Chạy \`pnpm run e2e\`.`);
+}
+
 export default defineConfig({
   testDir: 'e2e',
   timeout: 120_000,
