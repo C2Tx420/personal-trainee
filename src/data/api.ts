@@ -508,6 +508,11 @@ export async function setExerciseLbStack(id: string, on: boolean): Promise<void>
   must(await supabase.from('exercises').update({ load_step_kg: on ? LB_STACK_STEP_KG : 2.5 }).eq('id', id));
 }
 
+/** Assisted machine: kg = assistance, lower = harder (src/engine/load.ts). */
+export async function setExerciseAssisted(id: string, on: boolean): Promise<void> {
+  must(await supabase.from('exercises').update({ is_assisted: on }).eq('id', id));
+}
+
 // ───────────────────────── Body
 export async function saveWeight(args: { date: IsoDate; weightKg: number; note: string | null; measurements: Record<string, number | null> }): Promise<void> {
   const id = crypto.randomUUID();

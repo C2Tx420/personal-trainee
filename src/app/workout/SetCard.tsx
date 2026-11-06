@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type SetInput } from '@/data/api';
+import { harder, sameLoad } from '@/engine/load';
 import { formatSet, kgDeviates } from '@/engine/progression';
 import { isLbStack, kgToLb, pinsAround, stackStep } from '@/engine/stack';
 import { type ExerciseRow, type Feel, FEEL_LABEL, KG_CHANGE_LABEL, type KgChangeReason, type SessionItemRow, type SetRow } from '@/engine/types';
@@ -53,7 +54,7 @@ export function SetCard({
   const lb = !timeBased && isLbStack(exercise.load_step_kg);
   const beatsLast =
     !!lastSet && !timeBased && kg !== null && reps !== null && lastSet.weight_kg !== null && lastSet.reps !== null &&
-    (kg > lastSet.weight_kg || (kg === lastSet.weight_kg && reps > lastSet.reps));
+    (harder(kg, lastSet.weight_kg, !!exercise.is_assisted) || (sameLoad(kg, lastSet.weight_kg) && reps > lastSet.reps));
 
   async function save() {
     setBusy(true);
@@ -129,6 +130,9 @@ export function SetCard({
             onStep={lb ? (d) => setKg(stackStep(kg, d)) : undefined}
             allowEmpty
           />
+        )}
+        {exercise.is_assisted && !timeBased && (
+          <div className="-mt-1 text-xs text-muted" data-testid="assisted-hint">Máy trợ lực: kg là trợ lực — kg thấp hơn là nặng hơn</div>
         )}
         {lb && (
           <div data-testid="lb-pins">

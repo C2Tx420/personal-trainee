@@ -16,13 +16,14 @@ export type PlannedSet = {
  * Warm-up load: fixed `kg` if set, otherwise `pct`% of the working load
  * (`target_kg`, or `fallbackWorkingKg` = previous working-set kg when absent),
  * rounded to the load step (nearest pin on lb stacks). Nothing to compute from → null (entered manually).
+ * Assisted machines: a % of the assistance means nothing, so `pct` warm-ups are dropped (fixed `kg` ones stay).
  */
-export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingKg: number | null): PlannedSet[] {
+export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingKg: number | null, assisted = false): PlannedSet[] {
   const workingKg = item.target_kg ?? fallbackWorkingKg;
   const warmups: PlannedSet[] =
     item.unit === 'seconds'
       ? []
-      : item.warmup_sets.map((w, i) => {
+      : item.warmup_sets.filter((w) => !assisted || w.kg !== undefined).map((w, i) => {
           const reps = w.reps === 'same' ? item.rep_max : w.reps;
           let kg: number | null = null;
           if (w.kg !== undefined) kg = w.kg;

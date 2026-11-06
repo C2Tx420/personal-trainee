@@ -111,7 +111,7 @@ export const EXERCISES: Def[] = [
   }),
   m({
     slug: 'assisted_dip', name_vi: 'Assisted Dip', aliases: ['assisted dip', 'dip trợ lực', 'máy dip trợ lực', 'assisted push up', 'assisted pushup', 'đẩy người trợ lực', 'Máy dip có trợ lực'],
-    primary_muscle: 'triceps', secondary_muscles: ['chest', 'front_delt'], movement_pattern: 'vertical_push', kind: 'compound', equipment: 'machine', load_step_kg: 4.5,
+    primary_muscle: 'triceps', secondary_muscles: ['chest', 'front_delt'], movement_pattern: 'vertical_push', kind: 'compound', equipment: 'machine', load_step_kg: 4.5, is_assisted: true,
     cues: ['Kg càng cao càng nhẹ (trợ lực)', 'Quỳ lên đệm, hạ tới khi vai ngang khuỷu', 'Đẩy lên duỗi tay, không khoá khuỷu'],
     common_mistakes: ['Hạ quá sâu làm đau vai', 'Thả người rơi nhanh khi xuống'],
   }),
@@ -131,7 +131,7 @@ export const EXERCISES: Def[] = [
   }),
   m({
     slug: 'assisted_pull_up', name_vi: 'Assisted Pull-Up', aliases: ['assisted pull up', 'kéo xà trợ lực', 'assisted chin', 'assisted chin up', 'chin up trợ lực', 'máy kéo xà trợ lực', 'Máy kéo xà có trợ lực'],
-    primary_muscle: 'lats', secondary_muscles: ['biceps'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'machine',
+    primary_muscle: 'lats', secondary_muscles: ['biceps'], movement_pattern: 'vertical_pull', kind: 'compound', equipment: 'machine', is_assisted: true,
     cues: ['Kg càng cao càng nhẹ (trợ lực)', 'Quỳ lên đệm, kéo ngực về xà'],
     common_mistakes: ['Thả người rơi nhanh khi xuống'],
   }),

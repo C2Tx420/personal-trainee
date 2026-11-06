@@ -1,14 +1,18 @@
 import { addDays, type IsoDate, WEEKDAYS } from './dates';
+import { byHardest, effectiveLoad, type LoadContext, PLAIN_LOADS } from './load';
 import { round, sum } from './math';
 import type { PlanContent } from './plan-schema';
 import type { ExerciseRow, KgChangeReason, SessionItemRow, SessionRow, SetRow, SubstitutionReason } from './types';
 
-/** Volume = Σ kg × reps, only completed working sets with kg (excludes warm-ups, timed exercises, empty kg). */
-export function volumeKg(sets: SetRow[]): number {
+/**
+ * Volume = Σ kg × reps, only completed working sets with kg (excludes warm-ups, timed exercises, empty kg).
+ * Assisted machines count body weight − assistance; without a body weight they are left out.
+ */
+export function volumeKg(sets: SetRow[], ctx: LoadContext = PLAIN_LOADS): number {
   return sum(
     sets
       .filter((s) => s.completed && s.set_type === 'working' && s.weight_kg !== null && s.reps !== null)
-      .map((s) => (s.weight_kg as number) * (s.reps as number)),
+      .map((s) => (effectiveLoad(s.weight_kg as number, ctx.assisted(s.exercise_id), ctx.bodyKg) ?? 0) * (s.reps as number)),
   );
 }
 
@@ -30,7 +34,8 @@ export function sessionSummary(
   session: Pick<SessionRow, 'warmup' | 'started_at' | 'ended_at' | 'duration_min'>,
   items: SessionItemRow[],
   sets: SetRow[],
-  exercises: Map<string, Pick<ExerciseRow, 'name_vi' | 'is_time_based'>>,
+  exercises: Map<string, Pick<ExerciseRow, 'name_vi' | 'is_time_based'> & { is_assisted?: boolean }>,
+  bodyKg: number | null = null,
   now: Date = new Date(),
 ): SessionSummary {
   const name = (id: string | null) => (id ? (exercises.get(id)?.name_vi ?? '?') : '—');
@@ -58,7 +63,7 @@ export function sessionSummary(
       })),
     workingSetsDone: working.filter((s) => s.completed).length,
     workingSetsPlanned: sum(items.filter((i) => i.status !== 'skipped').map((i) => i.target.sets)),
-    volumeKg: volumeKg(sets),
+    volumeKg: volumeKg(sets, { assisted: (id) => !!exercises.get(id)?.is_assisted, bodyKg }),
     missingKgExercises: [...missing],
     kgChanges: working
       .filter((s) => s.completed && s.kg_change_reason)
@@ -148,6 +153,7 @@ export function weeklyVolumeByExercise(
   sessions: SessionRow[],
   sets: SetRow[],
   weekStarts: IsoDate[],
+  ctx: LoadContext = PLAIN_LOADS,
 ): { week: IsoDate; volume: number }[] {
   const dateOf = new Map(sessions.map((s) => [s.id, s.session_date]));
   return weekStarts.map((w) => {
@@ -156,15 +162,16 @@ export function weeklyVolumeByExercise(
       const d = dateOf.get(s.session_id);
       return exerciseIds.has(s.exercise_id) && d !== undefined && d >= w && d <= end;
     });
-    return { week: w, volume: round(volumeKg(inWeek), 0) };
+    return { week: w, volume: round(volumeKg(inWeek, ctx), 0) };
   });
 }
 
-/** Heaviest working-set load per session of one exercise + the target load at the time. */
+/** Hardest working-set load per session of one exercise (least assistance if `assisted`) + the target load at the time. */
 export function topSetSeries(
   exerciseIds: Set<string>,
   sessions: SessionRow[],
   sets: SetRow[],
+  assisted = false,
 ): { date: IsoDate; topKg: number; targetKg: number | null }[] {
   const out: { date: IsoDate; topKg: number; targetKg: number | null }[] = [];
   for (const s of [...sessions].sort((a, b) => (a.session_date < b.session_date ? -1 : 1))) {
@@ -174,7 +181,7 @@ export function topSetSeries(
     if (work.length === 0) continue;
     out.push({
       date: s.session_date,
-      topKg: Math.max(...work.map((x) => x.weight_kg as number)),
+      topKg: work.map((x) => x.weight_kg as number).sort(byHardest(assisted))[0],
       targetKg: work.find((x) => x.target_kg !== null)?.target_kg ?? null,
     });
   }

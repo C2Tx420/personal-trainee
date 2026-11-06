@@ -1,4 +1,5 @@
 import type { IsoDate } from './dates';
+import { byHardest, harder, hardestLoad, sameLoad } from './load';
 import { round } from './math';
 import type { SessionRow, SetRow } from './types';
 import { weeklyWeights, type WeightLog } from './weight';
@@ -13,7 +14,7 @@ const loaded = (sets: SetRow[]) =>
 export type PersonalRecord = {
   exerciseId: string;
   setId: string;
-  /** kg = heaviest load ever; reps = at a load done before, more reps than ever at that load or heavier */
+  /** kg = hardest load ever (least assistance on assisted machines); reps = at a load done before, more reps than ever at that load or harder */
   kind: 'kg' | 'reps';
   kg: number;
   reps: number;
@@ -23,10 +24,15 @@ export type PersonalRecord = {
 
 /**
  * New personal records in `current` (one session) against every earlier set of the same exercise.
- * One record per exercise, the heavier kind first. An exercise done for the first time has
- * nothing to beat, so it sets no record.
+ * One record per exercise, the harder kind first. An exercise done for the first time has
+ * nothing to beat, so it sets no record. `assisted(exerciseId)` flips the direction (lower kg = harder).
  */
-export function personalRecords(current: SetRow[], previous: SetRow[], canonical: (exerciseId: string) => string = (id) => id): PersonalRecord[] {
+export function personalRecords(
+  current: SetRow[],
+  previous: SetRow[],
+  canonical: (exerciseId: string) => string = (id) => id,
+  assisted: (exerciseId: string) => boolean = () => false,
+): PersonalRecord[] {
   const before = new Map<string, ReturnType<typeof loaded>>();
   for (const s of loaded(previous)) before.set(canonical(s.exercise_id), [...(before.get(canonical(s.exercise_id)) ?? []), s]);
   const now = new Map<string, ReturnType<typeof loaded>>();
@@ -36,16 +42,18 @@ export function personalRecords(current: SetRow[], previous: SetRow[], canonical
   for (const [ex, sets] of now) {
     const prev = before.get(ex);
     if (!prev?.length) continue;
-    const prevMax = Math.max(...prev.map((s) => s.weight_kg));
-    const byLoad = [...sets].sort((a, b) => b.weight_kg - a.weight_kg || b.reps - a.reps);
+    const asst = assisted(ex) || sets.some((s) => assisted(s.exercise_id));
+    const prevBest = hardestLoad(prev.map((s) => s.weight_kg), asst);
+    const cmp = byHardest(asst);
+    const byLoad = [...sets].sort((a, b) => cmp(a.weight_kg, b.weight_kg) || b.reps - a.reps);
     const top = byLoad[0];
-    if (top.weight_kg > prevMax + 0.01) {
-      out.push({ exerciseId: ex, setId: top.id, kind: 'kg', kg: top.weight_kg, reps: top.reps, prevKg: prevMax, prevReps: null });
+    if (harder(top.weight_kg, prevBest, asst)) {
+      out.push({ exerciseId: ex, setId: top.id, kind: 'kg', kg: top.weight_kg, reps: top.reps, prevKg: prevBest, prevReps: null });
       continue;
     }
     for (const s of byLoad) {
-      if (!prev.some((p) => Math.abs(p.weight_kg - s.weight_kg) <= 0.01)) continue;
-      const prevReps = Math.max(...prev.filter((p) => p.weight_kg >= s.weight_kg - 0.01).map((p) => p.reps));
+      if (!prev.some((p) => sameLoad(p.weight_kg, s.weight_kg))) continue;
+      const prevReps = Math.max(...prev.filter((p) => sameLoad(p.weight_kg, s.weight_kg) || harder(p.weight_kg, s.weight_kg, asst)).map((p) => p.reps));
       if (s.reps > prevReps) {
         out.push({ exerciseId: ex, setId: s.id, kind: 'reps', kg: s.weight_kg, reps: s.reps, prevKg: null, prevReps });
         break;
@@ -59,24 +67,33 @@ export type StrengthChange = {
   exerciseId: string;
   first: { date: IsoDate; kg: number; reps: number };
   last: { date: IsoDate; kg: number; reps: number };
-  /** % change of the top-set load */
+  /** % change of the top-set load (positive = stronger; on assisted machines = less assistance) */
   pct: number;
+  assisted: boolean;
 };
 
 /**
- * First vs latest top set (heaviest load, then most reps) of each exercise done in at least
- * two completed sessions. Sorted by load change, biggest first.
+ * First vs latest top set (hardest load, then most reps) of each exercise done in at least
+ * two completed sessions. Sorted by load change, biggest gain first.
  */
-export function strengthChanges(sessions: SessionRow[], sets: SetRow[], canonical: (exerciseId: string) => string = (id) => id): StrengthChange[] {
+export function strengthChanges(
+  sessions: SessionRow[],
+  sets: SetRow[],
+  canonical: (exerciseId: string) => string = (id) => id,
+  assisted: (exerciseId: string) => boolean = () => false,
+): StrengthChange[] {
+  const assistedEx = new Set<string>();
   const dateOf = new Map(sessions.filter((s) => s.status === 'completed').map((s) => [s.id, s.session_date]));
   const tops = new Map<string, Map<string, { date: IsoDate; kg: number; reps: number }>>();
   for (const s of loaded(sets)) {
     const date = dateOf.get(s.session_id);
     if (!date) continue;
     const ex = canonical(s.exercise_id);
+    if (assisted(s.exercise_id) || assisted(ex)) assistedEx.add(ex);
+    const asst = assistedEx.has(ex);
     const perSession = tops.get(ex) ?? new Map();
     const cur = perSession.get(s.session_id);
-    if (!cur || s.weight_kg > cur.kg || (s.weight_kg === cur.kg && s.reps > cur.reps)) perSession.set(s.session_id, { date, kg: s.weight_kg, reps: s.reps });
+    if (!cur || harder(s.weight_kg, cur.kg, asst) || (sameLoad(s.weight_kg, cur.kg) && s.reps > cur.reps)) perSession.set(s.session_id, { date, kg: s.weight_kg, reps: s.reps });
     tops.set(ex, perSession);
   }
   const out: StrengthChange[] = [];
@@ -85,7 +102,9 @@ export function strengthChanges(sessions: SessionRow[], sets: SetRow[], canonica
     if (series.length < 2) continue;
     const first = series[0];
     const last = series.at(-1)!;
-    out.push({ exerciseId: ex, first, last, pct: first.kg > 0 ? round(((last.kg - first.kg) / first.kg) * 100, 0) : 0 });
+    const asst = assistedEx.has(ex);
+    const change = asst ? first.kg - last.kg : last.kg - first.kg;
+    out.push({ exerciseId: ex, first, last, pct: first.kg > 0 ? round((change / first.kg) * 100, 0) : 0, assisted: asst });
   }
   return out.sort((a, b) => b.pct - a.pct || b.last.reps - b.first.reps - (a.last.reps - a.first.reps));
 }

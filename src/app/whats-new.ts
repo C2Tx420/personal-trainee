@@ -12,9 +12,10 @@ export const RELEASES: WhatsNewRelease[] = [
   {
     id: '2026-11-05',
     date: '05/11/2026',
-    title: 'Tên bài tập tiếng Anh',
+    title: 'Tên bài tiếng Anh, máy trợ lực',
     plan: 'v2.7',
     items: [
+      { icon: '🪢', title: 'Máy trợ lực tính đúng chiều', body: 'Kéo xà / dip trợ lực: kg là trợ lực nên kg thấp hơn mới là khoẻ hơn. Kỷ lục 🏆, "↑ hơn lần trước", gợi ý tạ và thẻ Tiến độ giờ tính đúng chiều; không còn làm nóng theo %. Bài khác cũng là máy trợ lực thì bật "Máy trợ lực" ở trang bài.', to: '/exercises/assisted_pull_up' },
       { icon: '🔤', title: 'Tên bài tiếng Anh', body: 'Tất cả bài tập đổi sang tên tiếng Anh như ở phòng tập (vd. Machine Chest Press, Cable Lat Pulldown). Tên tiếng Việt cũ vẫn nằm trong "Tên gọi khác" — gõ tiếng Việt khi tìm, đổi bài hay ghi nhanh vẫn ra đúng bài. Hướng dẫn kỹ thuật giữ tiếng Việt.', to: '/exercises' },
     ],
   },

@@ -74,7 +74,7 @@ export function WorkoutFlowPage() {
   // 🏆 against every earlier session of these exercises
   const records = useMemo(() => {
     const previous = (history.data ?? []).filter((h) => h.sessionId !== id).flatMap((h) => h.sets);
-    return personalRecords(sets, previous, (exId) => ex.byId.get(exId)?.canonical_exercise_id ?? exId);
+    return personalRecords(sets, previous, (exId) => ex.byId.get(exId)?.canonical_exercise_id ?? exId, (exId) => !!ex.byId.get(exId)?.is_assisted);
   }, [history.data, id, sets, ex.byId]);
   const recordSetIds = new Set(records.map((r) => r.setId));
 
@@ -83,6 +83,7 @@ export function WorkoutFlowPage() {
       items.map((item) => ({
         item,
         loadStepKg: ex.byId.get(item.exercise_id)?.load_step_kg ?? 2.5,
+        assisted: !!ex.byId.get(item.exercise_id)?.is_assisted,
         fallbackWorkingKg: lastFor(item.exercise_id)?.sets.at(-1)?.weight_kg ?? null,
       })),
     [items, ex.byId, lastFor],
@@ -194,7 +195,7 @@ export function WorkoutFlowPage() {
       />
     );
   } else if (step.type === 'summary') {
-    const sum = sessionSummary(session, items, sets, ex.byId);
+    const sum = sessionSummary(session, items, sets, ex.byId, weights.data?.at(-1)?.weight_kg ?? null);
     body = (
       <div>
         <h2 className="mb-3 text-[26px] font-bold tracking-tight">Tổng kết buổi</h2>
@@ -250,7 +251,7 @@ export function WorkoutFlowPage() {
     const exercise = ex.byId.get(item.exercise_id);
     const planned = ex.byId.get(item.planned_exercise_id ?? '');
     const last = lastFor(item.exercise_id);
-    const hint = progressionHint(item.target, last, exercise?.load_step_kg ?? 2.5);
+    const hint = progressionHint(item.target, last, exercise?.load_step_kg ?? 2.5, !!exercise?.is_assisted);
     const doneHere = sets.filter((s) => s.session_item_id === item.id && s.completed);
     const fi = flowItems.find((f) => f.item.id === item.id)!;
     const allPlanned = plannedFor(fi);

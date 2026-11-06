@@ -27,7 +27,7 @@ export function ProgressCard({
     weights,
     measurements.map((m) => ({ log_date: m.log_date, waist_navel_cm: typeof m.waist_navel_cm === 'number' ? m.waist_navel_cm : null })),
   );
-  const lifts = strengthChanges(training.sessions, training.sets, (id) => byId.get(id)?.canonical_exercise_id ?? id).slice(0, 4);
+  const lifts = strengthChanges(training.sessions, training.sets, (id) => byId.get(id)?.canonical_exercise_id ?? id, (id) => !!byId.get(id)?.is_assisted).slice(0, 4);
   const firstSession = training.sessions.filter((s) => s.status === 'completed').map((s) => s.session_date).sort()[0];
   const since = [weights[0]?.log_date, firstSession].filter(Boolean).sort()[0];
   if (!since) return null;
@@ -79,7 +79,7 @@ export function ProgressCard({
                     </>
                   ) : (
                     <>
-                      {fmtKg(l.first.kg)} → <b>{fmtKg(l.last.kg)} kg</b>{' '}
+                      {fmtKg(l.first.kg)} → <b>{fmtKg(l.last.kg)} kg{l.assisted && ' trợ lực'}</b>{' '}
                       <span className={cx(l.pct > 0 ? 'text-ok' : 'text-warn')}>{signed(l.pct, 0)}%</span>
                     </>
                   )}

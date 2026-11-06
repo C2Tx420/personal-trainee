@@ -1,5 +1,5 @@
 import { useParams } from 'react-router';
-import { setExerciseAvailable, setExerciseLbStack } from '@/data/api';
+import { setExerciseAssisted, setExerciseAvailable, setExerciseLbStack } from '@/data/api';
 import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
@@ -90,6 +90,20 @@ export function ExerciseDetailPage() {
               checked={isLbStack(e.load_step_kg)}
               onChange={async (v) => {
                 await setExerciseLbStack(e.id, v);
+                await invalidate(qk.exercises);
+              }}
+            />
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
+            <div>
+              <div className="font-semibold">Máy trợ lực</div>
+              <div className="text-xs text-muted">Kg là trợ lực (kéo xà / dip trợ lực) — kg thấp hơn là nặng hơn, kỷ lục và gợi ý tính ngược lại</div>
+            </div>
+            <Toggle
+              label="Máy trợ lực"
+              checked={e.is_assisted}
+              onChange={async (v) => {
+                await setExerciseAssisted(e.id, v);
                 await invalidate(qk.exercises);
               }}
             />
