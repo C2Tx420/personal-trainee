@@ -7,6 +7,7 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 Plan: v2.7 · Latest migration: 20261105000100
 
 ### Changed
+- `pnpm run e2e` runs `scripts/e2e.ts`, which passes the local Supabase URL + anon key to Playwright; `playwright.config.ts` refuses to run against a non-local Supabase (`.env.local` points at production).
 - Exercise display names are English for all 53 seed exercises (e.g. "Machine Chest Press", "Cable Lat Pulldown"); the old Vietnamese name is appended to `aliases`, so search / substitute / quick log still match it. Column stays `name_vi` (now just the display name). Migration `20261105000100` (data only) renames existing rows whose name is still the original seed name and updates the SVG `aria-label`. `machine_biceps_curl` seed is an lb stack (`load_step_kg` 4.5). Coach instructions: write `name_vi` in English for new upserts.
 
 ### Added
