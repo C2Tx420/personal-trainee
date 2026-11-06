@@ -7,4 +7,4 @@ export const GIT_SHA = __GIT_SHA__;
 export const BUILD_TIME = __BUILD_TIME__;
 export const PLAN_DOC_VERSION = 'v2.7';
 /** Latest migration the app requires (§15.5). */
-export const MIN_SCHEMA_VERSION = '20261106000100';
+export const MIN_SCHEMA_VERSION = '20261106000200';

@@ -67,6 +67,7 @@ export function RemindersPage() {
                 {s.kind === 'inbody' && '30 ngày sau lần đo gần nhất'}
                 {s.kind === 'photos' && '14 ngày sau lần chụp gần nhất'}
                 {s.kind === 'goal' && '7 ngày trước mỗi mốc'}
+                {s.kind === 'missed_workout' && 'Ngày có buổi tạ mà chưa ghi gì (không sau 22:30; bỏ 3 buổi liền thì thôi nhắc)'}
                 {s.weekdays && s.weekdays.length > 0 && ` · ${s.weekdays.map((d) => WD[d - 1]).join(', ')}`}
               </div>
             </div>

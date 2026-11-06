@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(30);
+select plan(31);
 
 -- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
@@ -18,6 +18,7 @@ select is((select available_at_gym from public.exercises where slug = 'hack_squa
 select is((select archived from public.exercises where slug = 'plank'), true, 'plank đã lưu trữ');
 select is((select is_assisted from public.exercises where slug = 'assisted_pull_up'), true, 'kéo xà trợ lực: máy trợ lực');
 select is((select count(*)::int from public.exercises where is_assisted), 2, 'chỉ 2 bài trợ lực trong seed');
+select is((select time_of_day::text from public.notification_settings where kind = 'missed_workout' and enabled), '21:00:00', 'nhắc bỏ buổi 21:00, bật sẵn');
 select is((select count(*)::int from public.exercises where illustration_svg is null), 0, 'mọi bài đều có SVG');
 select is((select status from public.plan_versions where version_no = 1), 'active', 'plan v1 active');
 select is((select count(*)::int from public.session_templates), 3, '3 template push/pull/legs');
