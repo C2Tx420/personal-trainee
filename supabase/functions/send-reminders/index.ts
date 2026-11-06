@@ -4,7 +4,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 import { corsHeaders, json } from '../_shared/cors.ts';
-import { dueReminders, type ReminderSetting, workoutReminderTime } from '../_shared/reminders.ts';
+import { dueReminders, liftingTodayContext, type ReminderSetting, workoutReminderTime } from '../_shared/reminders.ts';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -58,12 +58,14 @@ Deno.serve(async (req) => {
     if (test) {
       messages = [{ kind: 'test', title: 'Thông báo thử ✅', body: 'Nhắc nhở đã hoạt động trên thiết bị này' }];
     } else {
-      const [{ data: settings }, { data: plan }, { data: inbody }, { data: photo }, { data: goals }] = await Promise.all([
+      const since = new Date(Date.parse(`${now.date}T00:00:00Z`) - 29 * 86_400_000).toISOString().slice(0, 10);
+      const [{ data: settings }, { data: plan }, { data: inbody }, { data: photo }, { data: goals }, { data: recent }] = await Promise.all([
         admin.from('notification_settings').select('*').eq('user_id', uid),
         admin.from('plan_versions').select('content').eq('user_id', uid).eq('status', 'active').maybeSingle(),
         admin.from('inbody_logs').select('measured_on').eq('user_id', uid).order('measured_on', { ascending: false }).limit(1).maybeSingle(),
         admin.from('progress_photos').select('taken_on').eq('user_id', uid).order('taken_on', { ascending: false }).limit(1).maybeSingle(),
         admin.from('goals').select('target_date,status').eq('user_id', uid),
+        admin.from('workout_sessions').select('session_date').eq('user_id', uid).gte('session_date', since),
       ]);
       const day = plan?.content?.schedule?.[WEEKDAYS[now.isoWeekday - 1]];
       const todaySession =
@@ -76,6 +78,7 @@ Deno.serve(async (req) => {
         daysSinceInbody: days(inbody?.measured_on ?? null, now.date),
         daysSincePhotos: days(photo?.taken_on ?? null, now.date),
         goalDaysLeft: (goals ?? []).filter((g) => g.status !== 'achieved').map((g) => days(now.date, g.target_date) ?? -1),
+        liftingToday: liftingTodayContext(plan?.content?.schedule, (recent ?? []).map((r) => r.session_date as string), now.date),
       });
     }
 
