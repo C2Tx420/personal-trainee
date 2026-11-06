@@ -31,7 +31,7 @@ export function TrendCard({
       <div className="divide-y divide-line" data-testid="set-trends">
         {rows.map(({ it, e, t }) => (
           <div key={it.id} className="flex items-center justify-between gap-3 py-1.5 text-sm">
-            <span className="min-w-0 truncate">{e?.name_vi ?? '?'}</span>
+            <span className="min-w-0 truncate">{e?.name ?? '?'}</span>
             <span className="tabular flex shrink-0 gap-1.5 font-bold" aria-label={t.map((x) => `hiệp ${x.setIndex}: ${x.trend}`).join(', ')}>
               {t.map((x) => (
                 <span key={x.setId} className={cx('w-4 text-center', TONE[x.trend])}>{TREND_ICON[x.trend]}</span>

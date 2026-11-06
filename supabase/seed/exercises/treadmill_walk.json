@@ -17,7 +17,7 @@
     "Vịn tay vào máy"
   ],
   "slug": "treadmill_walk",
-  "name_vi": "Treadmill Walk",
+  "name": "Treadmill Walk",
   "primary_muscle": "cardio",
   "movement_pattern": "cardio",
   "kind": "cardio",

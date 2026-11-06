@@ -20,7 +20,7 @@
     "Thả tạ bật lên"
   ],
   "slug": "machine_lat_pulldown",
-  "name_vi": "Machine Lat Pulldown",
+  "name": "Machine Lat Pulldown",
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",

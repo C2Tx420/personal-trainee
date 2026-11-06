@@ -24,7 +24,7 @@
     "Thả người rơi nhanh khi xuống"
   ],
   "slug": "assisted_dip",
-  "name_vi": "Assisted Dip",
+  "name": "Assisted Dip",
   "primary_muscle": "triceps",
   "movement_pattern": "vertical_push",
   "kind": "compound",

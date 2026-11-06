@@ -55,7 +55,7 @@ export function SubstituteSheet({
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title={`Đổi “${original.name_vi}”`}>
+    <Sheet open={open} onClose={onClose} title={`Đổi “${original.name}”`}>
       <div className="mb-3">
         <span className="mb-1 block text-sm font-medium text-muted">Lý do</span>
         <div className="flex flex-wrap gap-2">

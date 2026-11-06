@@ -18,7 +18,7 @@
     "Đung đưa lấy đà"
   ],
   "slug": "db_curl",
-  "name_vi": "Dumbbell Curl",
+  "name": "Dumbbell Curl",
   "primary_muscle": "biceps",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

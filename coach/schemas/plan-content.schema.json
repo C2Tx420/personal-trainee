@@ -1391,6 +1391,10 @@
             "type": "string",
             "pattern": "^[a-z0-9_]+$"
           },
+          "name": {
+            "type": "string",
+            "minLength": 2
+          },
           "name_vi": {
             "type": "string",
             "minLength": 2
@@ -1555,7 +1559,6 @@
         },
         "required": [
           "slug",
-          "name_vi",
           "primary_muscle",
           "movement_pattern",
           "kind",

@@ -57,7 +57,7 @@ const num = (v: unknown) => (v === null || v === undefined ? null : Number(v));
 
 // ───────────────────────── Reads
 export async function fetchExercises(): Promise<ExerciseRow[]> {
-  const rows = must(await supabase.from('exercises').select('*').order('name_vi'));
+  const rows = must(await supabase.from('exercises').select('*').order('name'));
   return (rows as ExerciseRow[]).map((r) => ({ ...r, load_step_kg: Number(r.load_step_kg) }));
 }
 
@@ -288,7 +288,8 @@ export async function createProvisionalExercise(name: string, like: ExerciseRow 
       .from('exercises')
       .insert({
         slug,
-        name_vi: name.trim(),
+        name: name.trim(),
+        name_vi: name.trim(), // until release N+1 drops the column (plan v2.7 §16 B13)
         aliases: [name.trim()],
         primary_muscle: like?.primary_muscle ?? 'chest',
         secondary_muscles: like?.secondary_muscles ?? [],

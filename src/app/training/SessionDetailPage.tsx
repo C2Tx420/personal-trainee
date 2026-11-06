@@ -91,7 +91,7 @@ export function SessionDetailPage() {
             <span className="text-warn">bỏ qua</span>
           ) : (
             <>
-              {w.cardio ? `${ex.bySlug.get(w.cardio.exercise)?.name_vi ?? w.cardio.exercise} ${w.cardio.minutes}′` : ''}
+              {w.cardio ? `${ex.bySlug.get(w.cardio.exercise)?.name ?? w.cardio.exercise} ${w.cardio.minutes}′` : ''}
               {w.cardio?.speed_kmh_min ? ` · ${String(w.cardio.speed_kmh_min).replace('.', ',')}–${w.cardio.speed_kmh_max} km/h` : ''}
               {w.mobility_done ? ' · khớp ✓' : ''}
             </>
@@ -106,11 +106,11 @@ export function SessionDetailPage() {
         return (
           <Card key={it.id}>
             <div className="mb-2 flex items-center gap-3">
-              <ExerciseImg svg={e?.illustration_svg} name={e?.name_vi ?? ''} className="w-20 shrink-0" />
+              <ExerciseImg svg={e?.illustration_svg} name={e?.name ?? ''} className="w-20 shrink-0" />
               <div className="min-w-0 flex-1">
-                <div className="font-semibold">{e?.name_vi}</div>
+                <div className="font-semibold">{e?.name}</div>
                 {it.substitution_reason && (
-                  <div className="text-xs text-info">thay {planned?.name_vi} · {SUBSTITUTION_LABEL[it.substitution_reason]}{it.substitution_note ? ` — ${it.substitution_note}` : ''}</div>
+                  <div className="text-xs text-info">thay {planned?.name} · {SUBSTITUTION_LABEL[it.substitution_reason]}{it.substitution_note ? ` — ${it.substitution_note}` : ''}</div>
                 )}
                 {it.template_item_position === null && <Badge>ngoài kế hoạch</Badge>}
                 {it.status === 'skipped' && <Badge tone="bad">bỏ{it.skip_reason ? `: ${it.skip_reason}` : ''}</Badge>}

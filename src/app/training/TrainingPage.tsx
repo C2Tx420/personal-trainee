@@ -27,7 +27,7 @@ export function TrainingPage() {
   const data = training.data;
   const trainedExercises = useMemo(() => {
     const ids = new Set((data?.sets ?? []).filter((s) => s.set_type === 'working' && s.weight_kg !== null).map((s) => s.exercise_id));
-    return [...ids].map((i) => ex.byId.get(i)).filter(Boolean).sort((a, b) => a!.name_vi.localeCompare(b!.name_vi));
+    return [...ids].map((i) => ex.byId.get(i)).filter(Boolean).sort((a, b) => a!.name.localeCompare(b!.name));
   }, [data, ex.byId]);
 
   if (training.isLoading || plan.isLoading) return <Page title="Tập"><Skeleton /></Page>;
@@ -86,7 +86,7 @@ export function TrainingPage() {
           <>
             <select aria-label="Chọn bài" className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={selected} onChange={(e) => setExId(e.target.value)}>
               {trainedExercises.map((e) => (
-                <option key={e!.id} value={e!.id}>{e!.name_vi}</option>
+                <option key={e!.id} value={e!.id}>{e!.name}</option>
               ))}
             </select>
             <Segmented value={weeks} onChange={setWeeks} options={[{ value: '4', label: '4 tuần' }, { value: '8', label: '8 tuần' }]} />

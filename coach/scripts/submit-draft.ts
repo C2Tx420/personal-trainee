@@ -19,7 +19,7 @@ if (!file || !note) {
 
 const content = planContentSchema.parse(JSON.parse(fs.readFileSync(file, 'utf8')));
 const sql = connect();
-const lib = await sql`select slug, name_vi, load_step_kg::float as load_step_kg, is_assisted from exercises`;
+const lib = await sql`select slug, coalesce(name, name_vi) as name, load_step_kg::float as load_step_kg, is_assisted from exercises`;
 const slugs = lib.map((r) => r.slug as string);
 const errors = validatePlanRules(content, slugs).filter((i) => i.level === 'error').map((i) => i.message);
 // stricter checks vs the active plan (§16 B6); "đau" in a set / exercise note in the last 4 weeks
@@ -34,7 +34,7 @@ const strict = validateDraft(
   content,
   activeRow ? parsePlanContent(activeRow.content) : null,
   new Map(lib.map((r) => [r.slug as string, { load_step_kg: r.load_step_kg as number, is_assisted: r.is_assisted as boolean }])),
-  { painSlugs: new Set(pain.map((r) => r.slug as string)), names: (s) => (lib.find((r) => r.slug === s)?.name_vi as string) ?? s },
+  { painSlugs: new Set(pain.map((r) => r.slug as string)), names: (s) => (lib.find((r) => r.slug === s)?.name as string) ?? s },
 );
 errors.push(...strict.filter((i) => i.level === 'error').map((i) => i.message));
 const warnings = strict.filter((i) => i.level === 'warning').map((i) => i.message);

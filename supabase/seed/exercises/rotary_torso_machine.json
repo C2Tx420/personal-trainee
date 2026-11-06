@@ -21,7 +21,7 @@
     "Tạ quá nặng làm xoắn lưng dưới"
   ],
   "slug": "rotary_torso_machine",
-  "name_vi": "Rotary Torso Machine",
+  "name": "Rotary Torso Machine",
   "primary_muscle": "obliques",
   "movement_pattern": "core",
   "kind": "core",

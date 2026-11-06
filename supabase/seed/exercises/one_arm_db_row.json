@@ -19,7 +19,7 @@
     "Xoay người để kéo"
   ],
   "slug": "one_arm_db_row",
-  "name_vi": "One-Arm Dumbbell Row",
+  "name": "One-Arm Dumbbell Row",
   "primary_muscle": "lats",
   "movement_pattern": "horizontal_pull",
   "kind": "compound",

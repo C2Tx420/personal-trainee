@@ -21,7 +21,7 @@
     "Thả người rơi nhanh khi xuống"
   ],
   "slug": "assisted_pull_up",
-  "name_vi": "Assisted Pull-Up",
+  "name": "Assisted Pull-Up",
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",

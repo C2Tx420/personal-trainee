@@ -34,11 +34,11 @@ export function sessionSummary(
   session: Pick<SessionRow, 'warmup' | 'started_at' | 'ended_at' | 'duration_min'>,
   items: SessionItemRow[],
   sets: SetRow[],
-  exercises: Map<string, Pick<ExerciseRow, 'name_vi' | 'is_time_based'> & { is_assisted?: boolean }>,
+  exercises: Map<string, Pick<ExerciseRow, 'name' | 'is_time_based'> & { is_assisted?: boolean }>,
   bodyKg: number | null = null,
   now: Date = new Date(),
 ): SessionSummary {
-  const name = (id: string | null) => (id ? (exercises.get(id)?.name_vi ?? '?') : '—');
+  const name = (id: string | null) => (id ? (exercises.get(id)?.name ?? '?') : '—');
   const working = sets.filter((s) => s.set_type === 'working');
   const missing = new Set<string>();
   for (const s of working) {

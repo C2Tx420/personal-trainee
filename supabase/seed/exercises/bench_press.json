@@ -21,7 +21,7 @@
     "Khuỷu bè 90°"
   ],
   "slug": "bench_press",
-  "name_vi": "Barbell Bench Press",
+  "name": "Barbell Bench Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

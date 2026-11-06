@@ -20,7 +20,7 @@
     "Ghế dốc quá cao thành bài vai"
   ],
   "slug": "incline_db_press",
-  "name_vi": "Incline Dumbbell Press",
+  "name": "Incline Dumbbell Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

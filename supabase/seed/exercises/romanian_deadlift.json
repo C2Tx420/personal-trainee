@@ -20,7 +20,7 @@
     "Biến thành squat"
   ],
   "slug": "romanian_deadlift",
-  "name_vi": "Dumbbell Romanian Deadlift",
+  "name": "Dumbbell Romanian Deadlift",
   "primary_muscle": "hamstrings",
   "movement_pattern": "hinge",
   "kind": "compound",

@@ -18,7 +18,7 @@
     "Đổ người dồn trọng lượng"
   ],
   "slug": "triceps_pushdown",
-  "name_vi": "Cable Triceps Pushdown",
+  "name": "Cable Triceps Pushdown",
   "primary_muscle": "triceps",
   "movement_pattern": "isolation_push",
   "kind": "isolation",
