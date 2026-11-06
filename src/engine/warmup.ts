@@ -1,5 +1,5 @@
 import type { PlanItem, WarmupSet } from './plan-schema';
-import { capBelow, roundLoad } from './stack';
+import { capBelow, isLbStack, roundLoad, stackStep } from './stack';
 
 export type PlannedSet = {
   setType: 'warmup' | 'working';
@@ -34,7 +34,7 @@ export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingK
   const working: PlannedSet[] = Array.from({ length: item.sets }, (_, i) => ({
     setType: 'working',
     index: i + 1,
-    targetKg: item.target_kg_per_set?.[i] ?? item.target_kg,
+    targetKg: item.target_kg_per_set?.[i] ?? (i > 0 ? backoffKg(item.target_kg, item.backoff_steps ?? 0, loadStepKg, assisted) : item.target_kg),
     repMin: item.rep_min,
     repMax: item.rep_max,
   }));
@@ -59,4 +59,13 @@ export function suggestWarmup(args: { kind: string; isTimeBased?: boolean; assis
   if (w === null || !args.loadStepKg) return ramp;
   const at = (pct: number) => capBelow(roundLoad((w * pct) / 100, args.loadStepKg!), w, args.loadStepKg!);
   return Math.abs(at(50) - at(75)) < 0.01 ? [{ pct: 75, reps: 5 }] : ramp;
+}
+
+/** Load of a back-off set: `steps` lighter than the top set (pins on lb stacks; more assistance if assisted). */
+export function backoffKg(topKg: number | null, steps: number, loadStepKg: number, assisted = false): number | null {
+  if (topKg === null || steps <= 0) return topKg;
+  const dir = assisted ? 1 : -1;
+  let kg = topKg;
+  for (let i = 0; i < steps; i++) kg = isLbStack(loadStepKg) ? stackStep(kg, dir) : Math.max(0, Math.round((kg + dir * (loadStepKg || 2.5)) * 100) / 100);
+  return kg;
 }
