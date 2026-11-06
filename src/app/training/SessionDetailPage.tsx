@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { deleteSession, saveSet } from '@/data/api';
-import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail } from '@/data/queries';
+import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail, useWeights } from '@/data/queries';
 import { formatVN, WEEKDAY_LABEL, weekdayOf } from '@/engine/dates';
 import { formatSet } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
@@ -28,17 +28,19 @@ export function SessionDetailPage() {
   const exIds = useMemo(() => [...new Set((detail.data?.items ?? []).map((i) => i.exercise_id))].sort(), [detail.data]);
   const history = useExerciseHistory(exIds);
   const reviews = useReviews();
+  const weights = useWeights();
 
   if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Skeleton /></Page>;
   if (detail.error || !detail.data) return <Page title="Buổi tập" back="/training"><ErrorBox error={detail.error} /></Page>;
   const { session, items, sets } = detail.data;
-  const sum = sessionSummary(session, items, sets, ex.byId);
+  const sum = sessionSummary(session, items, sets, ex.byId, weights.data?.at(-1)?.weight_kg ?? null);
   const w = session.warmup;
   const editItem = edit ? items.find((i) => i.id === edit.session_item_id) : null;
   const records = personalRecords(
     sets,
     (history.data ?? []).filter((h) => h.sessionId !== id && h.date <= session.session_date).flatMap((h) => h.sets),
     (exId) => ex.byId.get(exId)?.canonical_exercise_id ?? exId,
+    (exId) => !!ex.byId.get(exId)?.is_assisted,
   );
   const recordSetIds = new Set(records.map((r) => r.setId));
 

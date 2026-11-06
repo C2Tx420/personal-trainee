@@ -24,6 +24,8 @@ export type ExerciseRow = {
   available_at_gym: boolean;
   unavailable_note: string | null;
   is_provisional: boolean;
+  /** assisted machine: kg = assistance, lower = harder (src/engine/load.ts) */
+  is_assisted: boolean;
   canonical_exercise_id: string | null;
   updated_by_plan_version_id?: string | null;
   created_at?: string;

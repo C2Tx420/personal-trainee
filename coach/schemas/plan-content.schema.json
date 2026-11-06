@@ -1533,6 +1533,9 @@
           "available_at_gym": {
             "type": "boolean"
           },
+          "is_assisted": {
+            "type": "boolean"
+          },
           "canonical_slug": {
             "anyOf": [
               {

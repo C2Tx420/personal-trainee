@@ -48,8 +48,9 @@ export function kgDeviates(targetKg: number | null, actualKg: number | null): bo
 /**
  * Load increase suggestion — only when the plan has no `target_kg` for the exercise.
  * Last working set of the previous session hit `rep_max` → +1 load step / next pin on lb stacks (timed exercises: +5 seconds).
+ * Assisted machines progress the other way: −1 step of assistance.
  */
-export function progressionHint(item: PlanItem, last: PastSession | null, loadStepKg: number): string | null {
+export function progressionHint(item: PlanItem, last: PastSession | null, loadStepKg: number, assisted = false): string | null {
   if (item.target_kg !== null || !last) return null;
   const lastSet = [...last.sets].sort((a, b) => a.set_index - b.set_index).at(-1);
   if (!lastSet) return null;
@@ -57,6 +58,12 @@ export function progressionHint(item: PlanItem, last: PastSession | null, loadSt
     return (lastSet.seconds ?? 0) >= item.rep_max ? `Thử ${item.rep_max + 5} giây` : null;
   }
   if (lastSet.weight_kg === null || (lastSet.reps ?? 0) < item.rep_max) return null;
-  const next = isLbStack(loadStepKg) ? stackStep(lastSet.weight_kg, 1) : lastSet.weight_kg + loadStepKg;
+  const dir = assisted ? -1 : 1;
+  const next = isLbStack(loadStepKg) ? stackStep(lastSet.weight_kg, dir) : lastSet.weight_kg + dir * loadStepKg;
+  if (assisted) {
+    return next <= 0 || next >= lastSet.weight_kg
+      ? `Lần trước đủ ${item.rep_max} lần — thử bớt trợ lực`
+      : `Lần trước đủ ${item.rep_max} lần — thử ${String(next).replace('.', ',')} kg trợ lực`;
+  }
   return `Lần trước đủ ${item.rep_max} lần — thử ${String(next).replace('.', ',')} kg`;
 }

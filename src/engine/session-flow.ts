@@ -14,6 +14,8 @@ export type FlowItem = {
   loadStepKg: number;
   /** previous working-set kg — used for warm-up loads when there is no target_kg. */
   fallbackWorkingKg: number | null;
+  /** assisted machine (kg = assistance) */
+  assisted?: boolean;
 };
 
 export type FlowStep =
@@ -37,7 +39,7 @@ export function orderedItems<T extends { item: SessionItemRow }>(items: T[]): T[
 }
 
 export function plannedFor(fi: FlowItem): PlannedSet[] {
-  return plannedSets(fi.item.target, fi.loadStepKg, fi.fallbackWorkingKg);
+  return plannedSets(fi.item.target, fi.loadStepKg, fi.fallbackWorkingKg, fi.assisted ?? false);
 }
 
 function isDone(p: PlannedSet, sets: SetRow[], itemId: string): boolean {

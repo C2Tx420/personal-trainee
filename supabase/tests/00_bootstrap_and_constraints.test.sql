@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(30);
 
 -- Simulated user
 insert into auth.users (id, email, aud, role, instance_id)
@@ -16,6 +16,8 @@ select is((select count(*)::int from public.goals), 3, '3 mốc goal');
 select ok((select count(*) from public.exercises) >= 53, '≥ 53 bài tập seed');
 select is((select available_at_gym from public.exercises where slug = 'hack_squat'), true, 'hack squat: phòng tập có máy');
 select is((select archived from public.exercises where slug = 'plank'), true, 'plank đã lưu trữ');
+select is((select is_assisted from public.exercises where slug = 'assisted_pull_up'), true, 'kéo xà trợ lực: máy trợ lực');
+select is((select count(*)::int from public.exercises where is_assisted), 2, 'chỉ 2 bài trợ lực trong seed');
 select is((select count(*)::int from public.exercises where illustration_svg is null), 0, 'mọi bài đều có SVG');
 select is((select status from public.plan_versions where version_no = 1), 'active', 'plan v1 active');
 select is((select count(*)::int from public.session_templates), 3, '3 template push/pull/legs');
@@ -71,8 +73,18 @@ select is(public.approve_plan_version((select id from public.plan_versions where
 select is((select status from public.plan_versions where version_no = 1), 'archived', 'v1 chuyển archived');
 select is((select count(*)::int from public.plan_versions where status = 'active'), 1, 'chỉ 1 bản active');
 
--- Immutability
+-- Upsert without `is_assisted` (older drafts) keeps the flag; with it, sets it
 reset role;
+select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
+  (select jsonb_build_array(e - 'is_assisted') from jsonb_array_elements(public._seed_payload()->'exercises') e where e->>'slug' = 'assisted_dip'),
+  null, true);
+select is((select is_assisted from public.exercises where slug = 'assisted_dip'), true, 'upsert thiếu is_assisted giữ nguyên cờ');
+select public._upsert_exercises('11111111-1111-4111-8111-111111111111',
+  (select jsonb_build_array(e || '{"is_assisted": true}') from jsonb_array_elements(public._seed_payload()->'exercises') e where e->>'slug' = 'pull_up'),
+  null, true);
+select is((select is_assisted from public.exercises where slug = 'pull_up'), true, 'upsert có is_assisted thì đặt cờ');
+
+-- Immutability
 select throws_ok(
   $$ update public.plan_versions set content = jsonb_set(content, '{nutrition,protein_g}', '150') where version_no = 1 $$,
   'P0001', null, 'không sửa content bản đã duyệt');

@@ -25,5 +25,6 @@
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",
-  "equipment": "machine"
+  "equipment": "machine",
+  "is_assisted": true
 }

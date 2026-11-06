@@ -106,6 +106,10 @@ test('03 thư viện bài tập + lịch sử', async () => {
   await lb.click();
   await expect(lb).toHaveAttribute('aria-checked', 'true');
   expect(psql("select load_step_kg from exercises where slug = 'machine_biceps_curl'")).toBe('4.50');
+
+  // assisted machine: kg = assistance, flagged in the seed
+  await nav(page, '/exercises/assisted_pull_up');
+  await expect(page.getByRole('switch', { name: 'Máy trợ lực' })).toHaveAttribute('aria-checked', 'true');
 });
 
 test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → tiếp tục sau khi tải lại', async () => {
@@ -452,7 +456,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
   await expect(page.getByTestId('version-line')).toContainText('Plan v2.7');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261105000100');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261106000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();
   await expect(page.getByText('Bản đầu tiên')).toBeVisible();

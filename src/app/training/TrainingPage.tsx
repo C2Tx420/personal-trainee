@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useActivePlan, useExerciseMaps, useReviews, useTraining, useWeights } from '@/data/queries';
 import { addDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
+import { loadContext } from '@/engine/load';
 import { formatNumberVN } from '@/engine/math';
 import { missingReflection, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
@@ -37,9 +38,11 @@ export function TrainingPage() {
   const selected = exId || trainedExercises[0]?.id || '';
   const group = new Set([selected, ...ex.list.filter((e) => e.canonical_exercise_id === selected).map((e) => e.id)]);
   const weekStarts = Array.from({ length: Number(weeks) }, (_, i) => addDays(ws, -7 * (Number(weeks) - 1 - i)));
-  const vol = data ? weeklyVolumeByExercise(group, sessions, data.sets, weekStarts).map((v) => ({ label: formatVN(v.week), volume: v.volume })) : [];
+  const loads = loadContext(ex.byId, weights.data?.at(-1)?.weight_kg ?? null);
+  const selectedAssisted = !!ex.byId.get(selected)?.is_assisted;
+  const vol = data ? weeklyVolumeByExercise(group, sessions, data.sets, weekStarts, loads).map((v) => ({ label: formatVN(v.week), volume: v.volume })) : [];
   const top = data
-    ? topSetSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets).map((t) => ({ label: formatVN(t.date), top: t.topKg, target: t.targetKg }))
+    ? topSetSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted).map((t) => ({ label: formatVN(t.date), top: t.topKg, target: t.targetKg }))
     : [];
 
   return (
@@ -81,7 +84,9 @@ export function TrainingPage() {
             <Segmented value={weeks} onChange={setWeeks} options={[{ value: '4', label: '4 tuần' }, { value: '8', label: '8 tuần' }]} />
             <div className="mb-1 text-sm font-medium">Khối lượng mỗi tuần (kg)</div>
             <SimpleBars data={vol} dataKey="volume" name="Khối lượng" />
-            <div className="mt-3 mb-1 text-sm font-medium">Tạ hiệp chính nặng nhất vs mục tiêu</div>
+            <div className="mt-3 mb-1 text-sm font-medium">
+              {selectedAssisted ? 'Kg trợ lực ít nhất vs mục tiêu (thấp hơn = khoẻ hơn)' : 'Tạ hiệp chính nặng nhất vs mục tiêu'}
+            </div>
             {top.length ? (
               <SimpleLine data={top} lines={[{ key: 'top', name: 'Thực tế' }, { key: 'target', name: 'Mục tiêu', color: 'var(--ok)', dashed: true }]} unit="kg" />
             ) : (
@@ -96,7 +101,7 @@ export function TrainingPage() {
       {sessions.map((s) => {
         const sets = data!.sets.filter((x) => x.session_id === s.id);
         const items = data!.items.filter((x) => x.session_id === s.id);
-        const v = volumeKg(sets);
+        const v = volumeKg(sets, loads);
         return (
           <Card key={s.id} onClick={() => nav(s.status === 'in_progress' ? `/workout/${s.id}` : `/training/session/${s.id}`)}>
             <div className="flex items-center justify-between">

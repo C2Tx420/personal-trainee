@@ -3,7 +3,7 @@ import type { ExerciseRow } from '@/engine/types';
 import { Card } from '@/ui/components';
 import { fmtKg } from '../shared';
 
-/** "🏆 Kỷ lục mới" — heaviest load ever, or more reps than ever at a load done before. */
+/** "🏆 Kỷ lục mới" — hardest load ever (least assistance on assisted machines), or more reps than ever at a load done before. */
 export function RecordsCard({ records, byId }: { records: PersonalRecord[]; byId: Map<string, ExerciseRow> }) {
   if (records.length === 0) return null;
   return (
@@ -13,7 +13,11 @@ export function RecordsCard({ records, byId }: { records: PersonalRecord[]; byId
         <div key={r.setId} className="tabular text-sm" data-testid="record">
           {byId.get(r.exerciseId)?.name_vi ?? '?'}: <b>{fmtKg(r.kg)} kg × {r.reps}</b>
           <span className="text-muted">
-            {r.kind === 'kg' ? ` · nặng nhất từ trước tới giờ (trước ${fmtKg(r.prevKg)} kg)` : ` · nhiều lần nhất ở mức ${fmtKg(r.kg)} kg (trước ${r.prevReps})`}
+            {r.kind === 'kg'
+              ? byId.get(r.exerciseId)?.is_assisted
+                ? ` · ít trợ lực nhất từ trước tới giờ (trước ${fmtKg(r.prevKg)} kg)`
+                : ` · nặng nhất từ trước tới giờ (trước ${fmtKg(r.prevKg)} kg)`
+              : ` · nhiều lần nhất ở mức ${fmtKg(r.kg)} kg (trước ${r.prevReps})`}
           </span>
         </div>
       ))}

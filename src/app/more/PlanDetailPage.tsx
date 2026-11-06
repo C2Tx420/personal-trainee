@@ -44,7 +44,7 @@ export function PlanDetailPage() {
   const diff = base && base.id !== p.id ? diffPlans(base.content, p.content, names, existing) : [];
   const issues = validatePlanRules(p.content, ex.bySlug.keys());
   const compare = base && base.id !== p.id ? base : undefined;
-  const sessions = sessionChanges(compare?.content ?? null, p.content, names);
+  const sessions = sessionChanges(compare?.content ?? null, p.content, names, (slug) => p.content.exercise_upserts.find((e) => e.slug === slug)?.is_assisted ?? !!ex.bySlug.get(slug)?.is_assisted);
   const library = diff.filter((d) => d.kind === 'exercise_new' || d.kind === 'exercise_edit');
   const general = diff.filter((d) => d.kind === 'schedule' || d.kind === 'nutrition');
   const me = labels.label(p.id);

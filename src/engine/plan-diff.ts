@@ -182,12 +182,13 @@ export type SessionView = {
 
 const firstKg = (i: PlanItem) => i.target_kg_per_set?.[0] ?? i.target_kg;
 
-function itemChanges(o: PlanItem, n: PlanItem): ItemChange[] {
+function itemChanges(o: PlanItem, n: PlanItem, assisted: boolean): ItemChange[] {
   const out: ItemChange[] = [];
   if (JSON.stringify(o.target_kg_per_set) + o.target_kg !== JSON.stringify(n.target_kg_per_set) + n.target_kg) {
     const a = firstKg(o);
     const b = firstKg(n);
-    const dir = a !== null && b !== null && a !== b ? (b > a ? 'up' : 'down') : undefined;
+    // up = harder: more kg, or less assistance on assisted machines
+    const dir = a !== null && b !== null && a !== b ? (b > a !== assisted ? 'up' : 'down') : undefined;
     const text = b === null ? `${kgSpec(o)} → tự chọn mức` : a === null ? `đặt ${kgSpec(n)}` : `${kgSpec(o)} → ${kgSpec(n)}`;
     out.push({ kind: 'target_kg', text, dir });
   }
@@ -203,7 +204,12 @@ function itemChanges(o: PlanItem, n: PlanItem): ItemChange[] {
 }
 
 /** Each session of `b` in order, every exercise tagged with what changed since `a` (null = first version). */
-export function sessionChanges(a: PlanContent | null, b: PlanContent, names: (s: string) => string): SessionView[] {
+export function sessionChanges(
+  a: PlanContent | null,
+  b: PlanContent,
+  names: (s: string) => string,
+  assisted: (slug: string) => boolean = () => false,
+): SessionView[] {
   return b.templates.map((t): SessionView => {
     const prev = a?.templates.find((x) => x.key === t.key);
     if (!a) {
@@ -213,7 +219,7 @@ export function sessionChanges(a: PlanContent | null, b: PlanContent, names: (s:
     const { removed, replacedPairs, reordered } = matchItems(ai, t.items);
     const items = t.items.map((item): SessionItemView => {
       const o = ai.find((x) => x.exercise === item.exercise);
-      if (o) return { item, status: 'kept', changes: itemChanges(o, item), noteChanged: !!item.coach_note && item.coach_note !== o.coach_note };
+      if (o) return { item, status: 'kept', changes: itemChanges(o, item, assisted(item.exercise)), noteChanged: !!item.coach_note && item.coach_note !== o.coach_note };
       const pair = replacedPairs.find(([, n]) => n === item);
       return pair
         ? { item, status: 'replaced', from: pair[0].exercise, changes: [], noteChanged: !!item.coach_note }

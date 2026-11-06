@@ -28,5 +28,6 @@
   "primary_muscle": "triceps",
   "movement_pattern": "vertical_push",
   "kind": "compound",
-  "equipment": "machine"
+  "equipment": "machine",
+  "is_assisted": true
 }

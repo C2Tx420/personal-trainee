@@ -32,7 +32,7 @@ const [goals, plans, weights, meas, inbody, sessions, exercises] = await Promise
   sql`select *, log_date::text as log_date_s from body_measurements order by log_date`,
   sql`select *, measured_on::text as measured_on_s from inbody_logs order by measured_on`,
   sql`select *, session_date::text as session_date_s from workout_sessions where session_date >= ${from8w} order by session_date`,
-  sql`select id, slug, name_vi, primary_muscle, equipment, available_at_gym, unavailable_note, is_provisional, archived,
+  sql`select id, slug, name_vi, primary_muscle, secondary_muscles, kind, equipment, load_step_kg::float as load_step_kg, is_assisted, available_at_gym, unavailable_note, is_provisional, archived,
              canonical_exercise_id, (illustration_svg is not null) as has_illustration, aliases
       from exercises order by slug`,
 ]);
@@ -58,6 +58,8 @@ const ibLogs = inbody.map((r) => ({
 
 // ── weight + goals
 const lastW = wLogs.at(-1)?.weight_kg ?? 0;
+// assisted machines: volume uses body weight − assistance (src/engine/load.ts)
+const loads = { assisted: (id: string) => !!exById.get(id)?.is_assisted, bodyKg: lastW || null };
 const trend = lossTrendKgPerWeek(wLogs, we);
 const ffm = latestFfm(ibLogs);
 const weekLogs = wLogs.filter((w) => w.log_date >= ws && w.log_date <= we);
@@ -111,6 +113,7 @@ const setsDetail = trainedEx.map((exId) => {
   return {
     exercise: ex.slug,
     name: ex.name_vi,
+    is_assisted: !!ex.is_assisted,
     target: plannedTarget(ex.slug as string),
     sessions: bySession,
     hit_target_pct: withTarget.length ? Math.round((hit.length / withTarget.length) * 100) : null,
@@ -183,12 +186,12 @@ const report = {
     },
     backfilled_sessions: weekSessions.filter((s) => s.is_backfill).map((s) => s.session_date),
     skipped_days: sRows.filter((s) => s.session_date >= ws && s.session_date <= we && s.status === 'skipped').map((s) => ({ date: s.session_date, kind: s.kind, note: s.note })),
-    sessions: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, duration_min: s.duration_min, volume_kg: volumeKg(setRows.filter((x) => x.session_id === s.id)), note: s.note?.startsWith('Ghi nhanh') ? 'ghi nhanh' : s.note, reflection: s.reflection })),
+    sessions: weekSessions.map((s) => ({ date: s.session_date, kind: s.kind, duration_min: s.duration_min, volume_kg: volumeKg(setRows.filter((x) => x.session_id === s.id), loads), note: s.note?.startsWith('Ghi nhanh') ? 'ghi nhanh' : s.note, reflection: s.reflection })),
     substitutions: iRows.filter((i) => weekIds.has(i.session_id) && i.substitution_reason).map((i) => ({ date: dateOf.get(i.session_id), planned: slugOf(i.planned_exercise_id), done: slugOf(i.exercise_id), reason: i.substitution_reason, note: i.substitution_note })),
     skipped_items: iRows.filter((i) => weekIds.has(i.session_id) && (i.status === 'skipped' || i.status === 'partial')).map((i) => ({ date: dateOf.get(i.session_id), exercise: slugOf(i.exercise_id), status: i.status, reason: i.skip_reason })),
     kg_changes: setRows.filter((s) => weekIds.has(s.session_id) && s.kg_change_reason).map((s) => ({ date: dateOf.get(s.session_id), exercise: slugOf(s.exercise_id), set: s.set_index, target_kg: s.target_kg, actual_kg: s.weight_kg, reason: s.kg_change_reason, note: s.kg_change_note })),
     sets_missing_kg: setsDetail.filter((d) => d.missing_kg_sets > 0).map((d) => ({ exercise: d.exercise, sets: d.missing_kg_sets })),
-    volume_by_exercise_8w: trainedEx.map((id) => ({ exercise: slugOf(id), weekly_kg: weeklyVolumeByExercise(new Set([id]), sRows, setRows, weekStarts8).map((v) => v.volume) })),
+    volume_by_exercise_8w: trainedEx.map((id) => ({ exercise: slugOf(id), weekly_kg: weeklyVolumeByExercise(new Set([id]), sRows, setRows, weekStarts8, loads).map((v) => v.volume) })),
     sets_detail_4w: setsDetail,
     progression_ready: progressionReady,
     schedule_violations: actualLegsBadmintonConflicts(weekSessions.map((s) => ({ date: s.session_date, kind: s.kind }))),

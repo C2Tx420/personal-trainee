@@ -42,6 +42,8 @@ export const exerciseDefSchema = z.object({
   reference_url: z.string().url().nullable().optional(),
   archived: z.boolean().optional(),
   available_at_gym: z.boolean().optional(),
+  /** assisted machine (kg = assistance). Optional with no default: an upsert without it keeps the current value. */
+  is_assisted: z.boolean().optional(),
   canonical_slug: slugSchema.nullable().optional(),
 });
 export type ExerciseDef = z.infer<typeof exerciseDefSchema>;

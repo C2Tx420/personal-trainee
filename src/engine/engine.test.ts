@@ -309,8 +309,8 @@ describe('kỷ lục + tiến độ', () => {
       set({ session_id: 's2', exercise_id: 'once', weight_kg: 10, reps: 10 }),
     ];
     expect(strengthChanges(sessions, sets)).toEqual([
-      { exerciseId: 'e', first: { date: '2026-10-26', kg: 27, reps: 12 }, last: { date: '2026-11-02', kg: 32, reps: 8 }, pct: 19 },
-      { exerciseId: 'b', first: { date: '2026-10-26', kg: 35, reps: 10 }, last: { date: '2026-11-02', kg: 35, reps: 12 }, pct: 0 },
+      { exerciseId: 'e', first: { date: '2026-10-26', kg: 27, reps: 12 }, last: { date: '2026-11-02', kg: 32, reps: 8 }, pct: 19, assisted: false },
+      { exerciseId: 'b', first: { date: '2026-10-26', kg: 35, reps: 10 }, last: { date: '2026-11-02', kg: 35, reps: 12 }, pct: 0, assisted: false },
     ]);
   });
   it('body: weekly averages need two weeks; waist needs two entries', () => {
