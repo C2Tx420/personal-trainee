@@ -105,6 +105,7 @@ Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg
 
 - Only use sets with `type = working`; ignore warm-up sets.
 - **Assisted machines** (`is_assisted: true` in `sets_detail_4w` — `assisted_pull_up`, `assisted_dip`): the kg is **assistance**, so progress = **lower** `target_kg` (−1 step = −1 pin on lb stacks), a lighter later set = **more** assistance in `target_kg_per_set`, and "too heavy" means raise the assistance. No % warm-ups on them. New assisted machine → set `is_assisted: true` in its upsert (he can also flip it in the app: exercise page → "Máy trợ lực").
+- `submit-draft` checks the draft (§ plan v2.7 B6): **errors** (fix them) = a new load off the lb ladder (18 / 23 / 27 / 32 / 36 …), an exercise twice in one session, a fixed warm-up ≥ the working load; **warnings** = > 1 step vs the active plan, > 6 changes, more load where he wrote "đau", an off-ladder load kept from the old plan (fix it while you're there). Give the reason for each warning in `--note`, then resubmit with `--accept-warnings`.
 - Change loads by at most **±1 step per week**. You may set `target_kg_per_set` (array with exactly one entry per working set) if later sets should be lighter.
 - Warm-up per exercise in `warmup_sets`: default for compound lifts is 2 sets `{pct: 75, reps: "same"}` or a fixed kg; isolation exercises `[]`.
 - Write a short `coach_note` (in Vietnamese) for any exercise whose load changed ("Đủ 3×10 ở 35kg thì tuần sau lên 40kg").

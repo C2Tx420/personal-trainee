@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { approvePlan, rejectPlan } from '@/data/api';
 import { qk, useExerciseMaps, useInvalidate, usePlans } from '@/data/queries';
 import { addDays, formatVN, todayVN, WEEKDAY_LABEL, WEEKDAYS } from '@/engine/dates';
+import { validateDraft } from '@/engine/draft-validate';
 import { formatNumberVN } from '@/engine/math';
 import { diffPlans, draftWarnings, type SessionItemView, type SessionView, sessionChanges } from '@/engine/plan-diff';
 import type { PlanContent } from '@/engine/plan-schema';
@@ -46,6 +47,8 @@ export function PlanDetailPage() {
   const existing = new Set(ex.list.filter((e) => !createdByThis(e)).map((e) => e.slug));
   const diff = base && base.id !== p.id ? diffPlans(base.content, p.content, names, existing) : [];
   const issues = validatePlanRules(p.content, ex.bySlug.keys());
+  // stricter checks (lb ladder, duplicates, ±1 step, > 6 changes) — shown, never blocking: he decides
+  const checks = p.status === 'draft' ? validateDraft(p.content, active?.content ?? null, ex.bySlug, { names }) : [];
   const compare = base && base.id !== p.id ? base : undefined;
   const sessions = sessionChanges(compare?.content ?? null, p.content, names, (slug) => p.content.exercise_upserts.find((e) => e.slug === slug)?.is_assisted ?? !!ex.bySlug.get(slug)?.is_assisted);
   const library = diff.filter((d) => d.kind === 'exercise_new' || d.kind === 'exercise_edit');
@@ -146,6 +149,7 @@ export function PlanDetailPage() {
         </Banner>
       )}
       {issues.filter((i) => i.level === 'error').map((i) => <Banner key={i.message} tone="bad">{i.message}</Banner>)}
+      {checks.map((i) => <Banner key={i.message} tone="warn">⚠ {i.message}</Banner>)}
       {error ? <ErrorBox error={error} /> : null}
       {p.status === 'active' && <Button block className="mb-3" onClick={() => nav(`/more/plans/${p.id}/edit`)}>Sửa → tạo bản mới cho tuần này</Button>}
 

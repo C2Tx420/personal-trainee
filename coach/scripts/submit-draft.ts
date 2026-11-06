@@ -1,5 +1,6 @@
 import fs from 'node:fs';
-import { planContentSchema, validatePlanRules } from '../../src/engine/plan-schema';
+import { validateDraft } from '../../src/engine/draft-validate';
+import { parsePlanContent, planContentSchema, validatePlanRules } from '../../src/engine/plan-schema';
 import { validateSvg } from '../../src/engine/svg-validate';
 import { arg, connect } from './db';
 
@@ -7,7 +8,7 @@ import { arg, connect } from './db';
  * Submit a plan draft for approval (§7.5). Can only call coach_submit_draft —
  * the draft is always status=draft, created_by=claude_code, and cannot activate itself.
  *
- *   pnpm run submit-draft --file draft.json --note "Reason + data…" [--based-on active|<uuid>] [--allow-pending]
+ *   pnpm run submit-draft --file draft.json --note "Reason + data…" [--based-on active|<uuid>] [--allow-pending] [--accept-warnings]
  */
 const file = arg('file');
 const note = arg('note');
@@ -18,8 +19,25 @@ if (!file || !note) {
 
 const content = planContentSchema.parse(JSON.parse(fs.readFileSync(file, 'utf8')));
 const sql = connect();
-const slugs = (await sql`select slug from exercises`).map((r) => r.slug as string);
+const lib = await sql`select slug, name_vi, load_step_kg::float as load_step_kg, is_assisted from exercises`;
+const slugs = lib.map((r) => r.slug as string);
 const errors = validatePlanRules(content, slugs).filter((i) => i.level === 'error').map((i) => i.message);
+// stricter checks vs the active plan (§16 B6); "đau" in a set / exercise note in the last 4 weeks
+const [activeRow] = await sql`select content from plan_versions where status = 'active'`;
+const pain = await sql`
+  select distinct x.slug from exercises x
+  where exists (select 1 from workout_sets s join workout_sessions w on w.id = s.session_id
+                where s.exercise_id = x.id and w.session_date >= current_date - 28 and s.note ~* '(đau|dau)')
+     or exists (select 1 from workout_session_items i join workout_sessions w on w.id = i.session_id
+                where i.exercise_id = x.id and w.session_date >= current_date - 28 and i.note ~* '(đau|dau)')`;
+const strict = validateDraft(
+  content,
+  activeRow ? parsePlanContent(activeRow.content) : null,
+  new Map(lib.map((r) => [r.slug as string, { load_step_kg: r.load_step_kg as number, is_assisted: r.is_assisted as boolean }])),
+  { painSlugs: new Set(pain.map((r) => r.slug as string)), names: (s) => (lib.find((r) => r.slug === s)?.name_vi as string) ?? s },
+);
+errors.push(...strict.filter((i) => i.level === 'error').map((i) => i.message));
+const warnings = strict.filter((i) => i.level === 'warning').map((i) => i.message);
 for (const e of content.exercise_upserts) {
   if (e.illustration_svg) for (const m of validateSvg(e.illustration_svg)) errors.push(`${e.slug}.svg: ${m}`);
   else if (!slugs.includes(e.slug)) errors.push(`${e.slug}: bài mới phải có illustration_svg`);
@@ -28,6 +46,14 @@ if (errors.length) {
   console.error('Draft không hợp lệ:\n- ' + errors.join('\n- '));
   await sql.end();
   process.exit(1);
+}
+if (warnings.length) {
+  console.error('Cảnh báo:\n- ' + warnings.join('\n- '));
+  if (!process.argv.includes('--accept-warnings')) {
+    console.error('Mỗi cảnh báo cần lý do trong --note; gửi lại với --accept-warnings nếu đã cân nhắc.');
+    await sql.end();
+    process.exit(1);
+  }
 }
 
 // one pending draft at a time: a second one goes stale as soon as either is approved (01–02/11/2026)
