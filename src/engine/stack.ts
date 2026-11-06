@@ -40,3 +40,13 @@ export function pinsAround(kg: number | null, count = 5): { lb: number; kg: numb
 export function roundLoad(kg: number, loadStepKg: number): number {
   return isLbStack(loadStepKg) ? lbToKg(kgToLb(kg)) : roundToStep(kg, loadStepKg);
 }
+
+/**
+ * Keep a warm-up load at least one step below the working load (one pin lower on lb stacks), so a
+ * rounded-up % never equals the working set. Never below 0.
+ */
+export function capBelow(kg: number, workingKg: number, loadStepKg: number): number {
+  if (kg < workingKg - 0.01) return kg;
+  const below = isLbStack(loadStepKg) ? stackStep(workingKg, -1) : roundToStep(workingKg - (loadStepKg || 2.5), loadStepKg || 2.5);
+  return Math.max(0, Math.min(kg, below >= workingKg ? 0 : below));
+}

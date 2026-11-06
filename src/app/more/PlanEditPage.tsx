@@ -4,6 +4,7 @@ import { approvePlan, createDraft } from '@/data/api';
 import { qk, useExerciseMaps, useInvalidate, usePlans } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
 import { type PlanContent, planContentSchema, validatePlanRules } from '@/engine/plan-schema';
+import { suggestWarmup } from '@/engine/warmup';
 import { Banner, Button, Card, ErrorBox, ExerciseImg, Field, Input, Page, SectionTitle, Skeleton } from '@/ui/components';
 import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 
@@ -92,7 +93,9 @@ export function PlanEditPage() {
                   if (!pick || !('exercise' in pick)) return;
                   set((d) =>
                     void d.templates[ti].items.push({
-                      exercise: pick.exercise.slug, alternatives: [], sets: 3, warmup_sets: [], rep_min: 10, rep_max: 12,
+                      exercise: pick.exercise.slug, alternatives: [], sets: 3,
+                      warmup_sets: suggestWarmup({ kind: pick.exercise.kind, isTimeBased: pick.exercise.is_time_based, assisted: pick.exercise.is_assisted }),
+                      rep_min: 10, rep_max: 12,
                       unit: pick.exercise.is_time_based ? 'seconds' : 'reps', rest_sec_min: 60, rest_sec_max: 90,
                       target_kg: null, target_kg_per_set: null, coach_note: '', note: '',
                     }),

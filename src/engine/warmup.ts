@@ -1,5 +1,5 @@
-import type { PlanItem } from './plan-schema';
-import { roundLoad } from './stack';
+import type { PlanItem, WarmupSet } from './plan-schema';
+import { capBelow, roundLoad } from './stack';
 
 export type PlannedSet = {
   setType: 'warmup' | 'working';
@@ -15,7 +15,8 @@ export type PlannedSet = {
  *
  * Warm-up load: fixed `kg` if set, otherwise `pct`% of the working load
  * (`target_kg`, or `fallbackWorkingKg` = previous working-set kg when absent),
- * rounded to the load step (nearest pin on lb stacks). Nothing to compute from → null (entered manually).
+ * rounded to the load step (nearest pin on lb stacks) and kept ≥ 1 step below the working load.
+ * Nothing to compute from → null (entered manually).
  * Assisted machines: a % of the assistance means nothing, so `pct` warm-ups are dropped (fixed `kg` ones stay).
  */
 export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingKg: number | null, assisted = false): PlannedSet[] {
@@ -27,7 +28,7 @@ export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingK
           const reps = w.reps === 'same' ? item.rep_max : w.reps;
           let kg: number | null = null;
           if (w.kg !== undefined) kg = w.kg;
-          else if (w.pct !== undefined && workingKg !== null) kg = roundLoad((workingKg * w.pct) / 100, loadStepKg);
+          else if (w.pct !== undefined && workingKg !== null) kg = capBelow(roundLoad((workingKg * w.pct) / 100, loadStepKg), workingKg, loadStepKg);
           return { setType: 'warmup', index: i + 1, targetKg: kg, repMin: reps, repMax: reps };
         });
   const working: PlannedSet[] = Array.from({ length: item.sets }, (_, i) => ({
@@ -44,4 +45,18 @@ export function setLabel(s: Pick<PlannedSet, 'setType' | 'index'>, totalWorking?
   return s.setType === 'warmup'
     ? `Làm nóng ${s.index}`
     : `Hiệp chính ${s.index}${totalWorking ? `/${totalWorking}` : ''}`;
+}
+
+/**
+ * Default warm-up for a new plan item (plan v2.7 §16 B8): compound lifts 50% × 8 then 75% × 4 — two
+ * ramp sets with fewer reps each, so they don't tire him before the work sets; if both round to the
+ * same load (light work load), one set 75% × 5. Isolation / core / cardio / assisted / timed: none.
+ */
+export function suggestWarmup(args: { kind: string; isTimeBased?: boolean; assisted?: boolean; workingKg?: number | null; loadStepKg?: number }): WarmupSet[] {
+  if (args.kind !== 'compound' || args.isTimeBased || args.assisted) return [];
+  const ramp: WarmupSet[] = [{ pct: 50, reps: 8 }, { pct: 75, reps: 4 }];
+  const w = args.workingKg ?? null;
+  if (w === null || !args.loadStepKg) return ramp;
+  const at = (pct: number) => capBelow(roundLoad((w * pct) / 100, args.loadStepKg!), w, args.loadStepKg!);
+  return Math.abs(at(50) - at(75)) < 0.01 ? [{ pct: 75, reps: 5 }] : ramp;
 }
