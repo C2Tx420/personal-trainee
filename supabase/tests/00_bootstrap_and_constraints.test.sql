@@ -14,7 +14,7 @@ select lives_ok($$ select public.bootstrap_user() $$, 'bootstrap_user gọi lạ
 
 select is((select count(*)::int from public.goals), 3, '3 mốc goal');
 select ok((select count(*) from public.exercises) >= 53, '≥ 53 bài tập seed');
-select is((select available_at_gym from public.exercises where slug = 'hack_squat'), false, 'hack squat: phòng tập không có máy');
+select is((select available_at_gym from public.exercises where slug = 'hack_squat'), true, 'hack squat: phòng tập có máy');
 select is((select archived from public.exercises where slug = 'plank'), true, 'plank đã lưu trữ');
 select is((select count(*)::int from public.exercises where illustration_svg is null), 0, 'mọi bài đều có SVG');
 select is((select status from public.plan_versions where version_no = 1), 'active', 'plan v1 active');

@@ -1,7 +1,8 @@
 {
   "aliases": [
     "đẩy vai tạ đơn",
-    "dumbbell shoulder press"
+    "dumbbell shoulder press",
+    "Đẩy vai tạ đơn ngồi"
   ],
   "secondary_muscles": [
     "side_delt",
@@ -18,7 +19,7 @@
     "Đập hai tạ vào nhau trên đỉnh"
   ],
   "slug": "seated_db_shoulder_press",
-  "name_vi": "Đẩy vai tạ đơn ngồi",
+  "name_vi": "Seated Dumbbell Shoulder Press",
   "primary_muscle": "front_delt",
   "movement_pattern": "vertical_push",
   "kind": "compound",

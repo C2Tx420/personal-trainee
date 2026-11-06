@@ -2,7 +2,8 @@
   "aliases": [
     "leg press",
     "đạp đùi",
-    "đạp chân"
+    "đạp chân",
+    "Máy đạp đùi"
   ],
   "secondary_muscles": [
     "glutes",
@@ -20,7 +21,7 @@
     "Khoá gối khi duỗi"
   ],
   "slug": "leg_press",
-  "name_vi": "Máy đạp đùi",
+  "name_vi": "Leg Press",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",

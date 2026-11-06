@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Cảm nhận sau buổi', { exact: true })).toBeVisible();
+  await expect(news.getByText('Tên bài tiếng Anh', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -68,7 +68,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   await shot(page, '03c-push-prompt', 'Lần đầu mở: hỏi bật nhắc nhở ngay (không phải tự vào Cài đặt)');
   await push.getByRole('button', { name: 'Để sau' }).click();
   await expect(push).toBeHidden();
-  await expect(page.getByText('Kéo xô cáp').first()).toBeVisible();
+  await expect(page.getByText('Cable Lat Pulldown').first()).toBeVisible();
   await expect(page.getByText(/Noel · 25\/12/)).toBeVisible();
   await expect(page.getByText(/Còn 59 ngày/)).toBeVisible();
   await expect(page.getByText('Tiến độ từ 26/10')).toBeVisible();
@@ -91,15 +91,20 @@ test('03 thư viện bài tập + lịch sử', async () => {
   await page.getByRole('link', { name: 'Bài tập', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Bài tập' })).toBeVisible();
   await shot(page, '06-exercises', 'Thư viện bài tập (đang dùng) — hình SVG');
-  await page.getByRole('button', { name: /Máy đẩy ngực/ }).first().click();
+  await page.getByRole('button', { name: /Machine Chest Press/ }).first().click();
   await expect(page.getByText('Lịch sử tạ')).toBeVisible();
   await expect(page.getByText('27×12').first()).toBeVisible();
   await shot(page, '07-exercise-detail', 'Chi tiết bài: hình, kỹ thuật, lịch sử buổi 26/10 (2 làm nóng 20kg + 3×27kg)');
 
   // the curl machine is a Matrix stack marked in lb
   await nav(page, '/exercises/machine_biceps_curl');
-  await page.getByRole('switch', { name: 'Máy chia nấc lb' }).click();
-  await expect(page.getByRole('switch', { name: 'Máy chia nấc lb' })).toHaveAttribute('aria-checked', 'true');
+  const lb = page.getByRole('switch', { name: 'Máy chia nấc lb' });
+  await expect(lb).toHaveAttribute('aria-checked', 'true'); // seed: lb stack
+  await expect(page.getByText(/Máy cuốn tay trước/)).toBeVisible(); // old Vietnamese name kept as alias
+  await lb.click();
+  await expect(lb).toHaveAttribute('aria-checked', 'false');
+  await lb.click();
+  await expect(lb).toHaveAttribute('aria-checked', 'true');
   expect(psql("select load_step_kg from exercises where slug = 'machine_biceps_curl'")).toBe('4.50');
 });
 
@@ -112,7 +117,7 @@ test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → ti�
   await shot(page, '08-warmup', 'Bước khởi động: đồng hồ đi bộ 10′ + khớp');
   await page.getByRole('button', { name: 'Tiếp →' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Kéo xô cáp' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Cable Lat Pulldown' })).toBeVisible();
   await shot(page, '09-intro', 'Màn giới thiệu bài 1/5 — hình, mục tiêu, coach note');
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   await expect(page.getByText('Làm nóng 1', { exact: true })).toBeVisible();
@@ -144,7 +149,7 @@ test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → ti�
 });
 
 test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sách', async () => {
-  await expect(page.getByRole('heading', { name: 'Máy chèo tựa ngực' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Chest-Supported Machine Row' })).toBeVisible();
   await page.getByRole('button', { name: 'Đổi bài', exact: true }).click();
   const dlg = page.getByRole('dialog');
   await dlg.getByLabel('Bài thay thế').fill('may cheo tua nguc');
@@ -155,11 +160,11 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await shot(page, '13-substitute', 'Đổi bài: chọn lý do + gõ tên máy thay thế (chưa có → bài tạm)');
   await dlg.getByRole('button', { name: 'Đổi & tập' }).click();
   await expect(page.getByRole('heading', { name: 'Máy chèo ngồi Impulse' })).toBeVisible();
-  await expect(page.getByText(/Thay cho Máy chèo tựa ngực/)).toBeVisible();
+  await expect(page.getByText(/Thay cho Chest-Supported Machine Row/)).toBeVisible();
   await shot(page, '14-provisional', 'Bài tạm đã thay — giữ số hiệp, kg từ mục tiêu');
   await page.getByRole('button', { name: 'Để sau', exact: true }).click();
 
-  await expect(page.getByRole('heading', { name: 'Kéo cáp ngồi' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Seated Cable Row' })).toBeVisible();
   await page.getByRole('button', { name: 'Danh sách bài' }).click();
   await shot(page, '15-overview', 'Danh sách bài: xong / đang / để sau / đã đổi');
   await page.getByRole('button', { name: 'Đóng' }).click();
@@ -168,7 +173,7 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await page.getByRole('dialog').getByRole('button', { name: 'Máy bận lâu' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Bỏ bài', exact: true }).click();
 
-  await expect(page.getByRole('heading', { name: 'Face pull (cáp)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Cable Face Pull' })).toBeVisible();
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   await page.getByRole('button', { name: 'Vừa', exact: true }).click();
   await page.getByRole('button', { name: 'Ghi chú hiệp' }).click();
@@ -177,7 +182,7 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
   await completeSet(page);
   await completeSet(page);
 
-  await expect(page.getByRole('heading', { name: 'Máy cuốn tay trước' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Machine Biceps Curl' })).toBeVisible();
   await page.getByRole('button', { name: 'Bắt đầu bài' }).click();
   // lb stack: one tap on a pin, −/+ go pin to pin
   const kg = page.getByRole('textbox', { name: 'kg', exact: true });
@@ -199,7 +204,7 @@ test('05 đổi bài (gõ máy thay thế) · để sau · bỏ bài · danh sá
 
 test('06 tổng kết + chi tiết buổi', async () => {
   await expect(page.getByRole('heading', { name: 'Tổng kết buổi' })).toBeVisible();
-  await expect(page.getByText(/Máy chèo tựa ngực → /)).toBeVisible();
+  await expect(page.getByText(/Chest-Supported Machine Row → /)).toBeVisible();
   await expect(page.getByText(/kế hoạch 35kg → thực tế/)).toHaveCount(3);
   await page.getByLabel('Cảm nhận sau buổi').fill('Hơi mệt, ngủ 6 tiếng');
   await shot(page, '16-summary', 'Tổng kết: bài đổi, kg khác kế hoạch, khối lượng, cảm nhận');
@@ -227,7 +232,7 @@ test('06 tổng kết + chi tiết buổi', async () => {
 test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu lông', async () => {
   await page.getByRole('link', { name: 'Tập', exact: true }).click();
   await expect(page.getByText(/2\/4 buổi/)).toBeVisible();
-  await page.getByLabel('Chọn bài').selectOption({ label: 'Kéo xô cáp' });
+  await page.getByLabel('Chọn bài').selectOption({ label: 'Cable Lat Pulldown' });
   await shot(page, '18-training', 'Tập: tổng kết tuần, khối lượng theo bài, tạ vs mục tiêu, lịch sử');
 
   await page.getByRole('button', { name: 'Ghi nhanh', exact: true }).click();
@@ -239,7 +244,7 @@ test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu
   await expect(page.getByText(/là làm nóng/)).toBeVisible();
   // unknown name "nhón gót máy cũ" has no match → pick an exercise
   await page.getByLabel('Chọn bài').fill('nhón');
-  await page.getByRole('button', { name: /Máy nhón bắp chân/ }).click();
+  await page.getByRole('button', { name: /Machine Calf Raise/ }).click();
   await shot(page, '20-quicklog-preview', 'Ghi nhanh: xem trước — tự đánh dấu làm nóng, chọn bài cho tên lạ');
   await page.getByRole('button', { name: 'Lưu buổi tập' }).click();
   await expect(page.getByRole('heading', { name: /Legs · 24\/10/ })).toBeVisible();
@@ -446,8 +451,8 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   expect(backup).not.toHaveProperty('photos');
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
-  await expect(page.getByTestId('version-line')).toContainText('Plan v2.6');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261102000100');
+  await expect(page.getByTestId('version-line')).toContainText('Plan v2.7');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261105000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();
   await expect(page.getByText('Bản đầu tiên')).toBeVisible();
@@ -455,7 +460,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await shot(page, '39b-whats-new', 'Có gì mới: từng bản cập nhật bằng tiếng Việt, nhật ký kỹ thuật thu gọn');
   await nav(page, '/exercises');
   await page.getByRole('button', { name: 'Không có máy', exact: true }).click();
-  await expect(page.getByText('Máy chèo tựa ngực', { exact: true })).toBeVisible();
+  await expect(page.getByText('Chest-Supported Machine Row', { exact: true })).toBeVisible();
   await shot(page, '40-unavailable', 'Bài đánh dấu "không có máy" — Claude không chọn lại');
 });
 

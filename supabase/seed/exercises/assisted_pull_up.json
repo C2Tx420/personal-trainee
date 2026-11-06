@@ -5,7 +5,8 @@
     "assisted chin",
     "assisted chin up",
     "chin up trợ lực",
-    "máy kéo xà trợ lực"
+    "máy kéo xà trợ lực",
+    "Máy kéo xà có trợ lực"
   ],
   "secondary_muscles": [
     "biceps"
@@ -20,7 +21,7 @@
     "Thả người rơi nhanh khi xuống"
   ],
   "slug": "assisted_pull_up",
-  "name_vi": "Máy kéo xà có trợ lực",
+  "name_vi": "Assisted Pull-Up",
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",

@@ -1,7 +1,8 @@
 {
   "aliases": [
     "cable curl",
-    "cuốn cáp"
+    "cuốn cáp",
+    "Curl cáp"
   ],
   "secondary_muscles": [],
   "load_step_kg": 2.5,
@@ -13,7 +14,7 @@
     "Vung người"
   ],
   "slug": "cable_curl",
-  "name_vi": "Curl cáp",
+  "name_vi": "Cable Curl",
   "primary_muscle": "biceps",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

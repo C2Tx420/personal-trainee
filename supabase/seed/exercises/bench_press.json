@@ -2,7 +2,8 @@
   "aliases": [
     "bench press",
     "bench",
-    "đẩy ngực đòn"
+    "đẩy ngực đòn",
+    "Đẩy ngực tạ đòn"
   ],
   "secondary_muscles": [
     "front_delt",
@@ -20,7 +21,7 @@
     "Khuỷu bè 90°"
   ],
   "slug": "bench_press",
-  "name_vi": "Đẩy ngực tạ đòn",
+  "name_vi": "Barbell Bench Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

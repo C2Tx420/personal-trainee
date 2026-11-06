@@ -1,7 +1,8 @@
 {
   "aliases": [
     "face pull",
-    "kéo mặt"
+    "kéo mặt",
+    "Face pull (cáp)"
   ],
   "secondary_muscles": [
     "upper_back",
@@ -18,7 +19,7 @@
     "Kéo bằng lưng dưới"
   ],
   "slug": "face_pull",
-  "name_vi": "Face pull (cáp)",
+  "name_vi": "Cable Face Pull",
   "primary_muscle": "rear_delt",
   "movement_pattern": "isolation_pull",
   "kind": "isolation",

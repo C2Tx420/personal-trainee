@@ -2,7 +2,8 @@
   "aliases": [
     "chèo tạ đơn",
     "one arm row",
-    "db row"
+    "db row",
+    "Chèo tạ đơn một tay"
   ],
   "secondary_muscles": [
     "upper_back",
@@ -18,7 +19,7 @@
     "Xoay người để kéo"
   ],
   "slug": "one_arm_db_row",
-  "name_vi": "Chèo tạ đơn một tay",
+  "name_vi": "One-Arm Dumbbell Row",
   "primary_muscle": "lats",
   "movement_pattern": "horizontal_pull",
   "kind": "compound",

@@ -2,7 +2,8 @@
   "aliases": [
     "pull up",
     "kéo xà",
-    "hít xà"
+    "hít xà",
+    "Kéo xà đơn"
   ],
   "secondary_muscles": [
     "biceps",
@@ -18,7 +19,7 @@
     "Đung đưa lấy đà"
   ],
   "slug": "pull_up",
-  "name_vi": "Kéo xà đơn",
+  "name_vi": "Pull-Up",
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",

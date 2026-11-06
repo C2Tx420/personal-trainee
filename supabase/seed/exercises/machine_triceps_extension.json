@@ -4,7 +4,8 @@
     "máy tay sau",
     "triceps máy",
     "máy duỗi tay sau ngồi",
-    "triceps extension"
+    "triceps extension",
+    "Máy duỗi tay sau"
   ],
   "secondary_muscles": [],
   "load_step_kg": 5,
@@ -19,7 +20,7 @@
     "Dùng vai đẩy"
   ],
   "slug": "machine_triceps_extension",
-  "name_vi": "Máy duỗi tay sau",
+  "name_vi": "Machine Triceps Extension",
   "primary_muscle": "triceps",
   "movement_pattern": "isolation_push",
   "kind": "isolation",

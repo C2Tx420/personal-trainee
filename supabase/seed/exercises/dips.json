@@ -1,7 +1,8 @@
 {
   "aliases": [
     "dips",
-    "xà kép"
+    "xà kép",
+    "Dips xà kép"
   ],
   "secondary_muscles": [
     "triceps",
@@ -17,7 +18,7 @@
     "Hạ quá sâu gây đau vai"
   ],
   "slug": "dips",
-  "name_vi": "Dips xà kép",
+  "name_vi": "Parallel Bar Dips",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",

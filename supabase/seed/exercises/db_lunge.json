@@ -3,7 +3,8 @@
     "lunge",
     "walking lunge",
     "chùng chân",
-    "bước chùng"
+    "bước chùng",
+    "Lunge tạ đơn"
   ],
   "secondary_muscles": [
     "glutes",
@@ -21,7 +22,7 @@
     "Đổ người ra trước"
   ],
   "slug": "db_lunge",
-  "name_vi": "Lunge tạ đơn",
+  "name_vi": "Dumbbell Lunge",
   "primary_muscle": "quads",
   "movement_pattern": "squat",
   "kind": "compound",

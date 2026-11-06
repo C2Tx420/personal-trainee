@@ -3,7 +3,8 @@
     "seated dip",
     "triceps press",
     "máy dip ngồi",
-    "dip máy"
+    "dip máy",
+    "Máy dip ngồi (tay sau)"
   ],
   "secondary_muscles": [
     "chest",
@@ -21,7 +22,7 @@
     "Khuỷu bè rộng ra ngoài"
   ],
   "slug": "machine_seated_dip",
-  "name_vi": "Máy dip ngồi (tay sau)",
+  "name_vi": "Seated Dip Machine",
   "primary_muscle": "triceps",
   "movement_pattern": "isolation_push",
   "kind": "compound",

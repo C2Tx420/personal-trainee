@@ -3,7 +3,8 @@
     "đi bộ máy",
     "treadmill",
     "máy chạy bộ",
-    "warm up đi bộ"
+    "warm up đi bộ",
+    "Đi bộ máy chạy"
   ],
   "secondary_muscles": [],
   "load_step_kg": 0,
@@ -16,7 +17,7 @@
     "Vịn tay vào máy"
   ],
   "slug": "treadmill_walk",
-  "name_vi": "Đi bộ máy chạy",
+  "name_vi": "Treadmill Walk",
   "primary_muscle": "cardio",
   "movement_pattern": "cardio",
   "kind": "cardio",

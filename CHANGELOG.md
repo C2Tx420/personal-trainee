@@ -4,7 +4,10 @@ Format follows Keep a Changelog, versions follow SemVer (see plan v2.4 §15).
 
 ## [Unreleased]
 
-Plan: v2.6 · Latest migration: 20261102000100
+Plan: v2.7 · Latest migration: 20261105000100
+
+### Changed
+- Exercise display names are English for all 53 seed exercises (e.g. "Machine Chest Press", "Cable Lat Pulldown"); the old Vietnamese name is appended to `aliases`, so search / substitute / quick log still match it. Column stays `name_vi` (now just the display name). Migration `20261105000100` (data only) renames existing rows whose name is still the original seed name and updates the SVG `aria-label`. `machine_biceps_curl` seed is an lb stack (`load_step_kg` 4.5). Coach instructions: write `name_vi` in English for new upserts.
 
 ### Added
 - Post-workout reflection ("Cảm nhận sau buổi"): optional text on the session summary, editable / backfilled on the session detail until that week has a coach review note, then read-only (`src/engine/reflection.ts`, DB trigger `workout_sessions_reflection_guard`). History marks done sessions still missing one; the coach report gets `sessions[].reflection`. Migration `20261102000100` (nullable `workout_sessions.reflection`).

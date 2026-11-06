@@ -3,7 +3,8 @@
     "db bench press",
     "dumbbell bench press",
     "đẩy ngực tạ đơn",
-    "đẩy ngực ghế phẳng"
+    "đẩy ngực ghế phẳng",
+    "Đẩy ngực tạ đơn ghế phẳng"
   ],
   "secondary_muscles": [
     "front_delt",
@@ -21,7 +22,7 @@
     "Khuỷu bè 90°"
   ],
   "slug": "db_bench_press",
-  "name_vi": "Đẩy ngực tạ đơn ghế phẳng",
+  "name_vi": "Dumbbell Bench Press",
   "primary_muscle": "chest",
   "movement_pattern": "horizontal_push",
   "kind": "compound",
