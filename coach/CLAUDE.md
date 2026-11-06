@@ -87,13 +87,13 @@ pnpm run add-review-note --week 2026-10-26 --file reports/2026-11-02-note.md --p
 
 ## Adjusting loads (the main job each week)
 
-Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg change reason):
+Based on `training.sets_detail_4w` (each set: kg × reps × effort × note × kg change reason; per exercise also `stall_sessions` and `e1rm_by_session` — best estimated 1RM per session, a trend number only, never quote it as his max):
 
 | Situation | Action |
 |---|---|
 | `rep_max` reached on every working set, effort Light/Moderate | `target_kg` +1 step (`load_step_kg`) |
 | Reps reached but last set Hard | Keep the load |
-| Missed reps ≥ 2 sessions in a row, or Hard from the first set | −1 step, or −1 set |
+| `stall_sessions ≥ 2` (listed in `training.stalled`: stuck at the same load, missed `rep_max`, no more total reps), or Hard from the first set | −1 step, or −1 set (see `deload_options` when present) |
 | `kg_change_reason = too_heavy` on ≥ 2 sets / 2 sessions | Lower `target_kg` to what he actually lifted |
 | `kg_change_reason = too_light` | +1 step |
 | `kg_change_reason = machine_diff` | Not a missed session; reset `target_kg` for the new machine |
