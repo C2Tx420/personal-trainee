@@ -6,5 +6,5 @@ export const APP_VERSION = __APP_VERSION__;
 export const GIT_SHA = __GIT_SHA__;
 export const BUILD_TIME = __BUILD_TIME__;
 export const PLAN_DOC_VERSION = 'v2.8';
-/** Latest migration the app requires (§15.5). */
-export const MIN_SCHEMA_VERSION = '20261113000100';
+/** Oldest DB schema this app build works with (§15.5) — 20261108000100 adds `upper`; the app doesn't need 20261113000100 (drop name_vi), which ships on its own date. */
+export const MIN_SCHEMA_VERSION = '20261108000100';

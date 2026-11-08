@@ -18,6 +18,7 @@
     "e2e": "tsx scripts/e2e.ts",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
+    "db:migrate": "bash scripts/db-migrate.sh",
     "icons:build": "tsx scripts/make-icons.ts",
     "coach:report": "cd coach && tsx scripts/weekly-report.ts"
   },
