@@ -1,5 +1,5 @@
 import { addDays, diffDays, weekdayOf, type IsoDate } from './dates';
-import type { DayPlan, PlanContent, PlanItem, PlanTemplate, TemplateKey } from './plan-schema';
+import { type DayPlan, type PlanContent, type PlanItem, type PlanTemplate, TEMPLATE_KEYS, type TemplateKey } from './plan-schema';
 
 /** Scheduled session for a given date. */
 export function dayPlanFor(content: PlanContent, date: IsoDate): DayPlan {
@@ -26,7 +26,7 @@ export function lightenTemplate(t: PlanTemplate): PlanTemplate {
 }
 
 export const SESSION_KINDS = [
-  'push', 'pull', 'legs', 'push_light', 'pull_light', 'badminton', 'walk', 'zone2', 'core',
+  'push', 'pull', 'legs', 'upper', 'push_light', 'pull_light', 'badminton', 'walk', 'zone2', 'core',
 ] as const;
 export type SessionKind = (typeof SESSION_KINDS)[number];
 
@@ -34,6 +34,7 @@ export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
   push: 'Push',
   pull: 'Pull',
   legs: 'Legs',
+  upper: 'Thân trên',
   push_light: 'Push nhẹ',
   pull_light: 'Pull nhẹ',
   badminton: 'Cầu lông',
@@ -42,14 +43,24 @@ export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
   core: 'Core',
 };
 
+export function isTemplateKey(kind: string): kind is TemplateKey {
+  return (TEMPLATE_KEYS as readonly string[]).includes(kind);
+}
+
+/** Template a session kind is built from (push_light → push); null for badminton / walk / zone 2 / core. */
+export function templateKeyOf(kind: SessionKind): TemplateKey | null {
+  if (isTemplateKey(kind)) return kind;
+  if (kind === 'push_light') return 'push';
+  if (kind === 'pull_light') return 'pull';
+  return null;
+}
+
 /** Template for a session kind (light Push → push template with fewer sets). */
 export function templateForKind(content: PlanContent, kind: SessionKind): PlanTemplate | undefined {
-  if (kind === 'push' || kind === 'pull' || kind === 'legs') return templateFor(content, kind);
-  if (kind === 'push_light' || kind === 'pull_light') {
-    const base = templateFor(content, kind === 'push_light' ? 'push' : 'pull');
-    return base ? lightenTemplate(base) : undefined;
-  }
-  return undefined;
+  const key = templateKeyOf(kind);
+  if (!key) return undefined;
+  const base = templateFor(content, key);
+  return base && key !== kind ? lightenTemplate(base) : base;
 }
 
 export type LoggedSession = { date: IsoDate; kind: string };

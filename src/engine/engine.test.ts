@@ -9,14 +9,14 @@ import { legsBadmintonAdjacency, parsePlanContent, planContentSchema, validatePl
 import { kgDeviates, prefillKg, progressionHint } from './progression';
 import { bodyChange, personalRecords, strengthChanges } from './progress';
 import { dueReminders, DEFAULT_REMINDERS } from './reminders';
-import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, restDayOptions, templateFor } from './schedule';
+import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, restDayOptions, templateFor, templateForKind, templateKeyOf } from './schedule';
 import { kgToLb, lbToKg, pinsAround, roundLoad, stackStep } from './stack';
 import { exactMatch, searchExercises, suggestSubstitutes } from './substitutions';
 import { validateSvg } from './svg-validate';
 import type { SessionRow, SetRow } from './types';
 import { plannedSets } from './warmup';
 import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } from './weight';
-import { volumeKg } from './workout-summary';
+import { volumeKg, weekSummary } from './workout-summary';
 
 const goal = (o: Partial<Goal>): Goal => ({
   id: 'g', name: 'Noel', ordinal: 1, target_date: '2026-12-25', target_weight_min: 76, target_weight_max: 77,
@@ -104,6 +104,36 @@ describe('plan v1 + rule lịch', () => {
   it('lịch thực tế: Legs T7 + cầu lông T6 → xung đột', () => {
     expect(actualLegsBadmintonConflicts([{ date: '2026-10-30', kind: 'badminton' }, { date: '2026-10-31', kind: 'legs' }])).toHaveLength(1);
     expect(actualLegsBadmintonConflicts([{ date: '2026-10-29', kind: 'badminton' }, { date: '2026-10-31', kind: 'legs' }])).toHaveLength(0);
+  });
+});
+
+describe('buổi Thân trên T6 (plan v2.8)', () => {
+  const base = parsePlanContent(PLAN_V1);
+  const push = templateFor(base, 'push')!;
+  const plan = parsePlanContent({
+    ...PLAN_V1,
+    schedule: { ...base.schedule, fri: { kind: 'session', template: 'upper' } },
+    templates: [...base.templates, { ...push, key: 'upper', name: 'Thân trên' }],
+  });
+  const slugs = fs.readdirSync(path.resolve(import.meta.dirname, '../../supabase/seed/exercises'))
+    .filter((f) => f.endsWith('.json')).map((f) => f.replace('.json', ''));
+
+  it('lịch 4 buổi hợp lệ: T6 thân trên không vi phạm Legs/cầu lông', () => {
+    expect(validatePlanRules(plan, slugs)).toEqual([]);
+    expect(dayPlanFor(plan, '2026-11-13')).toEqual({ kind: 'session', template: 'upper' });
+  });
+  it('template theo loại buổi: upper đủ hiệp, push_light bớt hiệp, cầu lông không có', () => {
+    expect(templateKeyOf('upper')).toBe('upper');
+    expect(templateKeyOf('pull_light')).toBe('pull');
+    expect(templateKeyOf('badminton')).toBeNull();
+    expect(templateForKind(plan, 'upper')?.items.map((i) => i.sets)).toEqual(push.items.map((i) => i.sets));
+    expect(templateForKind(plan, 'push_light')?.name).toBe('Push nhẹ');
+  });
+  it('tuần: 4 buổi gym, cầu lông không tính buổi chính', () => {
+    const s = (date: string, kind: string) => ({ id: date + kind, session_date: date, kind, status: 'completed', warmup: null, duration_min: 60, est_kcal: 0 }) as unknown as SessionRow;
+    const sessions = [s('2026-11-09', 'push'), s('2026-11-10', 'pull'), s('2026-11-12', 'badminton'), s('2026-11-13', 'upper')];
+    const w = weekSummary('2026-11-09', sessions, [], [], plan, 80);
+    expect([w.doneSessions, w.plannedSessions, w.badmintonSessions]).toEqual([3, 4, 1]);
   });
 });
 

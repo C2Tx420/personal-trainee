@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Tên bài tiếng Anh', { exact: true })).toBeVisible();
+  await expect(news.getByText('Buổi Thân trên thứ Sáu', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -235,7 +235,7 @@ test('06 tổng kết + chi tiết buổi', async () => {
 
 test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu lông', async () => {
   await page.getByRole('link', { name: 'Tập', exact: true }).click();
-  await expect(page.getByText(/2\/4 buổi/)).toBeVisible();
+  await expect(page.getByText(/2\/3 buổi/)).toBeVisible(); // gym days only — badminton is not a main session (v2.8)
   await page.getByLabel('Chọn bài').selectOption({ label: 'Cable Lat Pulldown' });
   await page.getByRole('tab', { name: 'e1RM' }).click();
   await expect(page.getByText('Sức mạnh ước tính (e1RM)')).toBeVisible();
@@ -489,7 +489,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   expect(backup).not.toHaveProperty('photos');
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
-  await expect(page.getByTestId('version-line')).toContainText('Plan v2.7');
+  await expect(page.getByTestId('version-line')).toContainText('Plan v2.8');
   await expect(page.getByTestId('version-line')).toContainText('DB 20261113000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();

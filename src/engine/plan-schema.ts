@@ -104,7 +104,8 @@ export const templateWarmupSchema = z.object({
 });
 export type TemplateWarmup = z.infer<typeof templateWarmupSchema>;
 
-export const TEMPLATE_KEYS = ['push', 'pull', 'legs'] as const;
+/** `upper` (Thân trên) since plan v2.8 — the 4th gym day. Older app builds don't know it: update the app before approving a plan that uses it. */
+export const TEMPLATE_KEYS = ['push', 'pull', 'legs', 'upper'] as const;
 export type TemplateKey = (typeof TEMPLATE_KEYS)[number];
 
 export const templateSchema = z.object({

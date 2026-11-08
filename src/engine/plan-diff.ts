@@ -1,6 +1,7 @@
 import { WEEKDAY_LABEL, WEEKDAYS } from './dates';
 import type { DayPlan, ExerciseDef, PlanContent, PlanItem, PlanTemplate } from './plan-schema';
 import { legsBadmintonAdjacency, parsePlanContent } from './plan-schema';
+import { SESSION_KIND_LABEL } from './schedule';
 
 export type DiffKind =
   | 'added'
@@ -27,7 +28,7 @@ const reps = (i: PlanItem) => `${i.rep_min}–${i.rep_max}${i.unit === 'seconds'
 function dayLabel(p: DayPlan): string {
   switch (p.kind) {
     case 'session':
-      return p.template === 'push' ? 'Push' : p.template === 'pull' ? 'Pull' : 'Legs';
+      return SESSION_KIND_LABEL[p.template];
     case 'rest':
       return 'Nghỉ';
     case 'badminton':

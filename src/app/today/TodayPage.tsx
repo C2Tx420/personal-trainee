@@ -7,7 +7,7 @@ import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
 import { inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
 import type { SundayOption } from '@/engine/plan-schema';
-import { BADMINTON_SUBSTITUTES, dayPlanFor, type LightKind, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, todayConflictWarning } from '@/engine/schedule';
+import { BADMINTON_SUBSTITUTES, dayPlanFor, type LightKind, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, templateKeyOf, todayConflictWarning } from '@/engine/schedule';
 import { lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
@@ -75,8 +75,8 @@ export function TodayPage() {
 
   async function start(kind: SessionKind) {
     const tmpl = templateForKind(content, kind);
-    const key = kind.startsWith('push') ? 'push' : kind.startsWith('pull') ? 'pull' : 'legs';
-    if (!tmpl || !plan.data) return;
+    const key = templateKeyOf(kind);
+    if (!tmpl || !key || !plan.data) return;
     setStarting(true);
     setError(null);
     try {

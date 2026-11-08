@@ -80,14 +80,14 @@ export function sessionSummary(
   };
 }
 
-const STRENGTH_KINDS = new Set(['push', 'pull', 'legs', 'push_light', 'pull_light']);
+const STRENGTH_KINDS = new Set(['push', 'pull', 'legs', 'upper', 'push_light', 'pull_light']);
 
-/** Planned sessions in a week: lifting + badminton (rest/optional days don't count). */
+/**
+ * Planned sessions in a week: gym days only. Badminton is light activity on a day off, not a main session
+ * (his call, 08/11/2026) — it is counted separately in `badmintonSessions`.
+ */
 function plannedSessionsPerWeek(content: PlanContent): number {
-  return WEEKDAYS.filter((d) => {
-    const k = content.schedule[d].kind;
-    return k === 'session' || k === 'badminton';
-  }).length;
+  return WEEKDAYS.filter((d) => content.schedule[d].kind === 'session').length;
 }
 
 /** Estimated workout calories — reference only, not to be eaten back. */
@@ -138,7 +138,7 @@ export function weekSummary(
   return {
     weekStart: weekStartDate,
     plannedSessions: plannedSessionsPerWeek(content),
-    doneSessions: inWeek.filter((s) => STRENGTH_KINDS.has(s.kind) || s.kind === 'badminton').length,
+    doneSessions: strength.length,
     badmintonSessions: inWeek.filter((s) => s.kind === 'badminton').length,
     sessionsWithWarmup: strength.filter((s) => s.warmup && !s.warmup.skipped).length,
     strengthSessions: strength.length,

@@ -10,6 +10,16 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-08',
+    date: '08/11/2026',
+    title: '4 buổi gym: thêm buổi Thân trên T6',
+    plan: 'v2.8',
+    items: [
+      { icon: '🗓️', title: 'Buổi Thân trên thứ Sáu', body: 'Lịch mới: T2 Push · T3 Pull · T6 Thân trên · T7 Legs. Buổi Thân trên tập xô, vai sau, vai ngang và ngực lần 2 — chủ yếu máy, nặng vừa để T7 còn sức tập chân. Bài và mức tạ do coach đặt ở lộ trình tuần, duyệt rồi mới áp dụng.' },
+      { icon: '🏸', title: 'Cầu lông là ngày nghỉ nhẹ', body: 'Cầu lông T5 không còn tính là buổi chính: tiến độ tuần đếm 4 buổi gym, cầu lông vẫn ghi và đếm riêng như vận động nhẹ.', to: '/training' },
+    ],
+  },
+  {
     id: '2026-11-06',
     date: '06/11/2026',
     title: 'Tên tiếng Anh, máy trợ lực, so với lần trước',

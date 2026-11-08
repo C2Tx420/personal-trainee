@@ -1,7 +1,7 @@
 import { addDays, type IsoDate, todayVN } from '@/engine/dates';
 import type { Goal } from '@/engine/goals';
 import type { InbodyLog } from '@/engine/inbody';
-import { type PlanContent, type PlanItem, parsePlanContent } from '@/engine/plan-schema';
+import { type PlanContent, type PlanItem, parsePlanContent, type TemplateKey } from '@/engine/plan-schema';
 import type { SessionKind } from '@/engine/schedule';
 import { LB_STACK_STEP_KG } from '@/engine/stack';
 import { slugifyVi } from '@/engine/text';
@@ -200,7 +200,7 @@ export type StartArgs = {
   date: IsoDate;
   plan: PlanVersion;
   items: PlanItem[];
-  templateKey: 'push' | 'pull' | 'legs';
+  templateKey: TemplateKey;
   exercises: ExerciseRow[];
 };
 

@@ -29,6 +29,7 @@ const KIND_WORDS: [RegExp, SessionKind][] = [
   [/\bpush\b/, 'push'],
   [/\bpull\b/, 'pull'],
   [/\blegs?\b|\bchan\b/, 'legs'],
+  [/\bupper\b|than tren/, 'upper'],
   [/cau long|badminton/, 'badminton'],
 ];
 

@@ -22,6 +22,9 @@ warm up bằng 10p đi bộ tốc độ 3.5-5`;
 describe('quick-log-parser', () => {
   const r = parseQuickLog(MONDAY, '2026-10-27');
 
+  it('"13/11 thân trên" → buổi upper', () => {
+    expect(parseQuickLog('13/11 Thân trên\nMáy đẩy ngực 27x10', '2026-11-13').kind).toBe('upper');
+  });
   it('ngày + loại buổi', () => {
     expect(r.date).toBe('2026-10-26');
     expect(r.kind).toBe('push');
