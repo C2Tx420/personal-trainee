@@ -1,6 +1,6 @@
--- Rename release N+1 (plan v2.7 §16 B13): drop `exercises.name_vi`. Ship ONLY after release N
--- (20261106000300: `name` column kept in sync with `name_vi`) has run on production for ≥ 1 week,
--- so no installed app build still reads or writes `name_vi`.
+-- Rename release N+1 (plan v2.7 §16 B13): drop `exercises.name_vi`, after release N
+-- (20261106000300: `name` column kept in sync with `name_vi`). Was 20261113000100; renumbered on
+-- 09/11/2026 so it sorts before 20261108000100 — production had already run it.
 drop trigger exercises_name_sync on public.exercises;
 drop function public.exercises_name_sync();
 
@@ -73,4 +73,4 @@ end $$;
 
 revoke execute on function public._upsert_exercises(uuid, jsonb, uuid, boolean) from public, anon, authenticated;
 
-update public.app_meta set value = '20261113000100' where key = 'schema_version';
+update public.app_meta set value = '20261106000400' where key = 'schema_version';

@@ -6,7 +6,7 @@
 #
 # - Each file runs in its own transaction (-1) and stops at the first error (exit 1).
 # - Stops at the first migration dated after today (VN time): a file's timestamp is also its
-#   earliest ship date, e.g. 20261113000100 (drop name_vi) must not run before 13/11.
+#   earliest ship date.
 #   Override with MIGRATE_ALLOW_FUTURE=1 only if you really mean it.
 # - Each applied file is also recorded in supabase_migrations.schema_migrations (if that table
 #   exists), so a later `supabase db push` doesn't run it a second time.

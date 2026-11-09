@@ -9,6 +9,5 @@ alter table public.workout_sessions drop constraint workout_sessions_kind_check;
 alter table public.workout_sessions add constraint workout_sessions_kind_check
   check (kind in ('push', 'pull', 'legs', 'upper', 'push_light', 'pull_light', 'badminton', 'walk', 'zone2', 'core'));
 
--- Dated before 20261113000100 (drop name_vi, which ships on its own date) but may run after it:
--- never move schema_version backwards.
+-- Can re-run on a database already past this version: never move schema_version backwards.
 update public.app_meta set value = greatest(value, '20261108000100') where key = 'schema_version';

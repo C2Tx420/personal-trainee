@@ -490,7 +490,7 @@ test('11 Thêm: lộ trình, nhận xét, nhắc nhở, sao lưu, giới thiệu
   await shot(page, '38-backup', 'Sao lưu JSON (không kèm ảnh mặc định)');
   await nav(page, '/more/about');
   await expect(page.getByTestId('version-line')).toContainText('Plan v2.8');
-  await expect(page.getByTestId('version-line')).toContainText('DB 20261113000100');
+  await expect(page.getByTestId('version-line')).toContainText('DB 20261108000100');
   await shot(page, '39-about', 'Giới thiệu: phiên bản app, plan, DB');
   await page.getByText('Có gì mới', { exact: true }).click();
   await expect(page.getByText('Bản đầu tiên')).toBeVisible();
