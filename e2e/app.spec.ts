@@ -236,7 +236,7 @@ test('06 tổng kết + chi tiết buổi', async () => {
 test('07 tab Tập: tuần, biểu đồ, ghi nhanh bằng chữ, ghi bù, cầu lông', async () => {
   await page.getByRole('link', { name: 'Tập', exact: true }).click();
   await expect(page.getByText(/2\/3 buổi/)).toBeVisible(); // gym days only — badminton is not a main session (v2.8)
-  await page.getByLabel('Chọn bài').selectOption({ label: 'Cable Lat Pulldown' });
+  await page.getByLabel('Chọn bài').selectOption({ label: 'Cable Lat Pulldown (Long Bar)' });
   await page.getByRole('tab', { name: 'e1RM' }).click();
   await expect(page.getByText('Sức mạnh ước tính (e1RM)')).toBeVisible();
   await page.getByRole('tab', { name: 'Tạ', exact: true }).click();

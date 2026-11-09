@@ -10,7 +10,7 @@
     "lats",
     "biceps"
   ],
-  "load_step_kg": 5,
+  "load_step_kg": 4.5,
   "is_time_based": false,
   "cues": [
     "Ngồi thẳng, gối hơi cong",

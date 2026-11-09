@@ -2,7 +2,9 @@
   "aliases": [
     "máy kéo xô",
     "lat pulldown machine",
-    "machine pulldown"
+    "machine pulldown",
+    "máy kéo xô matrix",
+    "tay cầm rời"
   ],
   "secondary_muscles": [
     "biceps",
@@ -20,7 +22,7 @@
     "Thả tạ bật lên"
   ],
   "slug": "machine_lat_pulldown",
-  "name": "Machine Lat Pulldown",
+  "name": "Matrix Lat Pulldown (Handles)",
   "primary_muscle": "lats",
   "movement_pattern": "vertical_pull",
   "kind": "compound",
