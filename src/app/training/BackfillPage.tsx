@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { skipScheduledDay } from '@/data/api';
 import { useNavigate } from 'react-router';
 import { qk, useActivePlan, useExerciseMaps, useInvalidate, useTraining } from '@/data/queries';
-import { todayVN } from '@/engine/dates';
-import { SESSION_KIND_LABEL, SESSION_KINDS, type SessionKind, templateForKind } from '@/engine/schedule';
+import { formatVN, todayVN } from '@/engine/dates';
+import { BADMINTON_SUBSTITUTES, liftOptionsFor, replacedNote, scheduledOpenOn, SESSION_KIND_LABEL, SESSION_KINDS, type SessionKind, templateForKind } from '@/engine/schedule';
 import { plannedSets } from '@/engine/warmup';
 import { Button, Card, ErrorBox, Field, Input, Page } from '@/ui/components';
 import { type EditorItem, newKey, SessionEditor } from './SessionEditor';
@@ -21,6 +22,20 @@ export function BackfillPage() {
   const [items, setItems] = useState<EditorItem[]>([]);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
+  const [replaceScheduled, setReplaceScheduled] = useState(true);
+
+  const sessions = training.data?.sessions ?? [];
+  const open = plan.data ? scheduledOpenOn(plan.data.content, date, sessions.map((s) => ({ date: s.session_date, kind: s.kind }))) : null;
+  const scheduled = open !== kind ? open : null;
+  const canReplace =
+    !!scheduled &&
+    liftOptionsFor(
+      plan.data!.content,
+      date,
+      todayVN(),
+      sessions.filter((s) => s.status === 'completed').map((s) => ({ date: s.session_date, kind: s.kind })),
+    ).includes(kind);
+  const replaces = canReplace && replaceScheduled;
 
   function fromTemplate() {
     if (!plan.data) return;
@@ -52,6 +67,7 @@ export function BackfillPage() {
     setError(null);
     try {
       const mins = Number(warmupMin) || 0;
+      if (replaces && scheduled) await skipScheduledDay({ date, kind: scheduled, note: replacedNote(scheduled, kind) });
       const id = await saveEditor({
         date,
         kind,
@@ -64,6 +80,7 @@ export function BackfillPage() {
       await invalidate(qk.training, qk.exercises);
       nav(`/training/session/${id}`, { replace: true });
     } catch (e) {
+      await invalidate(qk.training);
       setError(e);
     } finally {
       setBusy(false);
@@ -85,6 +102,29 @@ export function BackfillPage() {
             </select>
           </Field>
         </div>
+        {scheduled && (
+          <div className="glass-subtle rounded-ctl mb-3 p-3 text-sm" data-testid="backfill-replace">
+            <p className="mb-2">
+              {formatVN(date)} theo lịch là {SESSION_KIND_LABEL[scheduled]}, chưa ghi gì.
+              {scheduled === 'badminton' && ' Không đánh thì thay bằng cardio nhẹ:'}
+            </p>
+            {scheduled === 'badminton' && (
+              <div className="mb-2 grid grid-cols-2 gap-2">
+                {BADMINTON_SUBSTITUTES.map((k) => (
+                  <Button key={k} size="sm" onClick={() => nav(`/training/simple/${k}?thay=badminton&ngay=${date}`)}>{SESSION_KIND_LABEL[k]}</Button>
+                ))}
+              </div>
+            )}
+            {!canReplace ? (
+              kind === 'legs' && <p className="text-xs text-muted">Legs không thay được buổi ngày này (sát ngày cầu lông hoặc Chủ nhật) — buổi này ghi riêng.</p>
+            ) : (
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={replaceScheduled} onChange={(e) => setReplaceScheduled(e.target.checked)} />
+                {scheduled === 'badminton' ? 'Hoặc: b' : 'B'}uổi {SESSION_KIND_LABEL[kind]} này thay {SESSION_KIND_LABEL[scheduled]} (ghi {SESSION_KIND_LABEL[scheduled]} là nghỉ)
+              </label>
+            )}
+          </div>
+        )}
         <Field label="Khởi động (phút đi bộ, 0 = không)">
           <Input inputMode="numeric" value={warmupMin} onChange={(e) => setWarmupMin(e.target.value)} />
         </Field>

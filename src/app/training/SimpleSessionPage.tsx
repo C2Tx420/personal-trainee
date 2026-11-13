@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
-import { logSimpleSession } from '@/data/api';
-import { qk, useActivePlan, useInvalidate, useWeights } from '@/data/queries';
-import { todayVN } from '@/engine/dates';
+import { logSimpleSession, skipScheduledDay } from '@/data/api';
+import { qk, useActivePlan, useInvalidate, useTraining, useWeights } from '@/data/queries';
+import { formatVN, type IsoDate, todayVN } from '@/engine/dates';
 import { INTENSITIES, type Intensity } from '@/engine/plan-schema';
-import { SESSION_KIND_LABEL, type SessionKind } from '@/engine/schedule';
+import { BADMINTON_SUBSTITUTES, type LightKind, replacedNote, scheduledOpenOn, SESSION_KIND_LABEL, type SessionKind } from '@/engine/schedule';
 import { estimateSessionKcal } from '@/engine/workout-summary';
 import { Banner, Button, Card, Chip, ErrorBox, Field, Input, Page } from '@/ui/components';
 
@@ -17,13 +17,18 @@ const SUBSTITUTE_MIN: Record<string, number> = { walk: 50, zone2: 45 };
 export function SimpleSessionPage() {
   const { kind = 'badminton' } = useParams();
   const k = kind as SessionKind;
-  const replacesBadminton = useSearchParams()[0].get('thay') === 'badminton';
+  const [params] = useSearchParams();
+  const replacesBadminton = params.get('thay') === 'badminton';
   const nav = useNavigate();
   const invalidate = useInvalidate();
   const plan = useActivePlan();
   const weights = useWeights();
-  const [date, setDate] = useState(todayVN());
+  const training = useTraining();
+  const today = todayVN();
+  const initialDate = params.get('ngay');
+  const [date, setDate] = useState<IsoDate>(initialDate && initialDate <= today ? initialDate : today);
   const [minutes, setMinutes] = useState((replacesBadminton ? SUBSTITUTE_MIN[k] : undefined) ?? DEFAULT_MIN[k] ?? 30);
+  const [replace, setReplace] = useState(replacesBadminton);
   const [intensity, setIntensity] = useState<Intensity>('light');
   const [warmupDone, setWarmupDone] = useState(true);
   const [note, setNote] = useState(replacesBadminton ? 'Thay buổi cầu lông' : '');
@@ -34,13 +39,22 @@ export function SimpleSessionPage() {
     ? estimateSessionKcal({ kind: k, duration_min: minutes, badminton_intensity: k === 'badminton' ? intensity : null }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? 81.7)
     : 0;
 
+  const canReplace =
+    BADMINTON_SUBSTITUTES.includes(k as LightKind) &&
+    !!plan.data &&
+    scheduledOpenOn(plan.data.content, date, (training.data?.sessions ?? []).map((s) => ({ date: s.session_date, kind: s.kind }))) === 'badminton';
+
   async function save() {
     setBusy(true);
     try {
+      if (canReplace && replace) {
+        await skipScheduledDay({ date, kind: 'badminton', note: replacedNote('badminton', k) });
+      }
       await logSimpleSession({ date, kind: k, minutes, intensity: k === 'badminton' ? intensity : null, estKcal: kcal, note: note.trim() || null, warmupDone: k === 'badminton' ? warmupDone : null });
       await invalidate(qk.training);
       nav('/training', { replace: true });
     } catch (e) {
+      await invalidate(qk.training);
       setError(e);
       setBusy(false);
     }
@@ -50,8 +64,14 @@ export function SimpleSessionPage() {
     <Page title={`Ghi ${SESSION_KIND_LABEL[k]}`} back>
       <Card>
         <Field label="Ngày">
-          <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
+          <Input type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} />
         </Field>
+        {canReplace && (
+          <label className="mb-3 flex items-center gap-2 text-sm">
+            <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
+            Thay buổi cầu lông {date === today ? 'hôm nay' : formatVN(date)} (ghi cầu lông là nghỉ)
+          </label>
+        )}
         <Field label="Thời lượng (phút)">
           <Input inputMode="numeric" value={minutes} onChange={(e) => setMinutes(Number(e.target.value) || 0)} />
         </Field>

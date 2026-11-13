@@ -105,7 +105,7 @@ export function Button({ variant = 'secondary', size = 'md', block, className, .
 // ───────────────────────── Form
 export function Field({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {
   return (
-    <label className="mb-3 block">
+    <label className="mb-3 block min-w-0">
       <span className="mb-1.5 block text-[13px] font-medium text-muted">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
@@ -116,7 +116,7 @@ export function Field({ label, hint, children }: { label: string; hint?: ReactNo
 /** w-full by default, unless className already sets a width (avoids 2 conflicting width classes). */
 const hasWidth = (c?: string) => !!c && /(^|\s)(max-|min-)?w-/.test(c);
 
-const FIELD = 'glass-input rounded-ctl text-base text-fg outline-none placeholder:text-muted/60 focus:border-accent/70';
+const FIELD = 'glass-input rounded-ctl min-w-0 text-base text-fg outline-none placeholder:text-muted/60 focus:border-accent/70';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cx(FIELD, 'h-11 px-3.5', !hasWidth(props.className) && 'w-full', props.className)} />;

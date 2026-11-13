@@ -110,3 +110,36 @@ export function restDayOptions(content: PlanContent, date: IsoDate): LightKind[]
 
 /** Badminton day without badminton: easy cardio of a similar length, never a leg session. */
 export const BADMINTON_SUBSTITUTES: LightKind[] = ['zone2', 'walk'];
+
+/** What the schedule asks for on `date`: a lifting template, badminton, or nothing (rest / optional day). */
+export function scheduledKindOn(content: PlanContent, date: IsoDate): SessionKind | null {
+  const day = dayPlanFor(content, date);
+  return day.kind === 'session' ? day.template : day.kind === 'badminton' ? 'badminton' : null;
+}
+
+/** The scheduled session on `date` if nothing is logged for it yet (neither done nor skipped) — it can still be swapped. */
+export function scheduledOpenOn(content: PlanContent, date: IsoDate, logged: LoggedSession[]): SessionKind | null {
+  const k = scheduledKindOn(content, date);
+  return k && !logged.some((s) => s.date === date && s.kind === k) ? k : null;
+}
+
+/** Skip note stored on the scheduled session when another one replaces it. */
+export function replacedNote(scheduled: SessionKind, by: SessionKind): string {
+  const label = SESSION_KIND_LABEL[by].toLowerCase();
+  return scheduled === 'badminton' ? `Không đánh — thay bằng ${label}` : `Đổi sang ${label}`;
+}
+
+/**
+ * Lifting sessions he may pick on `date` instead of (or on top of) the schedule — any in the plan, except Legs where a
+ * hard rule forbids it (Sunday, or badminton the day before / after: logged for past days, scheduled for days after `today`).
+ */
+export function liftOptionsFor(content: PlanContent, date: IsoDate, today: IsoDate, logged: LoggedSession[]): SessionKind[] {
+  const kinds = SESSION_KINDS.filter((k) => {
+    const key = templateKeyOf(k);
+    return !!key && !!templateFor(content, key);
+  });
+  const badmintonOn = (d: IsoDate) =>
+    logged.some((s) => s.date === d && s.kind === 'badminton') || (d > today && dayPlanFor(content, d).kind === 'badminton');
+  const legsBlocked = weekdayOf(date) === 'sun' || badmintonOn(addDays(date, -1)) || badmintonOn(addDays(date, 1));
+  return legsBlocked ? kinds.filter((k) => k !== 'legs') : kinds;
+}

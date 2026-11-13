@@ -9,7 +9,7 @@ import { legsBadmintonAdjacency, parsePlanContent, planContentSchema, validatePl
 import { kgDeviates, prefillKg, progressionHint } from './progression';
 import { bodyChange, personalRecords, strengthChanges } from './progress';
 import { dueReminders, DEFAULT_REMINDERS } from './reminders';
-import { actualLegsBadmintonConflicts, dayPlanFor, lightenTemplate, restDayOptions, templateFor, templateForKind, templateKeyOf } from './schedule';
+import { actualLegsBadmintonConflicts, dayPlanFor, liftOptionsFor, replacedNote, scheduledOpenOn, lightenTemplate, restDayOptions, templateFor, templateForKind, templateKeyOf } from './schedule';
 import { kgToLb, lbToKg, pinsAround, roundLoad, stackStep } from './stack';
 import { exactMatch, searchExercises, suggestSubstitutes } from './substitutions';
 import { validateSvg } from './svg-validate';
@@ -84,6 +84,27 @@ describe('plan v1 + rule lịch', () => {
     // T4 nghỉ: đi bộ / zone 2 / core · T6 (mai Legs): chỉ đi bộ / core
     expect(restDayOptions(plan, '2026-10-28')).toEqual(['walk', 'zone2', 'core']);
     expect(restDayOptions(plan, '2026-10-30')).toEqual(['walk', 'core']);
+  });
+  it('buổi theo lịch chưa ghi gì mới được đổi (kể cả ngày đã qua)', () => {
+    expect(scheduledOpenOn(plan, '2026-10-29', [])).toBe('badminton');
+    expect(scheduledOpenOn(plan, '2026-10-29', [{ date: '2026-10-29', kind: 'badminton' }])).toBeNull();
+    expect(scheduledOpenOn(plan, '2026-10-29', [{ date: '2026-10-22', kind: 'badminton' }, { date: '2026-10-29', kind: 'push' }])).toBe('badminton');
+    expect(scheduledOpenOn(plan, '2026-10-26', [])).toBe('push');
+    expect(scheduledOpenOn(plan, '2026-10-26', [{ date: '2026-10-26', kind: 'push' }])).toBeNull();
+    expect(scheduledOpenOn(plan, '2026-10-28', [])).toBeNull();
+    expect(replacedNote('badminton', 'upper')).toBe('Không đánh — thay bằng thân trên');
+    expect(replacedNote('push', 'pull_light')).toBe('Đổi sang pull nhẹ');
+  });
+  it('buổi tạ tuỳ chọn mọi ngày, Legs bị chặn khi sát cầu lông / CN', () => {
+    const all = liftOptionsFor(plan, '2026-10-29', '2026-10-30', []);
+    expect(all).toEqual(expect.arrayContaining(['push', 'pull', 'legs', 'push_light', 'pull_light']));
+    expect(all).not.toContain('badminton');
+    // cầu lông đã đánh hôm trước → không Legs
+    expect(liftOptionsFor(plan, '2026-10-29', '2026-10-30', [{ date: '2026-10-28', kind: 'badminton' }])).not.toContain('legs');
+    // lịch cầu lông ngày mai (chưa tới) → không Legs
+    const thuSat = { ...plan, schedule: { ...plan.schedule, fri: plan.schedule.thu } };
+    expect(liftOptionsFor(thuSat, '2026-10-29', '2026-10-29', [])).not.toContain('legs');
+    expect(liftOptionsFor(plan, '2026-11-01', '2026-11-01', [])).not.toContain('legs');
   });
   it('Legs liền cầu lông bị phát hiện, kể cả vòng tuần', () => {
     expect(legsBadmintonAdjacency(plan.schedule)).toEqual([]);

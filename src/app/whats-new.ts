@@ -10,6 +10,17 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-13',
+    date: '13/11/2026',
+    title: 'Đổi buổi tập linh hoạt',
+    plan: 'v2.8',
+    items: [
+      { icon: '🔀', title: 'Đổi buổi tập bất kỳ ngày nào', body: 'Ngày tạ: bấm "Đổi sang buổi khác" để tập Push / Pull / Thân trên / Legs / bản nhẹ thay buổi theo lịch. Ngày cầu lông: thay bằng cardio nhẹ hoặc một buổi tạ. Ngày nghỉ, Chủ nhật: "Vẫn muốn tập tạ". Buổi theo lịch được ghi là nghỉ kèm lý do "Đổi sang …" để coach biết. Legs chỉ bị ẩn khi sát ngày cầu lông hoặc Chủ nhật.', to: '/' },
+      { icon: '🗓️', title: 'Ghi bù cũng đổi được', body: 'Vào "+ Ghi bù", chọn ngày còn trống buổi theo lịch rồi chọn loại buổi khác: tick "buổi này thay …" để buổi theo lịch được ghi là nghỉ. Ngày cầu lông còn có nút Cardio zone 2 / Đi bộ.', to: '/training/backfill' },
+      { icon: '📏', title: 'Sửa ô nhập bị đè', body: 'Ô Ngày không còn tràn đè lên ô Cân nặng (và các form 2 cột khác) trên iPhone.', to: '/body' },
+    ],
+  },
+  {
     id: '2026-11-08',
     date: '08/11/2026',
     title: '4 buổi gym: thêm buổi Thân trên T6',

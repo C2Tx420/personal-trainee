@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { deleteSession, skipScheduledDay, startSession } from '@/data/api';
 import { qk, useActivePlan, useExerciseMaps, useGoals, useInbody, useInProgress, useInvalidate, useMeasurements, usePhotos, usePlans, useReviews, useTraining, useWeights } from '@/data/queries';
-import { diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
+import { addDays, diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekStart } from '@/engine/dates';
 import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
 import { inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
 import type { SundayOption } from '@/engine/plan-schema';
-import { BADMINTON_SUBSTITUTES, dayPlanFor, type LightKind, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, templateKeyOf, todayConflictWarning } from '@/engine/schedule';
+import { BADMINTON_SUBSTITUTES, dayPlanFor, liftOptionsFor, replacedNote, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, templateKeyOf, todayConflictWarning } from '@/engine/schedule';
 import { lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
 import { ExerciseLine } from '../shared';
+import { LiftSwap } from './LiftSwap';
 import { ProgressCard } from './ProgressCard';
 import { SkipDaySheet } from './SkipDaySheet';
 
@@ -90,19 +91,64 @@ export function TodayPage() {
     }
   }
 
-  /** Badminton not played → mark it skipped (reason = the substitute) and log the substitute. */
-  async function substitute(k: LightKind) {
+
+  /** Start the lifting session he picked; the scheduled one (if any) is logged skipped with the swap as the reason. */
+  async function pickLift(k: SessionKind, scheduled: SessionKind | null) {
     setError(null);
+    setStarting(true);
     try {
-      if (!skippedToday.some((s) => s.kind === 'badminton')) {
-        await skipScheduledDay({ date: today, kind: 'badminton', note: `Không đánh — thay bằng ${SESSION_KIND_LABEL[k].toLowerCase()}` });
-        await invalidate(qk.training);
+      if (scheduled && !skippedToday.some((s) => s.kind === scheduled)) {
+        await skipScheduledDay({ date: today, kind: scheduled, note: replacedNote(scheduled, k) });
       }
-      nav(`/training/simple/${k}?thay=badminton`);
     } catch (e) {
-      setError(e);
+      setStarting(false);
+      return setError(e);
     }
+    await start(k);
   }
+
+  const liftDone = doneToday.filter((s) => templateKeyOf(s.kind) !== null);
+  const liftOptions = liftOptionsFor(
+    content,
+    today,
+    today,
+    sessions.filter((s) => s.status === 'completed').map((s) => ({ date: s.session_date, kind: s.kind })),
+  );
+  const tomorrow = dayPlanFor(content, addDays(today, 1));
+  const tomorrowName = tomorrow.kind === 'session' ? templateFor(content, tomorrow.template)?.name : null;
+
+  /** Any lifting session instead of / on top of the schedule — only while nothing is lifted or in progress today. */
+  const liftSwap = (scheduled: SessionKind | null, title: string, opts: { exclude?: SessionKind[]; defaultOpen?: boolean; divider?: boolean } = {}) =>
+    !inProgress.data && liftDone.length === 0 && (
+      <LiftSwap
+        title={title}
+        options={liftOptions.filter((k) => k !== scheduled && !opts.exclude?.includes(k))}
+        hint={tomorrowName ? `mai là ${tomorrowName}, tránh trùng nhóm cơ hoặc chọn bản nhẹ` : null}
+        legsBlocked={!liftOptions.includes('legs') && content.templates.some((t) => t.key === 'legs')}
+        disabled={starting}
+        defaultOpen={opts.defaultOpen}
+        divider={opts.divider}
+        onPick={(k) => void pickLift(k, scheduled)}
+      />
+    );
+
+  /** Lifting sessions done today other than the scheduled one, and the one in progress. */
+  const extraLifts = (scheduled: SessionKind | null, withContinue: boolean) => (
+    <>
+      {liftDone
+        .filter((s) => s.kind !== scheduled)
+        .map((s) => (
+          <Button key={s.id} block className="mt-2" onClick={() => nav(`/training/session/${s.id}`)}>
+            Xem buổi {SESSION_KIND_LABEL[s.kind]} đã tập
+          </Button>
+        ))}
+      {withContinue && inProgress.data && (
+        <Button variant="primary" size="lg" block className="mt-2" onClick={() => nav(`/workout/${inProgress.data!.id}`)}>
+          Tiếp tục buổi {SESSION_KIND_LABEL[inProgress.data.kind]}
+        </Button>
+      )}
+    </>
+  );
 
   /** Light sessions already logged today (rest / badminton day). */
   const lightDone = doneToday.filter((s) => s.kind === 'walk' || s.kind === 'zone2' || s.kind === 'core');
@@ -195,6 +241,7 @@ export function TodayPage() {
       {day.kind === 'session' && (() => {
         const tmpl = templateFor(content, day.template)!;
         const done = doneToday.find((s) => s.kind === day.template);
+        const skipped = skippedToday.some((s) => s.kind === day.template);
         return (
           <Card>
             <div className="mb-1 flex items-center justify-between">
@@ -214,7 +261,7 @@ export function TodayPage() {
             </div>
             {done ? (
               <Button block onClick={() => nav(`/training/session/${done.id}`)}>Xem buổi đã tập</Button>
-            ) : skippedToday.some((s) => s.kind === day.template) ? (
+            ) : skipped ? (
               skipRow(day.template)
             ) : (
               <>
@@ -222,6 +269,8 @@ export function TodayPage() {
                 {skipRow(day.template)}
               </>
             )}
+            {extraLifts(day.template, skipped)}
+            {!done && liftSwap(day.template, 'Đổi sang buổi khác')}
           </Card>
         );
       })()}
@@ -244,14 +293,16 @@ export function TodayPage() {
               {skipRow('badminton')}
             </>
           )}
-          {!doneToday.some((s) => s.kind === 'badminton') && lightDone.length === 0 && (
-            <div className="mt-3 border-t border-line pt-3">
-              <p className="mb-2 text-sm text-muted">Không đánh được? Thay bằng cardio nhẹ cùng thời lượng — không tập chân.</p>
+          {extraLifts('badminton', true)}
+          {!doneToday.some((s) => s.kind === 'badminton') && lightDone.length === 0 && liftDone.length === 0 && !inProgress.data && (
+            <div className="mt-3 border-t border-line pt-3" data-testid="badminton-replace">
+              <p className="mb-2 text-sm text-muted">Không đánh được? Thay bằng cardio nhẹ cùng thời lượng:</p>
               <div className="grid grid-cols-2 gap-2">
                 {BADMINTON_SUBSTITUTES.map((k) => (
-                  <Button key={k} onClick={() => void substitute(k)}>{SESSION_KIND_LABEL[k]}</Button>
+                  <Button key={k} onClick={() => nav(`/training/simple/${k}?thay=badminton`)}>{SESSION_KIND_LABEL[k]}</Button>
                 ))}
               </div>
+              {liftSwap('badminton', 'Hoặc tập một buổi tạ', { defaultOpen: true, divider: false })}
             </div>
           )}
         </Card>
@@ -277,6 +328,8 @@ export function TodayPage() {
               </>
             );
           })()}
+          {extraLifts(null, true)}
+          {liftSwap(null, 'Vẫn muốn tập tạ')}
         </Card>
       )}
 
@@ -297,6 +350,8 @@ export function TodayPage() {
               ),
             )}
           </div>
+          {extraLifts(null, true)}
+          {liftSwap(null, 'Buổi tạ khác', { exclude: day.options.filter((o): o is 'push_light' | 'pull_light' => o === 'push_light' || o === 'pull_light') })}
         </Card>
       )}
 
