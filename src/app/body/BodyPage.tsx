@@ -9,9 +9,6 @@ import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } fro
 import { SimpleLine } from '@/ui/charts';
 import { Badge, Banner, Button, Card, Empty, Field, Input, Page, SectionTitle, Segmented, Skeleton } from '@/ui/components';
 
-/** start of the goal line: the InBody weigh-in on 26/10/2026 */
-const START: { date: IsoDate; kg: number } = { date: '2026-10-26', kg: 81.7 };
-
 export function BodyPage() {
   const nav = useNavigate();
   const invalidate = useInvalidate();
@@ -42,8 +39,11 @@ export function BodyPage() {
   const delta = thisWeek && prevWeek ? round(thisWeek.last - prevWeek.last, 1) : null;
   const pendingDraft = (plans.data ?? []).some((p) => p.status === 'draft');
 
-  // goal line: linear interpolation from start → each goal
-  const anchors = [START, ...(goals.data ?? []).map((g) => ({ date: g.target_date, kg: g.target_weight_max }))];
+  // goal line: linear interpolation from the first weigh-in → each goal
+  const start = logs[0];
+  const anchors: { date: IsoDate; kg: number }[] = start
+    ? [{ date: start.log_date, kg: start.weight_kg }, ...(goals.data ?? []).map((g) => ({ date: g.target_date, kg: g.target_weight_max }))]
+    : [];
   const targetAt = (d: IsoDate): number | null => {
     for (let i = 0; i < anchors.length - 1; i++) {
       const a = anchors[i];
@@ -112,7 +112,7 @@ export function BodyPage() {
             <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
           </Field>
           <Field label="Cân nặng (kg)">
-            <Input inputMode="decimal" placeholder={logs.at(-1) ? String(logs.at(-1)!.weight_kg).replace('.', ',') : '81,7'} value={kg} onChange={(e) => setKg(e.target.value)} />
+            <Input inputMode="decimal" placeholder={logs.at(-1) ? String(logs.at(-1)!.weight_kg).replace('.', ',') : '70,0'} value={kg} onChange={(e) => setKg(e.target.value)} />
           </Field>
         </div>
         <button className="mb-2 text-sm font-medium text-accent" onClick={() => setShowMeasure((v) => !v)}>

@@ -10,6 +10,7 @@ import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import type { TemplateWarmup } from '@/engine/plan-schema';
 import { FEEL_LABEL, KG_CHANGE_LABEL, SUBSTITUTION_LABEL, type ExerciseRow, type SessionItemRow, type SetRow } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
+import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { estimateSessionKcal, sessionSummary } from '@/engine/workout-summary';
 import { useNow, useWakeLock } from '@/lib/hooks';
 import { Badge, Banner, Button, Card, Chip, cx, ErrorBox, ExerciseImg, GLASS_HEADER, Input, ProgressBar, Sheet, Spinner, Stat, TextArea } from '@/ui/components';
@@ -179,7 +180,7 @@ export function WorkoutFlowPage() {
     setFinishing(true);
     try {
       const minutes = session!.started_at ? Math.round((Date.now() - new Date(session!.started_at).getTime()) / 60_000) : 60;
-      const kcal = plan.data ? estimateSessionKcal({ ...session!, duration_min: minutes }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? 81.7) : null;
+      const kcal = plan.data ? estimateSessionKcal({ ...session!, duration_min: minutes }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? DEFAULT_BODY_WEIGHT_KG) : null;
       await finishSession(session!, kcal, reflection.trim() || null);
       await refresh();
       nav(`/training/session/${session!.id}`, { replace: true });

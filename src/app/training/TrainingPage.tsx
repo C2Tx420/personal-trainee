@@ -7,6 +7,7 @@ import { loadContext } from '@/engine/load';
 import { formatNumberVN } from '@/engine/math';
 import { missingReflection, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
+import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { topSetSeries, volumeKg, weeklyVolumeByExercise, weekSummary } from '@/engine/workout-summary';
 import { SimpleBars, SimpleLine } from '@/ui/charts';
 import { MuscleSetsCard } from './MuscleSetsCard';
@@ -36,7 +37,7 @@ export function TrainingPage() {
   const reviewed = reviews.data ? reviewedWeeks(reviews.data) : null;
   const content = plan.data?.content;
   const ws = weekStart(today);
-  const week = content && data ? weekSummary(ws, sessions, data.items, data.sets, content, weights.data?.at(-1)?.weight_kg ?? 81.7) : null;
+  const week = content && data ? weekSummary(ws, sessions, data.items, data.sets, content, weights.data?.at(-1)?.weight_kg ?? DEFAULT_BODY_WEIGHT_KG) : null;
 
   const selected = exId || trainedExercises[0]?.id || '';
   const group = new Set([selected, ...ex.list.filter((e) => e.canonical_exercise_id === selected).map((e) => e.id)]);

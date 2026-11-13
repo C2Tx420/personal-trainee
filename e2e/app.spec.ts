@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Buổi Thân trên thứ Sáu', { exact: true })).toBeVisible();
+  await expect(news.getByText('Đổi buổi tập bất kỳ ngày nào', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -144,10 +144,10 @@ test('04 luồng tập Pull: khởi động → làm nóng → đổi kg → ti�
   await expect(page.getByTestId('kg-change')).toBeVisible();
   await page.getByRole('button', { name: 'Nặng quá' }).click();
   await page.getByRole('button', { name: 'Nặng', exact: true }).click();
-  await shot(page, '12-kg-change', 'Không tập được 35kg → ghi 30kg + lý do "Nặng quá"');
+  await shot(page, '12-kg-change', 'Không tập được 35kg → hạ 1 nấc (32kg) + lý do "Nặng quá"');
   await completeSet(page);
   await expect(page.getByText('Hiệp chính 2/3', { exact: true })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'kg', exact: true })).toHaveValue('30');
+  await expect(page.getByRole('textbox', { name: 'kg', exact: true })).toHaveValue('32');
   await completeSet(page);
   await completeSet(page);
 });
@@ -384,11 +384,11 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'test-results', 'coach-report.json'), JSON.stringify(report, null, 2));
 
-  // Claude's changes: lat pulldown 35→32.5kg; add cable chest press; complete the provisional exercise; calories 1,900→1,850
+  // Claude's changes: lat pulldown 35→32kg; add cable chest press; complete the provisional exercise; calories 1,900→1,850
   const content = report.active_plan.content;
   const pull = content.templates.find((t: { key: string }) => t.key === 'pull');
-  pull.items[0].target_kg = 32.5;
-  pull.items[0].coach_note = '3/3 hiệp "nặng quá" ở 35kg → 32,5kg; đủ 3×10 thì lên lại 35kg';
+  pull.items[0].target_kg = 32;
+  pull.items[0].coach_note = '3/3 hiệp "nặng quá" ở 35kg → 32kg; đủ 3×10 thì lên lại 35kg';
   pull.items[1].exercise = report.provisional_exercises[0].slug;
   pull.items[1].alternatives = ['one_arm_db_row', 'seated_cable_row'];
   const push = content.templates.find((t: { key: string }) => t.key === 'push');
@@ -411,20 +411,20 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   const draftFile = path.join(ROOT, 'test-results', 'coach-draft.json');
   fs.writeFileSync(draftFile, JSON.stringify(content));
   const out = JSON.parse(
-    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32,5kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850; curl giữ 15kg — sẽ chỉnh theo nấc lb" --accept-warnings`, {
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Kéo xô 35→32kg (3 hiệp nặng quá); hoàn thiện bài tạm máy chèo Impulse; ép ngực cáp thay pec deck; calo tham khảo 1.900→1.850; curl giữ 15kg — sẽ chỉnh theo nấc lb" --accept-warnings`, {
       cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8',
     }),
   );
   const noteFile = path.join(ROOT, 'test-results', 'coach-note.md');
   fs.writeFileSync(
     noteFile,
-    '**Tiến độ cân**: 81,2 kg (−0,5 so với 26/10) · Noel còn 8,3 tuần, cần −0,51 kg/tuần → đúng hướng.\n**Tập luyện**: 2/4 buổi tới T3, khởi động đủ. Kéo xô hụt ở 35kg (3 hiệp "nặng quá").\n**Đề xuất**: draft — kéo xô 32,5kg, ép ngực cáp thay pec deck, hoàn thiện bài máy chèo Impulse.',
+    '**Tiến độ cân**: 81,2 kg (−0,8 so với 26/10) · Noel còn 8,3 tuần, cần −0,51 kg/tuần → đúng hướng.\n**Tập luyện**: 2/4 buổi tới T3, khởi động đủ. Kéo xô hụt ở 35kg (3 hiệp "nặng quá").\n**Đề xuất**: draft — kéo xô 32kg, ép ngực cáp thay pec deck, hoàn thiện bài máy chèo Impulse.',
   );
   execSync(`pnpm exec tsx scripts/add-review-note.ts --week 2026-10-26 --file "${noteFile}" --plan ${out.draft_id}`, { cwd: path.join(ROOT, 'coach'), env: COACH_ENV });
 
   // a second draft while one is pending: refused, unless --allow-pending (the app then offers to reject the older one)
   const submit2 = (flag: string) =>
-    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Bản sửa lại: kéo xô 32,5kg; ép ngực cáp thay pec deck" --accept-warnings ${flag}`, {
+    execSync(`pnpm exec tsx scripts/submit-draft.ts --file "${draftFile}" --note "Bản sửa lại: kéo xô 32kg; ép ngực cáp thay pec deck" --accept-warnings ${flag}`, {
       cwd: path.join(ROOT, 'coach'), env: COACH_ENV, encoding: 'utf8', stdio: 'pipe',
     });
   expect(() => submit2('')).toThrow(/bản nháp chờ duyệt/);
@@ -451,7 +451,7 @@ test('10 Claude Code: báo cáo tuần → draft + nhận xét → duyệt trong
   await expect(page.getByText('Nhận xét tuần mới từ coach')).toBeVisible();
   await shot(page, '30-today-draft', 'Hôm nay: banner lộ trình chờ duyệt + nhận xét coach');
   await page.getByText('Có 2 lộ trình mới chờ duyệt').click();
-  await expect(page.getByText(/→ 32,5 kg/)).toBeVisible();
+  await expect(page.getByText(/→ 32 kg/)).toBeVisible();
   await expect(page.getByText(/Còn 1 bản nháp cũ hơn đang chờ/)).toBeVisible();
   // stricter draft checks are shown (not blocking): the curl machine is an lb stack, 15 kg is off the ladder
   await expect(page.getByText(/Machine Biceps Curl" là máy nấc lb/)).toBeVisible();

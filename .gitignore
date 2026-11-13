@@ -30,3 +30,6 @@ coach/node_modules/
 *.pem
 npm-debug.*
 /e2e/screenshots/
+
+# coach — personal profile and one-off notes
+coach/CLAUDE.local.md

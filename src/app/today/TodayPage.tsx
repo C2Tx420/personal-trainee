@@ -8,7 +8,7 @@ import { inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
 import type { SundayOption } from '@/engine/plan-schema';
 import { BADMINTON_SUBSTITUTES, dayPlanFor, liftOptionsFor, replacedNote, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, templateKeyOf, todayConflictWarning } from '@/engine/schedule';
-import { lossTrendKgPerWeek } from '@/engine/weight';
+import { DEFAULT_BODY_WEIGHT_KG, lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
 import { ExerciseLine } from '../shared';
@@ -53,6 +53,7 @@ export function TodayPage() {
   const doneToday = sessions.filter((s) => s.session_date === today && s.status === 'completed');
   const skippedToday = sessions.filter((s) => s.session_date === today && s.status === 'skipped');
   const lastWeight = weights.data?.at(-1);
+  const startKg = weights.data?.[0]?.weight_kg ?? 0;
   const trend = weights.data ? lossTrendKgPerWeek(weights.data, today) : null;
   const ffm = inbody.data ? latestFfm(inbody.data) : null;
   const progress = lastWeight && goals.data ? goals.data.map((g) => goalProgress(g, lastWeight.weight_kg, today, trend, ffm)) : [];
@@ -71,7 +72,7 @@ export function TodayPage() {
   const isMonday = weekdayOf(today) === 'mon';
   const reviewedThisWeek = (plans.data ?? []).some((p) => p.approved_at && p.approved_at.slice(0, 10) >= weekStart(today));
   const week = training.data
-    ? weekSummary(weekStart(today), sessions, training.data.items, training.data.sets, content, lastWeight?.weight_kg ?? 81.7)
+    ? weekSummary(weekStart(today), sessions, training.data.items, training.data.sets, content, lastWeight?.weight_kg ?? DEFAULT_BODY_WEIGHT_KG)
     : null;
 
   async function start(kind: SessionKind) {
@@ -224,7 +225,7 @@ export function TodayPage() {
             Còn {goal.daysLeft} ngày ({formatNumberVN(goal.weeksLeft, 1)} tuần) · cần −{formatNumberVN(goal.requiredKgPerWeek, 2)} kg/tuần
             · còn {formatNumberVN(goal.gapKg, 1)} kg
           </div>
-          <ProgressBar value={81.7 - (lastWeight?.weight_kg ?? 81.7)} max={81.7 - goal.goal.target_weight_max} />
+          <ProgressBar value={startKg - (lastWeight?.weight_kg ?? startKg)} max={startKg - goal.goal.target_weight_max} />
           <div className="tabular mt-1 flex justify-between text-xs text-muted">
             <span>{formatNumberVN(lastWeight?.weight_kg ?? 0, 1)} kg</span>
             <span>

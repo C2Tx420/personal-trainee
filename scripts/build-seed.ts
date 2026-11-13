@@ -71,6 +71,7 @@ if (errors.length) {
 }
 
 const payload = {
+  // sample profile — the real one lives only in the hosted DB
   profile: { display_name: 'Anh', sex: 'male', birth_year: 1995, height_cm: 175, program_start_date: '2026-10-27' },
   goals: [
     { ordinal: 1, name: 'Noel', target_date: '2026-12-25', target_weight_min: 77, target_weight_max: 78, target_body_fat_min: 22, target_body_fat_max: 23 },

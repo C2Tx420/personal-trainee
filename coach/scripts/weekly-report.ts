@@ -9,7 +9,7 @@ import { planWeek, programStartOf } from '../../src/engine/plan-week';
 import { actualLegsBadmintonConflicts } from '../../src/engine/schedule';
 import { measurementDeltas, whr } from '../../src/engine/body';
 import type { SessionItemRow, SessionRow, SetRow } from '../../src/engine/types';
-import { lossTrendKgPerWeek, weeklyWeights, weeksWithoutLoss } from '../../src/engine/weight';
+import { DEFAULT_BODY_WEIGHT_KG, lossTrendKgPerWeek, weeklyWeights, weeksWithoutLoss } from '../../src/engine/weight';
 import { volumeKg, weeklyVolumeByExercise, weekSummary } from '../../src/engine/workout-summary';
 import { arg, connect } from './db';
 
@@ -141,7 +141,7 @@ const progressionReady = setsDetail
   })
   .map((d) => d.exercise);
 
-const week = weekSummary(ws, sRows, iRows, setRows, content, lastW || 81.7);
+const week = weekSummary(ws, sRows, iRows, setRows, content, lastW || DEFAULT_BODY_WEIGHT_KG);
 const lastMeas = meas.at(-1) ?? null;
 const meas4 = meas.filter((m) => m.log_date_s <= addDays(ws, -21)).at(-1) ?? null;
 const latestIb = ibLogs.at(-1) ?? null;

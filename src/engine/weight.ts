@@ -4,6 +4,9 @@ import { CALORIES_FLOOR } from './plan-schema';
 
 export type WeightLog = { log_date: IsoDate; weight_kg: number };
 
+/** Body weight for kcal / volume estimates before the first weigh-in. */
+export const DEFAULT_BODY_WEIGHT_KG = 70;
+
 export type WeeklyWeight = { weekStart: IsoDate; first: number; last: number; avg: number; count: number };
 
 export function weeklyWeights(logs: WeightLog[]): WeeklyWeight[] {

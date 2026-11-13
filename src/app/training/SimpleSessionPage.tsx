@@ -5,6 +5,7 @@ import { qk, useActivePlan, useInvalidate, useTraining, useWeights } from '@/dat
 import { formatVN, type IsoDate, todayVN } from '@/engine/dates';
 import { INTENSITIES, type Intensity } from '@/engine/plan-schema';
 import { BADMINTON_SUBSTITUTES, type LightKind, replacedNote, scheduledOpenOn, SESSION_KIND_LABEL, type SessionKind } from '@/engine/schedule';
+import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { estimateSessionKcal } from '@/engine/workout-summary';
 import { Banner, Button, Card, Chip, ErrorBox, Field, Input, Page } from '@/ui/components';
 
@@ -36,7 +37,7 @@ export function SimpleSessionPage() {
   const [error, setError] = useState<unknown>(null);
 
   const kcal = plan.data
-    ? estimateSessionKcal({ kind: k, duration_min: minutes, badminton_intensity: k === 'badminton' ? intensity : null }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? 81.7)
+    ? estimateSessionKcal({ kind: k, duration_min: minutes, badminton_intensity: k === 'badminton' ? intensity : null }, plan.data.content, weights.data?.at(-1)?.weight_kg ?? DEFAULT_BODY_WEIGHT_KG)
     : 0;
 
   const canReplace =
