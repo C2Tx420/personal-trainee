@@ -33,3 +33,7 @@ npm-debug.*
 
 # coach — personal profile and one-off notes
 coach/CLAUDE.local.md
+
+# editor / agent settings (local only)
+.claude/
+.vscode/
