@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { qk, useInvalidate } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
 import { BACKUP_TABLES, buildBackup, planImport } from '@/export/backup';
+import { t } from '@/i18n';
 import { must, supabase } from '@/lib/supabase';
 import { APP_VERSION } from '@/lib/version';
 import { Banner, Button, Card, Page } from '@/ui/components';
@@ -24,7 +25,7 @@ export function BackupPage() {
     setBusy(true);
     try {
       const tables: Record<string, Record<string, unknown>[]> = {};
-      for (const t of BACKUP_TABLES) tables[t] = must(await supabase.from(t).select('*')) as Record<string, unknown>[];
+      for (const table of BACKUP_TABLES) tables[table] = must(await supabase.from(table).select('*')) as Record<string, unknown>[];
       const backup = buildBackup(tables, APP_VERSION);
       if (withPhotos) {
         backup.photos = [];
@@ -40,7 +41,7 @@ export function BackupPage() {
       a.click();
       URL.revokeObjectURL(a.href);
       const total = Object.values(tables).reduce((n, r) => n + r.length, 0);
-      setMsg({ tone: 'ok', text: `Đã xuất ${total} dòng${withPhotos ? ` + ${backup.photos?.length ?? 0} ảnh` : ''}` });
+      setMsg({ tone: 'ok', text: `${t('Đã xuất {n} dòng', { n: total })}${withPhotos ? ` + ${t('{n} ảnh', { n: backup.photos?.length ?? 0 })}` : ''}` });
     } catch (e) {
       setMsg({ tone: 'bad', text: (e as Error).message });
     } finally {
@@ -55,7 +56,7 @@ export function BackupPage() {
       setPending(raw);
       setMsg({
         tone: 'info',
-        text: `Chạy thử: ${Object.entries(counts).filter(([, n]) => n).map(([t, n]) => `${t} ${n}`).join(' · ')}${skipped.length ? ` · bỏ qua (chỉ đọc): ${skipped.join(', ')}` : ''}`,
+        text: `${t('Chạy thử: {counts}', { counts: Object.entries(counts).filter(([, n]) => n).map(([table, n]) => `${table} ${n}`).join(' · ') })}${skipped.length ? ` · ${t('bỏ qua (chỉ đọc): {tables}', { tables: skipped.join(', ') })}` : ''}`,
       });
     } catch (e) {
       setMsg({ tone: 'bad', text: (e as Error).message });
@@ -74,7 +75,7 @@ export function BackupPage() {
         n += step.rows.length;
       }
       await invalidate(qk.training, qk.weights, qk.measurements, qk.inbody, qk.plans, qk.activePlan, qk.exercises);
-      setMsg({ tone: 'ok', text: `Đã nhập ${n} dòng` });
+      setMsg({ tone: 'ok', text: t('Đã nhập {n} dòng', { n }) });
       setPending(null);
     } catch (e) {
       setMsg({ tone: 'bad', text: (e as Error).message });
@@ -84,23 +85,23 @@ export function BackupPage() {
   }
 
   return (
-    <Page title="Sao lưu" back="/more">
+    <Page title={t('Sao lưu')} back="/more">
       <Card>
-        <div className="mb-1 font-semibold">Xuất JSON</div>
-        <p className="mb-3 text-sm text-muted">Toàn bộ dữ liệu (pt-backup/1), trừ PIN và thiết bị nhận thông báo. Ảnh tiến độ chỉ kèm nếu anh chọn.</p>
+        <div className="mb-1 font-semibold">{t('Xuất JSON')}</div>
+        <p className="mb-3 text-sm text-muted">{t('Toàn bộ dữ liệu (pt-backup/1), trừ PIN và thiết bị nhận thông báo. Ảnh tiến độ chỉ kèm nếu anh chọn.')}</p>
         <label className="mb-3 flex items-center gap-2 text-sm">
           <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={withPhotos} onChange={(e) => setWithPhotos(e.target.checked)} />
-          Kèm ảnh tiến độ (file sẽ lớn)
+          {t('Kèm ảnh tiến độ (file sẽ lớn)')}
         </label>
-        <Button variant="primary" block disabled={busy} onClick={() => void exportJson()}>Tải file sao lưu</Button>
+        <Button variant="primary" block disabled={busy} onClick={() => void exportJson()}>{t('Tải file sao lưu')}</Button>
       </Card>
       <Card>
-        <div className="mb-1 font-semibold">Nhập JSON</div>
-        <p className="mb-3 text-sm text-muted">Chọn file → app chạy thử (chỉ đếm) → bấm Nhập để ghi (upsert theo id, không nhân đôi).</p>
-        <input type="file" accept="application/json" aria-label="Chọn file sao lưu" onChange={(e) => e.target.files?.[0] && void onFile(e.target.files[0])} />
+        <div className="mb-1 font-semibold">{t('Nhập JSON')}</div>
+        <p className="mb-3 text-sm text-muted">{t('Chọn file → app chạy thử (chỉ đếm) → bấm Nhập để ghi (upsert theo id, không nhân đôi).')}</p>
+        <input type="file" accept="application/json" aria-label={t('Chọn file sao lưu')} onChange={(e) => e.target.files?.[0] && void onFile(e.target.files[0])} />
         {pending ? (
           <Button variant="primary" block className="mt-3" disabled={busy} onClick={() => void runImport()}>
-            Nhập dữ liệu
+            {t('Nhập dữ liệu')}
           </Button>
         ) : null}
       </Card>

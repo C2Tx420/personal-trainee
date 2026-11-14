@@ -2,6 +2,7 @@ import { type ButtonHTMLAttributes, createContext, type InputHTMLAttributes, typ
 import { useNavigate } from 'react-router';
 import { svgDataUrl } from '@/engine/svg-validate';
 import { IconBack, IconClose } from './icons';
+import { t } from '@/i18n';
 
 export function cx(...xs: (string | false | null | undefined)[]): string {
   return xs.filter(Boolean).join(' ');
@@ -38,7 +39,7 @@ export function Page({
       <header className={cx(GLASS_HEADER, 'mb-4 flex min-h-[calc(3.5rem+env(safe-area-inset-top))] items-center gap-2 px-4')}>
         {back && (
           <button
-            aria-label="Quay lại"
+            aria-label={t('Quay lại')}
             className="glass-subtle -ml-1 grid size-9 place-items-center rounded-full text-fg"
             onClick={() => (back === true ? nav(-1) : nav(back))}
           >
@@ -151,7 +152,7 @@ export function Stepper({
   const btn = 'glass-subtle rounded-ctl grid size-14 shrink-0 place-items-center text-3xl font-light text-fg active:bg-white/[0.08]';
   return (
     <div className="flex items-center gap-2" aria-label={label}>
-      <button type="button" aria-label={`Giảm ${label}`} className={btn} onClick={() => (onStep ? onStep(-1) : onChange(Math.max(min, (value ?? 0) - step)))}>
+      <button type="button" aria-label={t('Giảm {label}', { label })} className={btn} onClick={() => (onStep ? onStep(-1) : onChange(Math.max(min, (value ?? 0) - step)))}>
         −
       </button>
       <div className="glass-input rounded-ctl flex h-14 min-w-0 flex-1 items-baseline justify-center gap-1 px-2 pt-2.5">
@@ -170,7 +171,7 @@ export function Stepper({
         />
         <span className="shrink-0 text-sm text-muted">{unit}</span>
       </div>
-      <button type="button" aria-label={`Tăng ${label}`} className={btn} onClick={() => (onStep ? onStep(1) : onChange((value ?? 0) + step))}>
+      <button type="button" aria-label={t('Tăng {label}', { label })} className={btn} onClick={() => (onStep ? onStep(1) : onChange((value ?? 0) + step))}>
         +
       </button>
     </div>
@@ -281,7 +282,7 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="rounded-card border border-dashed border-line p-6 text-center text-sm text-muted">{children}</div>;
 }
 
-export function Spinner({ label = 'Đang tải…' }: { label?: string }) {
+export function Spinner({ label = t('Đang tải…') }: { label?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted" role="status">
       <span className="size-4 animate-spin rounded-full border-2 border-line border-t-accent" />
@@ -309,7 +310,7 @@ export function Splash({ label }: { label?: string }) {
 /** Placeholder cards while a page's first query loads — keeps the layout from jumping. */
 export function Skeleton({ cards = 3 }: { cards?: number }) {
   return (
-    <div role="status" aria-label="Đang tải…" className="animate-pulse">
+    <div role="status" aria-label={t('Đang tải…')} className="animate-pulse">
       {Array.from({ length: cards }, (_, i) => (
         <div key={i} className="glass rounded-card mb-3 p-4">
           <div className="mb-3 h-4 w-2/5 rounded-full bg-white/[0.08]" />
@@ -345,7 +346,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/20" />
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight">{title}</h2>
-          <button aria-label="Đóng" onClick={onClose} className="glass-subtle grid size-9 place-items-center rounded-full text-muted">
+          <button aria-label={t('Đóng')} onClick={onClose} className="glass-subtle grid size-9 place-items-center rounded-full text-muted">
             <IconClose className="size-4" />
           </button>
         </div>
@@ -416,9 +417,9 @@ export function ExerciseImg({ svg, name, className }: { svg: string | null | und
   if (!svg) {
     return (
       <div className={cx('grid place-items-center bg-white/[0.04] text-xs text-muted', frame, hasWidth(className) ? '' : 'w-full', className)}>
-        Chưa có hình
+        {t('Chưa có hình')}
       </div>
     );
   }
-  return <img src={svgDataUrl(forceDarkSvg(svg))} alt={`Hình minh hoạ: ${name}`} className={cx(frame, hasWidth(className) ? '' : 'w-full', className)} />;
+  return <img src={svgDataUrl(forceDarkSvg(svg))} alt={t('Hình minh hoạ: {name}', { name })} className={cx(frame, hasWidth(className) ? '' : 'w-full', className)} />;
 }

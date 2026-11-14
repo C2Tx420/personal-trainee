@@ -6,6 +6,7 @@ import { MAIN_MEASUREMENT_FIELDS, MAIN_MEASUREMENTS, MEASUREMENT_FIELDS, type Me
 import { addDays, diffDays, formatVN, type IsoDate, todayVN, weekStart } from '@/engine/dates';
 import { formatNumberVN, round } from '@/engine/math';
 import { lossRateVerdict, stallSuggestion, weeklyWeights, weeksWithoutLoss } from '@/engine/weight';
+import { t } from '@/i18n';
 import { SimpleLine } from '@/ui/charts';
 import { Badge, Banner, Button, Card, Empty, Field, Input, Page, SectionTitle, Segmented, Skeleton } from '@/ui/components';
 
@@ -28,7 +29,7 @@ export function BodyPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  if (weights.isLoading || measurements.isLoading) return <Page title="Cơ thể"><Skeleton /></Page>;
+  if (weights.isLoading || measurements.isLoading) return <Page title={t('Cơ thể')}><Skeleton /></Page>;
   const logs = weights.data ?? [];
   const meas = measurements.data ?? [];
   const lastMeas = meas.at(-1);
@@ -71,7 +72,7 @@ export function BodyPage() {
     setM({});
     setShowMeasure(false);
     setBusy(false);
-    setMsg('Đã lưu');
+    setMsg(t('Đã lưu'));
   }
 
   async function proposeDraft() {
@@ -84,7 +85,7 @@ export function BodyPage() {
       content,
       basedOn: plan.data.id,
       createdBy: 'system',
-      changeNote: `Cân không giảm ${stall} tuần liên tiếp → hạ calo tham khảo ${s.reduction} kcal (giảm carb, giữ đạm). Gợi ý thực tế: ${s.tips.join('; ')}.`,
+      changeNote: `Cân không giảm ${stall} tuần liên tiếp → hạ calo tham khảo ${s.reduction} kcal (giảm carb, giữ đạm). Gợi ý thực tế: ${s.tipsVi.join('; ')}.`, // i18n-ignore: saved to the database
     });
     await invalidate(qk.plans);
     nav(`/more/plans/${id}`);
@@ -98,25 +99,25 @@ export function BodyPage() {
   const chartFields = MEASUREMENT_FIELDS.filter(([k]) => MAIN_MEASUREMENTS.includes(k) || meas.some((x) => x[k] !== null));
 
   return (
-    <Page title="Cơ thể">
+    <Page title={t('Cơ thể')}>
       <div className="mb-3 grid grid-cols-2 gap-2">
         <Button onClick={() => nav('/body/inbody')}>InBody</Button>
-        <Button onClick={() => nav('/body/photos')}>Ảnh tiến độ</Button>
+        <Button onClick={() => nav('/body/photos')}>{t('Ảnh tiến độ')}</Button>
       </div>
 
       <Card>
-        <div className="mb-2 font-semibold">Cân hằng tuần</div>
-        <p className="mb-3 text-xs text-muted">Khuyến nghị: sáng thứ Hai, sau khi đi vệ sinh, trước khi ăn uống.</p>
+        <div className="mb-2 font-semibold">{t('Cân hằng tuần')}</div>
+        <p className="mb-3 text-xs text-muted">{t('Khuyến nghị: sáng thứ Hai, sau khi đi vệ sinh, trước khi ăn uống.')}</p>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Ngày">
+          <Field label={t('Ngày')}>
             <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
           </Field>
-          <Field label="Cân nặng (kg)">
-            <Input inputMode="decimal" placeholder={logs.at(-1) ? String(logs.at(-1)!.weight_kg).replace('.', ',') : '70,0'} value={kg} onChange={(e) => setKg(e.target.value)} />
+          <Field label={t('Cân nặng (kg)')}>
+            <Input inputMode="decimal" placeholder={logs.at(-1) ? formatNumberVN(logs.at(-1)!.weight_kg, 2) : t('70,0')} value={kg} onChange={(e) => setKg(e.target.value)} />
           </Field>
         </div>
         <button className="mb-2 text-sm font-medium text-accent" onClick={() => setShowMeasure((v) => !v)}>
-          {showMeasure ? '▾' : '▸'} Số đo chính (tuỳ chọn, cm)
+          {showMeasure ? '▾' : '▸'} {t('Số đo chính (tuỳ chọn, cm)')}
         </button>
         {showMeasure && (
           <div className="grid grid-cols-2 gap-x-3">
@@ -124,7 +125,7 @@ export function BodyPage() {
               <Field key={k} label={label}>
                 <Input
                   inputMode="decimal"
-                  placeholder={lastMeas?.[k] != null ? String(lastMeas[k]).replace('.', ',') : '—'}
+                  placeholder={lastMeas?.[k] != null ? formatNumberVN(lastMeas[k] as number, 2) : '—'}
                   value={m[k] ?? ''}
                   onChange={(e) => setM({ ...m, [k]: e.target.value })}
                 />
@@ -132,23 +133,23 @@ export function BodyPage() {
             ))}
           </div>
         )}
-        <Field label="Ghi chú">
+        <Field label={t('Ghi chú')}>
           <Input value={note} onChange={(e) => setNote(e.target.value)} />
         </Field>
         {msg && <Banner tone="ok">{msg}</Banner>}
-        <Button variant="primary" block disabled={busy || !kg} onClick={() => void save()}>Lưu</Button>
+        <Button variant="primary" block disabled={busy || !kg} onClick={() => void save()}>{t('Lưu')}</Button>
       </Card>
 
       {thisWeek && (
         <Card>
-          <div className="mb-1 font-semibold">Tuần {formatVN(thisWeek.weekStart)}</div>
+          <div className="mb-1 font-semibold">{t('Tuần {date}', { date: formatVN(thisWeek.weekStart) })}</div>
           <div className="tabular text-sm">
-            Đầu tuần {formatNumberVN(thisWeek.first, 1)} kg · cuối tuần {formatNumberVN(thisWeek.last, 1)} kg
+            {t('Đầu tuần {first} kg · cuối tuần {last} kg', { first: formatNumberVN(thisWeek.first, 1), last: formatNumberVN(thisWeek.last, 1) })}
             {delta !== null && (
               <>
-                {' '}· so tuần trước <b>{delta > 0 ? '+' : ''}{formatNumberVN(delta, 1)} kg</b>{' '}
+                {' '}· {t('so tuần trước')} <b>{delta > 0 ? '+' : ''}{formatNumberVN(delta, 1)} kg</b>{' '}
                 <Badge tone={lossRateVerdict(delta) === 'ok' ? 'ok' : 'warn'}>
-                  {lossRateVerdict(delta) === 'ok' ? 'đúng nhịp 0,5–0,7' : lossRateVerdict(delta) === 'slow' ? 'chậm' : 'nhanh quá — cân nhắc ăn thêm'}
+                  {lossRateVerdict(delta) === 'ok' ? t('đúng nhịp 0,5–0,7') : lossRateVerdict(delta) === 'slow' ? t('chậm') : t('nhanh quá — cân nhắc ăn thêm')}
                 </Badge>
               </>
             )}
@@ -158,48 +159,48 @@ export function BodyPage() {
 
       {stall >= 2 && plan.data && (
         <Banner tone="warn">
-          Cân không giảm {stall} tuần liên tiếp. {stallSuggestion(plan.data.content.nutrition.calories_kcal).tips.join(' · ')}
+          {t('Cân không giảm {n} tuần liên tiếp.', { n: stall })} {stallSuggestion(plan.data.content.nutrition.calories_kcal).tips.join(' · ')}
           <div className="mt-2">
             <Button size="sm" variant="primary" disabled={pendingDraft} onClick={() => void proposeDraft()}>
-              {pendingDraft ? 'Đã có draft chờ duyệt' : 'Tạo đề xuất (draft)'}
+              {pendingDraft ? t('Đã có draft chờ duyệt') : t('Tạo đề xuất (draft)')}
             </Button>
           </div>
         </Banner>
       )}
 
-      <Segmented value={tab} onChange={setTab} options={[{ value: 'weight', label: 'Cân nặng' }, { value: 'measure', label: 'Số đo' }]} />
-      <Segmented value={range} onChange={setRange} options={[{ value: '4', label: '4 tuần' }, { value: '8', label: '8 tuần' }]} />
+      <Segmented value={tab} onChange={setTab} options={[{ value: 'weight', label: t('Cân nặng') }, { value: 'measure', label: t('Số đo') }]} />
+      <Segmented value={range} onChange={setRange} options={[{ value: '4', label: t('4 tuần') }, { value: '8', label: t('8 tuần') }]} />
 
       {tab === 'weight' ? (
         <Card>
           {chart.length ? (
-            <SimpleLine data={chart} lines={[{ key: 'kg', name: 'Cân nặng' }, { key: 'target', name: 'Mục tiêu', color: 'var(--ok)', dashed: true }]} unit="" />
+            <SimpleLine data={chart} lines={[{ key: 'kg', name: t('Cân nặng') }, { key: 'target', name: t('Mục tiêu'), color: 'var(--ok)', dashed: true }]} unit="" />
           ) : (
-            <Empty>Chưa có số cân trong khoảng này</Empty>
+            <Empty>{t('Chưa có số cân trong khoảng này')}</Empty>
           )}
         </Card>
       ) : (
         <Card>
-          <select aria-label="Chọn số đo" className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={field} onChange={(e) => setField(e.target.value as MeasurementKey)}>
+          <select aria-label={t('Chọn số đo')} className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={field} onChange={(e) => setField(e.target.value as MeasurementKey)}>
             {chartFields.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
-          {measChart.length ? <SimpleLine data={measChart} lines={[{ key: 'v', name: 'cm' }]} /> : <Empty>Chưa có số đo này</Empty>}
+          {measChart.length ? <SimpleLine data={measChart} lines={[{ key: 'v', name: 'cm' }]} /> : <Empty>{t('Chưa có số đo này')}</Empty>}
           {lastWhr !== null && (
             <p className="mt-2 text-sm">
-              WHR (eo/hông) gần nhất: <b>{formatNumberVN(lastWhr, 2)}</b>{' '}
-              <Badge tone={lastWhr < WHR_MALE_THRESHOLD ? 'ok' : 'warn'}>tham khảo nam &lt; 0,90</Badge>
+              {t('WHR (eo/hông) gần nhất:')} <b>{formatNumberVN(lastWhr, 2)}</b>{' '}
+              <Badge tone={lastWhr < WHR_MALE_THRESHOLD ? 'ok' : 'warn'}>{t('tham khảo nam < 0,90')}</Badge>
             </p>
           )}
         </Card>
       )}
 
-      <SectionTitle>Lịch sử cân</SectionTitle>
+      <SectionTitle>{t('Lịch sử cân')}</SectionTitle>
       {[...logs].reverse().map((l) => (
         <div key={l.id} className="tabular flex items-center justify-between border-b border-line py-2 text-sm">
           <span>{formatVN(l.log_date, true)}{l.note ? <span className="text-muted"> · {l.note}</span> : null}</span>
           <span className="flex items-center gap-3">
             <b>{formatNumberVN(l.weight_kg, 1)} kg</b>
-            <button aria-label="Xoá" className="text-muted" onClick={async () => { await deleteWeight(l.id); await invalidate(qk.weights, qk.measurements); }}>✕</button>
+            <button aria-label={t('Xoá')} className="text-muted" onClick={async () => { await deleteWeight(l.id); await invalidate(qk.weights, qk.measurements); }}>✕</button>
           </span>
         </div>
       ))}

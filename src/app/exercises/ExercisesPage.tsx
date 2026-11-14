@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useActivePlan, useExerciseMaps } from '@/data/queries';
 import { searchExercises } from '@/engine/substitutions';
+import { t } from '@/i18n';
 import { Badge, Chip, ExerciseImg, Input, Page, Skeleton } from '@/ui/components';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from './labels';
 
@@ -15,10 +16,10 @@ export function ExercisesPage() {
   const [filter, setFilter] = useState<Filter>('in_plan');
   const [muscle, setMuscle] = useState<string | null>(null);
 
-  if (ex.loading) return <Page title="Bài tập"><Skeleton /></Page>;
+  if (ex.loading) return <Page title={t('Bài tập')}><Skeleton /></Page>;
   const inPlan = new Map<string, string[]>();
-  for (const t of plan.data?.content.templates ?? []) {
-    for (const it of t.items) inPlan.set(it.exercise, [...(inPlan.get(it.exercise) ?? []), t.name]);
+  for (const tpl of plan.data?.content.templates ?? []) {
+    for (const it of tpl.items) inPlan.set(it.exercise, [...(inPlan.get(it.exercise) ?? []), tpl.name]);
   }
   let list = q.trim() ? searchExercises(q, ex.list, 50) : ex.list.filter((e) => !e.archived);
   if (!q.trim()) {
@@ -30,13 +31,13 @@ export function ExercisesPage() {
   const muscles = [...new Set(ex.list.map((e) => e.primary_muscle))];
 
   return (
-    <Page title="Bài tập">
-      <Input placeholder="Tìm bài (gõ không dấu cũng được)…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Tìm bài" />
+    <Page title={t('Bài tập')}>
+      <Input placeholder={t('Tìm bài (gõ không dấu cũng được)…')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Tìm bài')} />
       <div className="my-3 flex gap-2 overflow-x-auto pb-1">
-        <Chip active={filter === 'in_plan'} onClick={() => setFilter('in_plan')}>Đang dùng</Chip>
-        <Chip active={filter === 'all'} onClick={() => setFilter('all')}>Tất cả ({ex.list.length})</Chip>
-        <Chip active={filter === 'unavailable'} onClick={() => setFilter('unavailable')}>Không có máy</Chip>
-        <Chip active={filter === 'provisional'} onClick={() => setFilter('provisional')}>Bài tạm</Chip>
+        <Chip active={filter === 'in_plan'} onClick={() => setFilter('in_plan')}>{t('Đang dùng')}</Chip>
+        <Chip active={filter === 'all'} onClick={() => setFilter('all')}>{t('Tất cả ({n})', { n: ex.list.length })}</Chip>
+        <Chip active={filter === 'unavailable'} onClick={() => setFilter('unavailable')}>{t('Không có máy')}</Chip>
+        <Chip active={filter === 'provisional'} onClick={() => setFilter('provisional')}>{t('Bài tạm')}</Chip>
       </div>
       <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
         {muscles.map((m) => (
@@ -53,9 +54,9 @@ export function ExercisesPage() {
             <div className="mt-1 flex flex-wrap gap-1">
               <Badge>{MUSCLE_LABEL[e.primary_muscle] ?? e.primary_muscle}</Badge>
               <Badge>{EQUIPMENT_LABEL[e.equipment] ?? e.equipment}</Badge>
-              {inPlan.get(e.slug)?.map((t) => <Badge key={t} tone="accent">{t}</Badge>)}
-              {!e.available_at_gym && <Badge tone="warn">không có máy</Badge>}
-              {e.is_provisional && <Badge tone="info">bài tạm</Badge>}
+              {inPlan.get(e.slug)?.map((name) => <Badge key={name} tone="accent">{name}</Badge>)}
+              {!e.available_at_gym && <Badge tone="warn">{t('không có máy')}</Badge>}
+              {e.is_provisional && <Badge tone="info">{t('bài tạm')}</Badge>}
             </div>
           </button>
         ))}

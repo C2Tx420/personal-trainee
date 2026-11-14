@@ -16,13 +16,13 @@ export type ReviewSection = { key: ReviewSectionKey; label: string; lines: Revie
 export type ParsedReview = { summary: string[]; sections: ReviewSection[] };
 
 const KEYS: [RegExp, ReviewSectionKey][] = [
-  [/^(tiến độ )?cân/i, 'weight'],
-  [/^số đo/i, 'body'],
-  [/^tập/i, 'training'],
+  [/^(tiến độ )?cân/i, 'weight'], // i18n-ignore: matches labels in the coach note
+  [/^số đo/i, 'body'], // i18n-ignore: matches labels in the coach note
+  [/^tập/i, 'training'], // i18n-ignore: matches labels in the coach note
   [/^inbody/i, 'inbody'],
-  [/^(bài tạm|thư viện)/i, 'library'],
-  [/^(đề xuất|lộ trình)/i, 'proposal'],
-  [/^(cần anh|câu hỏi|hỏi anh)/i, 'questions'],
+  [/^(bài tạm|thư viện)/i, 'library'], // i18n-ignore: matches labels in the coach note
+  [/^(đề xuất|lộ trình)/i, 'proposal'], // i18n-ignore: matches labels in the coach note
+  [/^(cần anh|câu hỏi|hỏi anh)/i, 'questions'], // i18n-ignore: matches labels in the coach note
 ];
 
 export function sectionKey(label: string): ReviewSectionKey {

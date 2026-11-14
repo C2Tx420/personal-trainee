@@ -6,6 +6,7 @@ import { formatSet, kgDeviates } from '@/engine/progression';
 import { isLbStack, kgToLb, pinsAround, stackStep } from '@/engine/stack';
 import { type ExerciseRow, type Feel, FEEL_LABEL, KG_CHANGE_LABEL, type KgChangeReason, type SessionItemRow, type SetRow } from '@/engine/types';
 import { type PlannedSet, setLabel } from '@/engine/warmup';
+import { t } from '@/i18n';
 import { Button, Chip, cx, Input, Stepper } from '@/ui/components';
 import { IconNote } from '@/ui/icons';
 import { fmtKg } from '../shared';
@@ -26,7 +27,7 @@ export function SetCard({
   lastSet,
   history = [],
   onSave,
-  saveLabel = 'Xong hiệp',
+  saveLabel = t('Xong hiệp'),
 }: {
   item: SessionItemRow;
   exercise: ExerciseRow;
@@ -101,7 +102,7 @@ export function SetCard({
         completed: true,
       });
     } catch (e) {
-      setError(`Chưa lưu được — ${(e as Error).message}. Số đã nhập vẫn giữ, bấm lại để thử.`);
+      setError(t('Chưa lưu được — {error}. Số đã nhập vẫn giữ, bấm lại để thử.', { error: (e as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -114,18 +115,18 @@ export function SetCard({
           {setLabel(planned, workingTotal)}
         </div>
         <div className="tabular text-sm text-muted">
-          mục tiêu {planned.targetKg !== null && !timeBased ? `${fmtKg(planned.targetKg)}kg × ` : ''}
+          {t('mục tiêu')} {planned.targetKg !== null && !timeBased ? `${fmtKg(planned.targetKg)}kg × ` : ''}
           {planned.repMin === planned.repMax ? planned.repMin : `${planned.repMin}–${planned.repMax}`}
-          {timeBased ? ' giây' : ''}
+          {timeBased ? ` ${t('giây')}` : ''}
         </div>
       </div>
 
       {lastSet && !existing && (
         <div className="tabular -mt-1 mb-3 flex items-center gap-2 text-sm" data-testid="last-set">
           <span className="min-w-0 flex-1 text-muted">
-            Lần trước: <b className="text-fg">{formatSet(lastSet)}</b>
+            {t('Lần trước:')} <b className="text-fg">{formatSet(lastSet)}</b>
             {lastSet.feel && ` · ${FEEL_LABEL[lastSet.feel].toLowerCase()}`}
-            {beatsLast && <span className="ml-1 text-ok">↑ hơn lần trước</span>}
+            {beatsLast && <span className="ml-1 text-ok">{t('↑ hơn lần trước')}</span>}
           </span>
           <Button
             size="sm"
@@ -135,7 +136,7 @@ export function SetCard({
               setReps(timeBased ? lastSet.seconds : lastSet.reps);
             }}
           >
-            Lặp lại
+            {t('Lặp lại')}
           </Button>
         </div>
       )}
@@ -153,12 +154,12 @@ export function SetCard({
           />
         )}
         {exercise.is_assisted && !timeBased && (
-          <div className="-mt-1 text-xs text-muted" data-testid="assisted-hint">Máy trợ lực: kg là trợ lực — kg thấp hơn là nặng hơn</div>
+          <div className="-mt-1 text-xs text-muted" data-testid="assisted-hint">{t('Máy trợ lực: kg là trợ lực — kg thấp hơn là nặng hơn')}</div>
         )}
         {lb && (
           <div data-testid="lb-pins">
             <div className="-mt-1 mb-1.5 text-xs text-muted">
-              Máy chia nấc lb{kg !== null && ` · ${fmtKg(kg)} kg ≈ ${kgToLb(kg)} lb`}
+              {t('Máy chia nấc lb')}{kg !== null && ` · ${fmtKg(kg)} kg ≈ ${kgToLb(kg)} lb`}
             </div>
             <div className="flex gap-1.5">
               {pinsAround(kg).map((p) => (
@@ -178,13 +179,13 @@ export function SetCard({
             </div>
           </div>
         )}
-        <Stepper label={timeBased ? 'giây' : 'lần'} unit={timeBased ? 'giây' : 'lần'} value={reps} onChange={setReps} step={timeBased ? 5 : 1} />
+        <Stepper label={timeBased ? t('giây') : t('lần')} unit={timeBased ? t('giây') : t('lần')} value={reps} onChange={setReps} step={timeBased ? 5 : 1} />
       </div>
 
       {deviates && (
         <div className="mt-3 rounded-ctl border border-warn/25 bg-warn-soft p-3" data-testid="kg-change">
           <div className="mb-2 text-sm font-semibold text-warn">
-            Mục tiêu {fmtKg(planned.targetKg)}kg → thực tế {fmtKg(kg)}kg · vì sao?
+            {t('Mục tiêu {target}kg → thực tế {actual}kg · vì sao?', { target: fmtKg(planned.targetKg), actual: fmtKg(kg) })}
           </div>
           <div className="flex flex-wrap gap-2">
             {(Object.keys(KG_CHANGE_LABEL) as KgChangeReason[]).map((r) => (
@@ -194,11 +195,11 @@ export function SetCard({
             ))}
           </div>
           {(reason === 'other' || reasonNote) && (
-            <Input className="mt-2" placeholder="Ghi thêm…" value={reasonNote} onChange={(e) => setReasonNote(e.target.value)} />
+            <Input className="mt-2" placeholder={t('Ghi thêm…')} value={reasonNote} onChange={(e) => setReasonNote(e.target.value)} />
           )}
         </div>
       )}
-      {belowReps && <p className="mt-2 text-sm text-warn">Ít hơn {planned.repMin} lần mục tiêu</p>}
+      {belowReps && <p className="mt-2 text-sm text-warn">{t('Ít hơn {n} lần mục tiêu', { n: planned.repMin })}</p>}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {(Object.keys(FEEL_LABEL) as Feel[]).map((f) => (
@@ -206,16 +207,16 @@ export function SetCard({
             {FEEL_LABEL[f]}
           </Chip>
         ))}
-        <button type="button" aria-label="Ghi chú hiệp" onClick={() => setShowNote((v) => !v)} className="glass-subtle ml-auto grid size-10 place-items-center rounded-full">
+        <button type="button" aria-label={t('Ghi chú hiệp')} onClick={() => setShowNote((v) => !v)} className="glass-subtle ml-auto grid size-10 place-items-center rounded-full">
           <IconNote className="size-[18px]" />
         </button>
       </div>
-      {showNote && <Input className="mt-2" placeholder="Ghi chú hiệp (vd. đau vai trái)" value={note} onChange={(e) => setNote(e.target.value)} />}
+      {showNote && <Input className="mt-2" placeholder={t('Ghi chú hiệp (vd. đau vai trái)')} value={note} onChange={(e) => setNote(e.target.value)} />}
       {suspicious && asking && (
         <div className="mt-3 rounded-ctl border border-warn/25 bg-warn-soft p-3" data-testid="typo-guard">
-          <div className="mb-2 text-sm font-semibold text-warn">Kiểm tra lại: {suspicious}</div>
+          <div className="mb-2 text-sm font-semibold text-warn">{t('Kiểm tra lại: {msg}', { msg: suspicious })}</div>
           <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="ghost" onClick={() => setAsking(false)}>Sửa</Button>
+            <Button size="sm" variant="ghost" onClick={() => setAsking(false)}>{t('Sửa')}</Button>
             <Button
               size="sm"
               variant="secondary"
@@ -224,14 +225,14 @@ export function SetCard({
                 void save(true);
               }}
             >
-              Đúng rồi — lưu
+              {t('Đúng rồi — lưu')}
             </Button>
           </div>
         </div>
       )}
       {error && <p className="mt-2 rounded-ctl border border-bad/25 bg-bad-soft p-2.5 text-sm text-bad">{error}</p>}
       <Button variant={planned.setType === 'warmup' ? 'secondary' : 'primary'} size="xl" block className="mt-4" disabled={busy} onClick={() => void save()}>
-        {busy ? 'Đang lưu…' : saveLabel}
+        {busy ? t('Đang lưu…') : saveLabel}
       </Button>
     </div>
   );

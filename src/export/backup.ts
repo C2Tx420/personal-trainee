@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { t } from '../i18n';
 
 /**
  * JSON backup `pt-backup/1` (§6.11). Every table except app_lock and push_subscriptions.
@@ -54,7 +55,7 @@ export type ImportPlan = { table: BackupTable; rows: Record<string, unknown>[] }
 /** Validate + order data for import. Throws a Vietnamese error message on bad format. */
 export function planImport(raw: unknown): { plan: ImportPlan; counts: Record<string, number>; skipped: string[] } {
   const parsed = backupSchema.safeParse(raw);
-  if (!parsed.success) throw new Error('File sao lưu không đúng định dạng pt-backup/1');
+  if (!parsed.success) throw new Error(t('File sao lưu không đúng định dạng pt-backup/1'));
   const plan: ImportPlan = [];
   const counts: Record<string, number> = {};
   const skipped: string[] = [];

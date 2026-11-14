@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { t } from '@/i18n';
 import { type SessionKind, SESSION_KIND_LABEL } from '@/engine/schedule';
 import { Button, cx } from '@/ui/components';
 
@@ -34,8 +35,7 @@ export function LiftSwap({
   return (
     <div className={cx('mt-3', divider && 'border-t border-line pt-3')} data-testid="lift-swap">
       <p className="mb-2 text-sm text-muted">
-        {title}
-        {hint ? ` — ${hint}` : ''}:
+        {hint ? t('{title} — {hint}:', { title, hint }) : `${title}:`}
       </p>
       <div className="grid grid-cols-2 gap-2">
         {options.map((k) => (
@@ -44,7 +44,7 @@ export function LiftSwap({
           </Button>
         ))}
       </div>
-      {legsBlocked && <p className="mt-2 text-xs text-muted">Không có Legs: sát ngày cầu lông hoặc Chủ nhật.</p>}
+      {legsBlocked && <p className="mt-2 text-xs text-muted">{t('Không có Legs: sát ngày cầu lông hoặc Chủ nhật.')}</p>}
     </div>
   );
 }

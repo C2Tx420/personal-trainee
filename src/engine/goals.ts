@@ -1,6 +1,7 @@
 import { diffDays, type IsoDate } from './dates';
 import { round } from './math';
 import { MAX_SAFE_LOSS_KG_PER_WEEK } from './plan-schema';
+import { t } from '../i18n';
 
 export type Goal = {
   id: string;
@@ -84,8 +85,8 @@ export function activeGoal(progress: GoalProgress[]): GoalProgress | undefined {
 }
 
 export const GOAL_STATUS_LABEL: Record<GoalStatus, string> = {
-  achieved: 'Đã đạt',
-  on_track: 'Đúng hướng',
-  behind: 'Chậm',
-  missed: 'Lỡ mốc',
+  achieved: t('Đã đạt'),
+  on_track: t('Đúng hướng'),
+  behind: t('Chậm'),
+  missed: t('Lỡ mốc'),
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { photoObjectUrl, type PhotoRow } from '@/data/api';
+import { t } from '@/i18n';
 import { cx } from '@/ui/components';
 
 /** Image loaded via a short-lived signed URL → blob URL, revoked on unmount. Never cached. */
@@ -19,9 +20,9 @@ export function PhotoThumb({ photo, className }: { photo: PhotoRow | undefined; 
       if (u) URL.revokeObjectURL(u);
     };
   }, [photo]);
-  if (!photo) return <div className={cx('grid aspect-[3/4] place-items-center rounded-xl bg-card-2 text-xs text-muted', className)}>Chưa có</div>;
+  if (!photo) return <div className={cx('grid aspect-[3/4] place-items-center rounded-xl bg-card-2 text-xs text-muted', className)}>{t('Chưa có')}</div>;
   return url ? (
-    <img src={url} alt={`Ảnh ${photo.angle} ${photo.taken_on}`} className={cx('aspect-[3/4] w-full rounded-xl object-cover', className)} />
+    <img src={url} alt={t('Ảnh {angle} {date}', { angle: photo.angle, date: photo.taken_on })} className={cx('aspect-[3/4] w-full rounded-xl object-cover', className)} />
   ) : (
     <div className={cx('aspect-[3/4] animate-pulse rounded-xl bg-card-2', className)} />
   );

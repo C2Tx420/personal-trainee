@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { exactMatch, searchExercises } from '@/engine/substitutions';
 import type { ExerciseRow } from '@/engine/types';
+import { t } from '@/i18n';
 import { cx, ExerciseImg, Input } from '@/ui/components';
 
 export type PickResult = { exercise: ExerciseRow } | { newName: string };
@@ -15,7 +16,7 @@ export function ExercisePicker({
   quick,
   value,
   onChange,
-  label = 'Bài thay thế',
+  label = t('Bài thay thế'),
   exclude,
 }: {
   library: ExerciseRow[];
@@ -43,14 +44,14 @@ export function ExercisePicker({
       </label>
       <Input
         id="pick-exercise"
-        placeholder="Gõ tên bài / máy anh sẽ tập…"
+        placeholder={t('Gõ tên bài / máy anh sẽ tập…')}
         value={text}
         onChange={(e) => {
-          const t = e.target.value;
-          setText(t);
-          const match = exactMatch(t, library);
-          if (!t.trim() || (match && match.id === exclude?.id)) onChange(null);
-          else onChange(match ? { exercise: match } : { newName: t.trim() });
+          const typed = e.target.value;
+          setText(typed);
+          const match = exactMatch(typed, library);
+          if (!typed.trim() || (match && match.id === exclude?.id)) onChange(null);
+          else onChange(match ? { exercise: match } : { newName: typed.trim() });
         }}
       />
       {quick.length > 0 && (
@@ -74,19 +75,19 @@ export function ExercisePicker({
               <ExerciseImg svg={e.illustration_svg} name={e.name} className="w-16 shrink-0" />
               <span className={cx('flex-1 text-sm', selectedId === e.id && 'font-semibold text-accent')}>
                 {e.name}
-                {!e.available_at_gym && <span className="ml-1 text-xs text-warn">(không có máy)</span>}
-                {e.is_provisional && <span className="ml-1 text-xs text-muted">(bài tạm)</span>}
+                {!e.available_at_gym && <span className="ml-1 text-xs text-warn">{t('(không có máy)')}</span>}
+                {e.is_provisional && <span className="ml-1 text-xs text-muted">{t('(bài tạm)')}</span>}
               </span>
             </button>
           ))}
           {isExcluded && (
             <div className="px-3 py-2 text-sm text-warn">
-              “{text.trim()}” chính là bài đang đổi ({exclude?.name}) — gõ tên máy / bài khác anh sẽ tập
+              {t('“{text}” chính là bài đang đổi ({name}) — gõ tên máy / bài khác anh sẽ tập', { text: text.trim(), name: exclude?.name ?? '' })}
             </div>
           )}
           {!exact && (
             <div className="px-3 py-2 text-sm text-muted">
-              Dùng tên mới “<b className="text-fg">{text.trim()}</b>” — tạo bài tạm, Claude sẽ bổ sung hình + kỹ thuật ở lần review
+              {t('Dùng tên mới')} “<b className="text-fg">{text.trim()}</b>”{t(' — tạo bài tạm, Claude sẽ bổ sung hình + kỹ thuật ở lần review')}
             </div>
           )}
         </div>

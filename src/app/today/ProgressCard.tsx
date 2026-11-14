@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router';
 import type { MeasurementRow, TrainingData } from '@/data/api';
 import { formatVN } from '@/engine/dates';
 import { formatNumberVN } from '@/engine/math';
+import { t } from '@/i18n';
 import { bodyChange, strengthChanges } from '@/engine/progress';
 import type { ExerciseRow } from '@/engine/types';
 import type { WeightLog } from '@/engine/weight';
@@ -35,11 +36,11 @@ export function ProgressCard({
   const row = 'tabular flex items-baseline justify-between gap-3 py-1.5 text-sm';
   return (
     <>
-      <SectionTitle>Tiến độ từ {formatVN(since)}</SectionTitle>
+      <SectionTitle>{t('Tiến độ từ {date}', { date: formatVN(since) })}</SectionTitle>
       <Card onClick={() => nav('/body')}>
         <div className="divide-y divide-line" data-testid="progress-card">
           <div className={row}>
-            <span className="text-muted">Cân (TB tuần)</span>
+            <span className="text-muted">{t('Cân (TB tuần)')}</span>
             {body.weight ? (
               <span>
                 {formatNumberVN(body.weight.firstAvg, 1)} → <b>{formatNumberVN(body.weight.lastAvg, 1)} kg</b>{' '}
@@ -48,25 +49,25 @@ export function ProgressCard({
             ) : (
               <span>
                 {body.weightThisWeek !== null && <b>{formatNumberVN(body.weightThisWeek, 1)} kg</b>}
-                <span className="text-muted"> · so được từ tuần 2</span>
+                <span className="text-muted"> · {t('so được từ tuần 2')}</span>
               </span>
             )}
           </div>
           <div className={row}>
-            <span className="text-muted">Vòng eo</span>
+            <span className="text-muted">{t('Vòng eo')}</span>
             {body.waist ? (
               <span>
                 {formatNumberVN(body.waist.first, 1)} → <b>{formatNumberVN(body.waist.last, 1)} cm</b>{' '}
                 <span className={cx(body.waist.delta < 0 ? 'text-ok' : 'text-muted')}>{signed(body.waist.delta)}</span>
               </span>
             ) : (
-              <span className="text-muted">cần 2 lần đo (2 tuần/lần)</span>
+              <span className="text-muted">{t('cần 2 lần đo (2 tuần/lần)')}</span>
             )}
           </div>
           {lifts.length === 0 ? (
             <div className={row}>
-              <span className="text-muted">Sức mạnh</span>
-              <span className="text-muted">mỗi bài tập 2 buổi là so được</span>
+              <span className="text-muted">{t('Sức mạnh')}</span>
+              <span className="text-muted">{t('mỗi bài tập 2 buổi là so được')}</span>
             </div>
           ) : (
             lifts.map((l) => (
@@ -75,11 +76,11 @@ export function ProgressCard({
                 <span className="shrink-0">
                   {l.first.kg === l.last.kg ? (
                     <>
-                      {fmtKg(l.last.kg)} kg: {l.first.reps} → <b>{l.last.reps} lần</b>
+                      {fmtKg(l.last.kg)} kg: {l.first.reps} → <b>{t('{n} lần', { n: l.last.reps })}</b>
                     </>
                   ) : (
                     <>
-                      {fmtKg(l.first.kg)} → <b>{fmtKg(l.last.kg)} kg{l.assisted && ' trợ lực'}</b>{' '}
+                      {fmtKg(l.first.kg)} → <b>{fmtKg(l.last.kg)} kg{l.assisted && ` ${t('trợ lực')}`}</b>{' '}
                       <span className={cx(l.pct > 0 ? 'text-ok' : 'text-warn')}>{signed(l.pct, 0)}%</span>
                     </>
                   )}

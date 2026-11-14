@@ -6,6 +6,7 @@ import { formatSet } from '@/engine/progression';
 import { isLbStack } from '@/engine/stack';
 import { FEEL_LABEL, KG_CHANGE_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
+import { t } from '@/i18n';
 import { Badge, Banner, Card, Empty, ExerciseImg, Page, SectionTitle, Skeleton, Spinner, Toggle } from '@/ui/components';
 import { itemSummary } from '../shared';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from './labels';
@@ -19,9 +20,9 @@ export function ExerciseDetailPage() {
   const ids = e ? [e.id, ...ex.list.filter((x) => x.canonical_exercise_id === e.id).map((x) => x.id)] : [];
   const history = useExerciseHistory(ids);
 
-  if (ex.loading) return <Page title="Bài tập" back="/exercises"><Skeleton /></Page>;
-  if (!e) return <Page title="Bài tập" back="/exercises"><Empty>Không tìm thấy bài</Empty></Page>;
-  const uses = (plan.data?.content.templates ?? []).flatMap((t) => t.items.filter((i) => i.exercise === slug).map((i) => ({ t: t.name, i })));
+  if (ex.loading) return <Page title={t('Bài tập')} back="/exercises"><Skeleton /></Page>;
+  if (!e) return <Page title={t('Bài tập')} back="/exercises"><Empty>{t('Không tìm thấy bài')}</Empty></Page>;
+  const uses = (plan.data?.content.templates ?? []).flatMap((tpl) => tpl.items.filter((i) => i.exercise === slug).map((i) => ({ name: tpl.name, i })));
 
   return (
     <Page title={e.name} back="/exercises">
@@ -30,13 +31,13 @@ export function ExerciseDetailPage() {
         <Badge tone="accent">{MUSCLE_LABEL[e.primary_muscle] ?? e.primary_muscle}</Badge>
         {e.secondary_muscles.map((m) => <Badge key={m}>{MUSCLE_LABEL[m] ?? m}</Badge>)}
         <Badge>{EQUIPMENT_LABEL[e.equipment] ?? e.equipment}</Badge>
-        {e.is_provisional && <Badge tone="info">bài tạm — chờ Claude bổ sung</Badge>}
+        {e.is_provisional && <Badge tone="info">{t('bài tạm — chờ Claude bổ sung')}</Badge>}
       </div>
-      {e.aliases.length > 0 && <p className="mb-3 text-xs text-muted">Tên gọi khác: {e.aliases.join(', ')}</p>}
+      {e.aliases.length > 0 && <p className="mb-3 text-xs text-muted">{t('Tên gọi khác: {names}', { names: e.aliases.join(', ') })}</p>}
 
-      {uses.map(({ t, i }) => (
-        <Card key={t}>
-          <div className="text-sm text-muted">Trong lộ trình · {t}</div>
+      {uses.map(({ name, i }) => (
+        <Card key={name}>
+          <div className="text-sm text-muted">{t('Trong lộ trình · {name}', { name })}</div>
           <div className="tabular font-semibold">{itemSummary(i)}</div>
           {i.coach_note && <div className="mt-1 text-sm text-info">Coach: “{i.coach_note}”</div>}
         </Card>
@@ -44,17 +45,17 @@ export function ExerciseDetailPage() {
 
       {e.cues.length > 0 && (
         <Card>
-          <div className="mb-1 font-semibold">Điểm kỹ thuật</div>
+          <div className="mb-1 font-semibold">{t('Điểm kỹ thuật')}</div>
           <ul className="list-disc space-y-0.5 pl-5 text-sm">{e.cues.map((c) => <li key={c}>{c}</li>)}</ul>
           {e.common_mistakes.length > 0 && (
             <>
-              <div className="mt-3 mb-1 font-semibold">Lỗi hay gặp</div>
+              <div className="mt-3 mb-1 font-semibold">{t('Lỗi hay gặp')}</div>
               <ul className="list-disc space-y-0.5 pl-5 text-sm text-muted">{e.common_mistakes.map((c) => <li key={c}>{c}</li>)}</ul>
             </>
           )}
           {e.reference_url && (
             <a href={e.reference_url} target="_blank" rel="noreferrer noopener" className="mt-2 block text-sm text-info underline">
-              Xem video hướng dẫn ↗
+              {t('Xem video hướng dẫn ↗')}
             </a>
           )}
         </Card>
@@ -63,11 +64,11 @@ export function ExerciseDetailPage() {
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="font-semibold">Phòng tập có máy / dụng cụ này</div>
-            <div className="text-xs text-muted">Tắt → app ẩn khỏi gợi ý, Claude không chọn bài này</div>
+            <div className="font-semibold">{t('Phòng tập có máy / dụng cụ này')}</div>
+            <div className="text-xs text-muted">{t('Tắt → app ẩn khỏi gợi ý, Claude không chọn bài này')}</div>
           </div>
           <Toggle
-            label="Phòng tập có máy"
+            label={t('Phòng tập có máy')}
             checked={e.available_at_gym}
             onChange={async (v) => {
               await setExerciseAvailable(e.id, v);
@@ -82,11 +83,11 @@ export function ExerciseDetailPage() {
         <Card>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="font-semibold">Máy chia nấc lb (Matrix)</div>
-              <div className="text-xs text-muted">Bật → khi tập chọn nấc 40 / 50 / 60 lb… app ghi 18 / 23 / 27 kg</div>
+              <div className="font-semibold">{t('Máy chia nấc lb (Matrix)')}</div>
+              <div className="text-xs text-muted">{t('Bật → khi tập chọn nấc 40 / 50 / 60 lb… app ghi 18 / 23 / 27 kg')}</div>
             </div>
             <Toggle
-              label="Máy chia nấc lb"
+              label={t('Máy chia nấc lb')}
               checked={isLbStack(e.load_step_kg)}
               onChange={async (v) => {
                 await setExerciseLbStack(e.id, v);
@@ -96,11 +97,11 @@ export function ExerciseDetailPage() {
           </div>
           <div className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
             <div>
-              <div className="font-semibold">Máy trợ lực</div>
-              <div className="text-xs text-muted">Kg là trợ lực (kéo xà / dip trợ lực) — kg thấp hơn là nặng hơn, kỷ lục và gợi ý tính ngược lại</div>
+              <div className="font-semibold">{t('Máy trợ lực')}</div>
+              <div className="text-xs text-muted">{t('Kg là trợ lực (kéo xà / dip trợ lực) — kg thấp hơn là nặng hơn, kỷ lục và gợi ý tính ngược lại')}</div>
             </div>
             <Toggle
-              label="Máy trợ lực"
+              label={t('Máy trợ lực')}
               checked={e.is_assisted}
               onChange={async (v) => {
                 await setExerciseAssisted(e.id, v);
@@ -111,9 +112,9 @@ export function ExerciseDetailPage() {
         </Card>
       )}
 
-      <SectionTitle>Lịch sử tạ</SectionTitle>
+      <SectionTitle>{t('Lịch sử tạ')}</SectionTitle>
       {history.isLoading && <Spinner />}
-      {history.data?.length === 0 && <Empty>Chưa tập bài này</Empty>}
+      {history.data?.length === 0 && <Empty>{t('Chưa tập bài này')}</Empty>}
       {history.data?.map((h) => (
         <Card key={h.sessionId}>
           <div className="mb-1 font-semibold">{formatVN(h.date, true)}</div>

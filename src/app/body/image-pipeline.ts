@@ -3,6 +3,8 @@
  * edge down to 1080px, re-encode JPEG via canvas → **all EXIF (GPS, device,
  * timestamp) is removed** because canvas carries no metadata.
  */
+import { t } from '@/i18n';
+
 const MAX_EDGE = 1080;
 
 export async function prepareImage(src: Blob): Promise<{ blob: Blob; width: number; height: number }> {
@@ -14,11 +16,11 @@ export async function prepareImage(src: Blob): Promise<{ blob: Blob; width: numb
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Trình duyệt không hỗ trợ canvas');
+  if (!ctx) throw new Error(t('Trình duyệt không hỗ trợ canvas'));
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
   const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Không nén được ảnh'))), 'image/jpeg', 0.82),
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error(t('Không nén được ảnh')))), 'image/jpeg', 0.82),
   );
   return { blob, width, height };
 }

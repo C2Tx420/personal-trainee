@@ -2,6 +2,7 @@ import { harder } from './load';
 import { sessionChanges } from './plan-diff';
 import type { PlanContent, PlanIssue, PlanItem } from './plan-schema';
 import { isLbStack, kgToLb, lbToKg } from './stack';
+import { t } from '../i18n';
 
 /**
  * Draft checks beyond `validatePlanRules` (plan v2.7 §16 B6), used by `coach/scripts/submit-draft.ts`
@@ -39,16 +40,16 @@ export function validateDraft(
     return { load_step_kg: up?.load_step_kg ?? lib?.load_step_kg ?? 2.5, is_assisted: up?.is_assisted ?? lib?.is_assisted ?? false };
   };
 
-  for (const t of draft.templates) {
+  for (const tpl of draft.templates) {
     const seen = new Set<string>();
-    for (const item of t.items) {
+    for (const item of tpl.items) {
       const ex = name(item.exercise);
-      if (seen.has(item.exercise)) issues.push({ level: 'error', message: `${t.name}: "${ex}" có 2 lần trong buổi` });
+      if (seen.has(item.exercise)) issues.push({ level: 'error', message: t('{session}: "{ex}" có 2 lần trong buổi', { session: tpl.name, ex }) });
       seen.add(item.exercise);
       const e = info(item.exercise);
       if (!e) continue;
 
-      const old = active?.templates.find((x) => x.key === t.key)?.items.find((x) => x.exercise === item.exercise);
+      const old = active?.templates.find((x) => x.key === tpl.key)?.items.find((x) => x.exercise === item.exercise);
       const loads = [item.target_kg, ...(item.target_kg_per_set ?? [])].filter((k): k is number => k !== null && k > 0);
       if (isLbStack(e.load_step_kg)) {
         const off = loads.filter((k) => !onLadder(k));
@@ -58,7 +59,9 @@ export function validateDraft(
           const unchanged = !!old && old.target_kg === item.target_kg && JSON.stringify(old.target_kg_per_set) === JSON.stringify(item.target_kg_per_set);
           issues.push({
             level: unchanged ? 'warning' : 'error',
-            message: `${t.name}: "${ex}" là máy nấc lb — tạ phải nằm trên thang 18/23/27/32/36… (${fix})${unchanged ? ' — đang lệch từ lộ trình cũ, nên sửa' : ''}`,
+            message: unchanged
+              ? t('{session}: "{ex}" là máy nấc lb — tạ phải nằm trên thang 18/23/27/32/36… ({fix}) — đang lệch từ lộ trình cũ, nên sửa', { session: tpl.name, ex, fix })
+              : t('{session}: "{ex}" là máy nấc lb — tạ phải nằm trên thang 18/23/27/32/36… ({fix})', { session: tpl.name, ex, fix }),
           });
         }
       }
@@ -66,7 +69,7 @@ export function validateDraft(
       if (working !== null && !e.is_assisted) {
         for (const w of item.warmup_sets) {
           if (w.kg !== undefined && w.kg >= working - EPS) {
-            issues.push({ level: 'error', message: `${t.name}: "${ex}" có hiệp làm nóng ${w.kg} kg ≥ tạ chính ${working} kg` });
+            issues.push({ level: 'error', message: t('{session}: "{ex}" có hiệp làm nóng {warm} kg ≥ tạ chính {working} kg', { session: tpl.name, ex, warm: w.kg, working }) });
           }
         }
       }
@@ -76,10 +79,10 @@ export function validateDraft(
       if (a !== null && working !== null && a !== working) {
         const steps = loadSteps(a, working, e.load_step_kg);
         if (steps > 1 + EPS) {
-          issues.push({ level: 'warning', message: `${t.name}: "${ex}" ${a} → ${working} kg là ${Math.round(steps * 10) / 10} bước (tối đa ±1 bước / tuần)` });
+          issues.push({ level: 'warning', message: t('{session}: "{ex}" {a} → {b} kg là {steps} bước (tối đa ±1 bước / tuần)', { session: tpl.name, ex, a, b: working, steps: Math.round(steps * 10) / 10 }) });
         }
         if (opts.painSlugs?.has(item.exercise) && harder(working, a, !!e.is_assisted)) {
-          issues.push({ level: 'warning', message: `${t.name}: "${ex}" tăng tạ dù anh ghi đau gần đây` });
+          issues.push({ level: 'warning', message: t('{session}: "{ex}" tăng tạ dù anh ghi đau gần đây', { session: tpl.name, ex }) });
         }
       }
     }
@@ -91,7 +94,7 @@ export function validateDraft(
       (acc, v) => acc + v.removed.length + v.items.filter((i) => i.status !== 'kept' || i.changes.length > 0).length,
       0,
     );
-    if (n > MAX_CHANGES_PER_WEEK) issues.push({ level: 'warning', message: `${n} thay đổi trong một tuần (nên ≤ ${MAX_CHANGES_PER_WEEK})` });
+    if (n > MAX_CHANGES_PER_WEEK) issues.push({ level: 'warning', message: t('{n} thay đổi trong một tuần (nên ≤ {max})', { n, max: MAX_CHANGES_PER_WEEK }) });
   }
   return issues;
 }

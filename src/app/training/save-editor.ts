@@ -4,6 +4,7 @@ import type { PlanContent, PlanItem } from '@/engine/plan-schema';
 import type { SessionKind } from '@/engine/schedule';
 import { normalizeVi } from '@/engine/text';
 import type { ExerciseRow, WarmupLog } from '@/engine/types';
+import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import type { EditorItem } from './SessionEditor';
 
@@ -17,16 +18,16 @@ export async function saveEditor(args: {
   content: PlanContent | null;
   planVersionId: string | null;
 }): Promise<string> {
-  const template = args.content?.templates.find((t) => args.kind.startsWith(t.key));
+  const template = args.content?.templates.find((tpl) => args.kind.startsWith(tpl.key));
   const out: BackfillItem[] = [];
   for (const it of args.items) {
-    if (!it.pick) throw new Error('Còn bài chưa chọn — chọn bài cho các dòng màu vàng');
+    if (!it.pick) throw new Error(t('Còn bài chưa chọn — chọn bài cho các dòng màu vàng'));
     const ex: ExerciseRow = 'exercise' in it.pick ? it.pick.exercise : await createProvisionalExercise(it.pick.newName, null, null);
     // the user picked an exercise for an unknown name → save that name as an alias for next time
     if (it.rawName && 'exercise' in it.pick && ![ex.name, ...ex.aliases].some((n) => normalizeVi(n) === normalizeVi(it.rawName!))) {
       await supabase.from('exercises').update({ aliases: [...ex.aliases, it.rawName] }).eq('id', ex.id);
     }
-    const tplPos = template?.items.findIndex((t) => t.exercise === ex.slug || t.alternatives.includes(ex.slug)) ?? -1;
+    const tplPos = template?.items.findIndex((x) => x.exercise === ex.slug || x.alternatives.includes(ex.slug)) ?? -1;
     const fromTpl = tplPos >= 0 ? template!.items[tplPos] : undefined;
     const working = it.sets.filter((s) => s.set_type === 'working');
     const reps = working.map((s) => s.reps ?? s.seconds ?? 0);

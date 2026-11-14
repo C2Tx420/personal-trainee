@@ -1,6 +1,7 @@
 import { addDays, diffDays, type IsoDate, weekStart } from './dates';
 import { avg, round, slope } from './math';
 import { CALORIES_FLOOR } from './plan-schema';
+import { t } from '../i18n';
 
 export type WeightLog = { log_date: IsoDate; weight_kg: number };
 
@@ -63,6 +64,8 @@ export type CalorieSuggestion = {
   /** hit the 1,700 floor → only suggest more activity */
   atFloor: boolean;
   tips: string[];
+  /** the same tips in Vietnamese, for text stored in the DB */
+  tipsVi: string[];
 };
 
 /** Suggestion after a 2-week plateau: lower reference calories by 100–150 kcal, never below 1,700. */
@@ -70,11 +73,18 @@ export function stallSuggestion(currentCalories: number, reduction = 150): Calor
   const target = Math.max(CALORIES_FLOOR, currentCalories - reduction);
   const atFloor = target === currentCalories;
   const tips = atFloor
-    ? ['Calo tham khảo đã ở mức sàn 1.700 — tăng vận động: thêm ~2.000 bước/ngày']
+    ? [t('Calo tham khảo đã ở mức sàn 1.700 — tăng vận động: thêm ~2.000 bước/ngày')]
     : [
-        'Bớt ~⅓ chén cơm mỗi bữa chính',
-        'Bỏ 1 ly nước ngọt / trà sữa mỗi ngày (≈ 100–150 kcal)',
-        'Thêm ~2.000 bước/ngày',
+        t('Bớt ~⅓ chén cơm mỗi bữa chính'),
+        t('Bỏ 1 ly nước ngọt / trà sữa mỗi ngày (≈ 100–150 kcal)'),
+        t('Thêm ~2.000 bước/ngày'),
       ];
-  return { newCalories: target, reduction: currentCalories - target, atFloor, tips };
+  const tipsVi = atFloor
+    ? ['Calo tham khảo đã ở mức sàn 1.700 — tăng vận động: thêm ~2.000 bước/ngày'] // i18n-ignore: stored
+    : [
+        'Bớt ~⅓ chén cơm mỗi bữa chính', // i18n-ignore: stored
+        'Bỏ 1 ly nước ngọt / trà sữa mỗi ngày (≈ 100–150 kcal)', // i18n-ignore: stored
+        'Thêm ~2.000 bước/ngày', // i18n-ignore: stored
+      ];
+  return { newCalories: target, reduction: currentCalories - target, atFloor, tips, tipsVi };
 }

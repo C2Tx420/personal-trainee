@@ -4,26 +4,26 @@ A single-user PWA for strength training and body recomposition. It runs a fixed 
 
 Every Monday **Claude Code acts as the coach**: it reads the week through a read-only Postgres role, writes a review note and submits next week's plan as a **draft**. Nothing changes until the user approves it in the app.
 
-Vietnamese UI · mobile-first · dark theme · online-only (no health data cached on the device).
+Vietnamese and English UI · mobile-first · dark theme · online-only (no health data cached on the device).
 
 <table>
   <tr>
     <td><img src=".github/screenshots/today.png" width="260" alt="Today: goal countdown and today's Pull session"></td>
-    <td><img src=".github/screenshots/set.png" width="260" alt="Logging a warm-up set with lb pin chips"></td>
+    <td><img src=".github/screenshots/set.png" width="260" alt="Logging a warm-up set"></td>
     <td><img src=".github/screenshots/rest.png" width="260" alt="Full-screen rest timer"></td>
   </tr>
   <tr>
     <td align="center">Today: goal and session</td>
-    <td align="center">Logging a set (lb pin stack)</td>
+    <td align="center">Logging a set</td>
     <td align="center">Rest timer</td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/summary.png" width="260" alt="Workout summary"></td>
+    <td><img src=".github/screenshots/summary.png" width="260" alt="Session summary"></td>
     <td><img src=".github/screenshots/training.png" width="260" alt="Training week and sets per muscle"></td>
     <td><img src=".github/screenshots/exercise.png" width="260" alt="Exercise page with illustration and cues"></td>
   </tr>
   <tr>
-    <td align="center">Workout summary</td>
+    <td align="center">Session summary</td>
     <td align="center">Week + sets per muscle</td>
     <td align="center">Exercise library</td>
   </tr>
@@ -39,7 +39,7 @@ Vietnamese UI · mobile-first · dark theme · online-only (no health data cache
   </tr>
 </table>
 
-<sub>Screenshots come from the Playwright run against a local Supabase with sample seed data.</sub>
+<sub>Screenshots come from the Playwright run against a local Supabase with sample seed data, with the UI set to English. Content written by the user or the coach (exercise cues, coach notes) stays in the language it was written in.</sub>
 
 ## Features
 
@@ -50,17 +50,18 @@ Vietnamese UI · mobile-first · dark theme · online-only (no health data cache
 - **Goals**: dated milestones with the required weekly rate. Loss faster than 0.7 kg/week gets flagged.
 - **Coach loop**: a weekly report → plan draft with reasons → a diff screen to approve or reject → the review note shows in the app.
 - **Reminders**: Web Push for weigh-in, measurements, progress photos, InBody, workout, missed workout, weekly review and goal milestones, sent by an Edge Function on pg_cron.
+- **Two languages**: Vietnamese (default) and English, switched under More → Language. Dates and numbers follow the language.
 - **Safety**: PIN lock on open, one account (sign-up disabled), hard rules enforced in the DB and the app: reference calories ≥ 1,700, Legs never next to badminton, no Legs on Sunday.
 
 ## Quality
 
-Measured on 13/11/2026 at commit time.
+Measured on 14/11/2026 at commit time.
 
 | Check | Result |
 |---|---|
-| Unit tests (Vitest, `src/engine`) | **105 / 105** passing |
+| Unit tests (Vitest: engine, i18n coverage) | **113 / 113** passing |
 | Database tests (pgTAP: bootstrap, constraints, RLS, coach role) | **55 / 55** passing |
-| End-to-end (Playwright, local Supabase) | **12 / 12** scenarios passing, 47 screens covered |
+| End-to-end (Playwright, local Supabase) | **13 / 13** scenarios passing, 47 screens covered + English screenshots |
 | Lighthouse mobile: Performance / Accessibility / Best Practices | **95 / 100 / 100** |
 | Core Web Vitals (Lighthouse, simulated slow 4G) | LCP 2.5 s · TBT 0 ms · CLS 0 |
 | Initial JS + CSS (gzip) | 223 KB |

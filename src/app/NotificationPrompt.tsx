@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { subscribePush } from '@/data/api';
+import { t } from '@/i18n';
 import { Banner, Button, Sheet } from '@/ui/components';
 
 /**
@@ -68,7 +69,7 @@ export function NotificationPrompt({ blocked }: { blocked: boolean }) {
     } catch (e) {
       if (pushSupported() && Notification.permission === 'denied') {
         snooze();
-        setError('Đã chặn thông báo — mở Cài đặt của máy → Thông báo → Personal Trainee để bật lại.');
+        setError(t('Đã chặn thông báo — mở Cài đặt của máy → Thông báo → Personal Trainee để bật lại.'));
       } else setError((e as Error).message);
     } finally {
       setBusy(false);
@@ -76,30 +77,29 @@ export function NotificationPrompt({ blocked }: { blocked: boolean }) {
   }
 
   return (
-    <Sheet open={!!state && !blocked} onClose={later} title={state === 'install' ? 'Thêm app vào màn hình chính' : 'Bật nhắc nhở'}>
+    <Sheet open={!!state && !blocked} onClose={later} title={state === 'install' ? t('Thêm app vào màn hình chính') : t('Bật nhắc nhở')}>
       {state === 'install' ? (
         <>
           <p className="mb-3 text-sm text-muted">
-            iPhone chỉ nhận thông báo nhắc tập khi app được mở từ icon trên màn hình chính (iOS 16.4+):
+            {t('iPhone chỉ nhận thông báo nhắc tập khi app được mở từ icon trên màn hình chính (iOS 16.4+):')}
           </p>
           <ol className="mb-3 list-decimal space-y-1 pl-5 text-sm">
-            <li>Trong Safari, bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên).</li>
-            <li>Chọn <b>Thêm vào MH chính</b> → Thêm.</li>
-            <li>Mở Personal Trainee từ icon mới, app sẽ hỏi bật thông báo.</li>
+            <li>{t('Trong Safari, bấm nút')} <b>{t('Chia sẻ')}</b> {t('(ô vuông có mũi tên lên).')}</li>
+            <li>{t('Chọn')} <b>{t('Thêm vào MH chính')}</b> {t('→ Thêm.')}</li>
+            <li>{t('Mở Personal Trainee từ icon mới, app sẽ hỏi bật thông báo.')}</li>
           </ol>
-          <Button variant="primary" block onClick={later}>Đã hiểu</Button>
+          <Button variant="primary" block onClick={later}>{t('Đã hiểu')}</Button>
         </>
       ) : (
         <>
           <p className="mb-3 text-sm text-muted">
-            Nhắc giờ tập theo lịch, cân sáng thứ Hai, chụp ảnh 2 tuần/lần và review tuần. Nội dung nhắc luôn chung chung, không có số liệu sức khỏe.
-            Chỉnh giờ hoặc tắt từng loại ở Thêm → Nhắc nhở.
+            {t('Nhắc giờ tập theo lịch, cân sáng thứ Hai, chụp ảnh 2 tuần/lần và review tuần. Nội dung nhắc luôn chung chung, không có số liệu sức khỏe. Chỉnh giờ hoặc tắt từng loại ở Thêm → Nhắc nhở.')}
           </p>
           {error && <Banner tone="bad">{error}</Banner>}
           <div className="grid grid-cols-2 gap-2">
-            <Button onClick={later}>Để sau</Button>
+            <Button onClick={later}>{t('Để sau')}</Button>
             <Button variant="primary" disabled={busy} onClick={() => void enable()}>
-              {busy ? 'Đang bật…' : 'Bật thông báo'}
+              {busy ? t('Đang bật…') : t('Bật thông báo')}
             </Button>
           </div>
         </>

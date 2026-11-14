@@ -3,8 +3,8 @@ export function normalizeVi(s: string): string {
   return s
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'd')
+    .replace(/đ/g, 'd') // i18n-ignore: folds Vietnamese input
+    .replace(/Đ/g, 'd') // i18n-ignore
     .toLowerCase()
     .replace(/[^a-z0-9 ]+/g, ' ')
     .replace(/\s+/g, ' ')

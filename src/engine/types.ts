@@ -1,6 +1,7 @@
 import type { IsoDate } from './dates';
 import type { PlanItem } from './plan-schema';
 import type { SessionKind } from './schedule';
+import { t } from '../i18n';
 
 /** Row types shared by the app, the engine and the coach scripts (match the Postgres tables). */
 
@@ -112,18 +113,18 @@ export type SetRow = {
 };
 
 export const KG_CHANGE_LABEL: Record<KgChangeReason, string> = {
-  too_heavy: 'Nặng quá',
-  too_light: 'Nhẹ quá',
-  machine_diff: 'Máy khác vạch / khác hãng',
-  pain: 'Đau / mỏi',
-  other: 'Khác',
+  too_heavy: t('Nặng quá'),
+  too_light: t('Nhẹ quá'),
+  machine_diff: t('Máy khác vạch / khác hãng'),
+  pain: t('Đau / mỏi'),
+  other: t('Khác'),
 };
 
-export const FEEL_LABEL: Record<Feel, string> = { easy: 'Nhẹ', ok: 'Vừa', hard: 'Nặng' };
+export const FEEL_LABEL: Record<Feel, string> = { easy: t('Nhẹ'), ok: t('Vừa'), hard: t('Nặng') };
 
 export const SUBSTITUTION_LABEL: Record<SubstitutionReason, string> = {
-  unavailable: 'Không có máy',
-  busy: 'Máy bận',
-  pain: 'Đau / không hợp',
-  preference: 'Đổi theo ý',
+  unavailable: t('Không có máy'),
+  busy: t('Máy bận'),
+  pain: t('Đau / không hợp'),
+  preference: t('Đổi theo ý'),
 };

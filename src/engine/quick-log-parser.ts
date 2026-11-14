@@ -126,7 +126,7 @@ export function parseQuickLog(text: string, today: IsoDate): ParsedLog {
 
   for (const raw of lines) {
     const n = normalizeVi(raw.replace(/(\d)[.,](\d)/g, '$1.$2'));
-    const nDots = raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+    const nDots = raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd'); // i18n-ignore: parses Vietnamese input
 
     if (!dateSet) {
       const d = parseDate(n, raw, today);

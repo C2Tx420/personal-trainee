@@ -1,16 +1,17 @@
 import { round } from './math';
+import { t } from '../i18n';
 
 export const MEASUREMENT_FIELDS = [
-  ['neck_cm', 'Vòng cổ'],
-  ['chest_cm', 'Vòng ngực'],
-  ['waist_navel_cm', 'Vòng eo (ngang rốn)'],
-  ['abdomen_cm', 'Vòng bụng'],
-  ['hip_cm', 'Vòng hông'],
-  ['shoulder_cm', 'Vòng vai'],
-  ['upper_arm_cm', 'Bắp tay trên'],
-  ['forearm_cm', 'Bắp tay dưới'],
-  ['thigh_cm', 'Vòng đùi'],
-  ['calf_cm', 'Bắp chân'],
+  ['neck_cm', t('Vòng cổ')],
+  ['chest_cm', t('Vòng ngực')],
+  ['waist_navel_cm', t('Vòng eo (ngang rốn)')],
+  ['abdomen_cm', t('Vòng bụng')],
+  ['hip_cm', t('Vòng hông')],
+  ['shoulder_cm', t('Vòng vai')],
+  ['upper_arm_cm', t('Bắp tay trên')],
+  ['forearm_cm', t('Bắp tay dưới')],
+  ['thigh_cm', t('Vòng đùi')],
+  ['calf_cm', t('Bắp chân')],
 ] as const;
 
 export type MeasurementKey = (typeof MEASUREMENT_FIELDS)[number][0];

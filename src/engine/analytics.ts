@@ -1,8 +1,9 @@
 import { addDays, type IsoDate } from './dates';
 import { byHardest, effectiveLoad, harder, sameLoad } from './load';
-import { round } from './math';
+import { formatNumberVN, round } from './math';
 import { isLbStack, kgToLb, lbToKg, stackStep } from './stack';
 import type { SessionRow, SetRow } from './types';
+import { t } from '../i18n';
 
 /**
  * Training analytics shared by the weekly coach report and the app (plan v2.7 §16 B2–B4).
@@ -252,21 +253,23 @@ export function suspiciousSet(
   opts: { repMax?: number | null; loadStepKg?: number } = {},
 ): string | null {
   const prev = loaded(history);
-  const fmt = (n: number) => String(n).replace('.', ',');
+  const fmt = (n: number) => formatNumberVN(n, 2);
   if (input.kg !== null && input.kg > 0) {
     if (opts.loadStepKg !== undefined && isLbStack(opts.loadStepKg)) {
       const pin = lbToKg(kgToLb(input.kg));
-      if (Math.abs(pin - input.kg) > 0.01) return `${fmt(input.kg)} kg không có trên máy nấc lb — nấc gần nhất ${pin} kg (${kgToLb(input.kg)} lb)`;
+      if (Math.abs(pin - input.kg) > 0.01) return t('{kg} kg không có trên máy nấc lb — nấc gần nhất {pin} kg ({lb} lb)', { kg: fmt(input.kg), pin: fmt(pin), lb: kgToLb(input.kg) });
     }
     if (prev.length) {
       const max = Math.max(...prev.map((s) => s.weight_kg));
-      if (max > 0 && input.kg > max * 1.5) return `${fmt(input.kg)} kg? Nặng nhất từng tập ${fmt(max)} kg`;
-      if (max > 0 && input.kg < max * 0.4) return `${fmt(input.kg)} kg? Thường tập tới ${fmt(max)} kg`;
+      if (max > 0 && input.kg > max * 1.5) return t('{kg} kg? Nặng nhất từng tập {max} kg', { kg: fmt(input.kg), max: fmt(max) });
+      if (max > 0 && input.kg < max * 0.4) return t('{kg} kg? Thường tập tới {max} kg', { kg: fmt(input.kg), max: fmt(max) });
     }
   }
   if (input.reps !== null) {
     const ref = opts.repMax ?? (prev.length ? Math.max(...prev.map((s) => s.reps)) : null);
-    if (ref && input.reps > 20 && input.reps > ref * 2) return `${input.reps} lần? ${opts.repMax ? `Mục tiêu tối đa ${opts.repMax}` : `Nhiều nhất từng tập ${ref}`} lần`;
+    if (ref && input.reps > 20 && input.reps > ref * 2) return opts.repMax
+        ? t('{reps} lần? Mục tiêu tối đa {max} lần', { reps: input.reps, max: opts.repMax })
+        : t('{reps} lần? Nhiều nhất từng tập {max} lần', { reps: input.reps, max: ref });
   }
   return null;
 }

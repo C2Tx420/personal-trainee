@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAppMeta, useInProgress } from '@/data/queries';
 import { useOnline } from '@/lib/hooks';
+import { t } from '@/i18n';
 import { MIN_SCHEMA_VERSION } from '@/lib/version';
 import { Banner, cx, PageBanners } from '@/ui/components';
 import { IconBook, IconDumbbell, IconMore, IconPulse, IconToday } from '@/ui/icons';
@@ -10,11 +11,11 @@ import { WhatsNewSheet } from './WhatsNew';
 import { useWhatsNewUnseen } from './whats-new';
 
 const TABS = [
-  { to: '/', label: 'Hôm nay', Icon: IconToday, end: true },
-  { to: '/training', label: 'Tập', Icon: IconDumbbell },
-  { to: '/exercises', label: 'Bài tập', Icon: IconBook },
-  { to: '/body', label: 'Cơ thể', Icon: IconPulse },
-  { to: '/more', label: 'Thêm', Icon: IconMore },
+  { to: '/', label: t('Hôm nay'), Icon: IconToday, end: true },
+  { to: '/training', label: t('Tập'), Icon: IconDumbbell },
+  { to: '/exercises', label: t('Bài tập'), Icon: IconBook },
+  { to: '/body', label: t('Cơ thể'), Icon: IconPulse },
+  { to: '/more', label: t('Thêm'), Icon: IconMore },
 ];
 
 export function AppShell() {
@@ -33,10 +34,10 @@ export function AppShell() {
 
   const banners = (
     <>
-      {dbOutdated && <Banner tone="bad">Database cần chạy migration mới ({meta.data?.schema_version} &lt; {MIN_SCHEMA_VERSION})</Banner>}
+      {dbOutdated && <Banner tone="bad">{t('Database cần chạy migration mới ({have} < {min})', { have: meta.data?.schema_version ?? '', min: MIN_SCHEMA_VERSION })}</Banner>}
       {inProgress.data && !loc.pathname.startsWith('/workout') && (
-        <Banner tone="accent" onClick={() => nav(`/workout/${inProgress.data!.id}`)} action={<span className="font-bold">Tiếp tục ›</span>}>
-          Đang có buổi tập dở
+        <Banner tone="accent" onClick={() => nav(`/workout/${inProgress.data!.id}`)} action={<span className="font-bold">{t('Tiếp tục ›')}</span>}>
+          {t('Đang có buổi tập dở')}
         </Banner>
       )}
     </>
@@ -46,7 +47,7 @@ export function AppShell() {
     <div className="min-h-dvh">
       {!online && (
         <div className="sticky top-0 z-40 bg-warn/90 px-4 pt-[calc(env(safe-area-inset-top)+0.375rem)] pb-1.5 text-center text-sm font-semibold text-black backdrop-blur" role="alert">
-          Mất kết nối — không lưu được cho tới khi có mạng
+          {t('Mất kết nối — không lưu được cho tới khi có mạng')}
         </div>
       )}
       <PageBanners value={banners}>
@@ -73,7 +74,7 @@ export function AppShell() {
                 <>
                   <span className="relative">
                     <Icon className={cx('size-[22px]', isActive && 'text-accent')} />
-                    {to === '/more' && whatsNew && <span className="absolute -top-0.5 -right-1 size-2 rounded-full bg-accent" aria-label="Có tính năng mới" />}
+                    {to === '/more' && whatsNew && <span className="absolute -top-0.5 -right-1 size-2 rounded-full bg-accent" aria-label={t('Có tính năng mới')} />}
                   </span>
                   {label}
                 </>

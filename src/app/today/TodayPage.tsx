@@ -6,22 +6,23 @@ import { addDays, diffDays, formatVN, todayVN, WEEKDAY_LABEL, weekdayOf, weekSta
 import { activeGoal, GOAL_STATUS_LABEL, goalProgress } from '@/engine/goals';
 import { inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
+import { t } from '@/i18n';
 import type { SundayOption } from '@/engine/plan-schema';
 import { BADMINTON_SUBSTITUTES, dayPlanFor, liftOptionsFor, replacedNote, restDayOptions, type SessionKind, SESSION_KIND_LABEL, templateFor, templateForKind, templateKeyOf, todayConflictWarning } from '@/engine/schedule';
 import { DEFAULT_BODY_WEIGHT_KG, lossTrendKgPerWeek } from '@/engine/weight';
 import { weekSummary } from '@/engine/workout-summary';
 import { Badge, Banner, Button, Card, ErrorBox, Page, ProgressBar, SectionTitle, Skeleton } from '@/ui/components';
-import { ExerciseLine } from '../shared';
+import { ExerciseLine, fmtKg } from '../shared';
 import { LiftSwap } from './LiftSwap';
 import { ProgressCard } from './ProgressCard';
 import { SkipDaySheet } from './SkipDaySheet';
 
 const SUNDAY_LABEL: Record<SundayOption, string> = {
-  walk: 'Đi bộ 30–40 phút',
+  walk: t('Đi bộ 30–40 phút'),
   zone2: 'Cardio zone 2',
-  core: 'Core 10–15 phút',
-  push_light: 'Push nhẹ',
-  pull_light: 'Pull nhẹ',
+  core: t('Core 10–15 phút'),
+  push_light: t('Push nhẹ'),
+  pull_light: t('Pull nhẹ'),
 };
 
 export function TodayPage() {
@@ -43,9 +44,9 @@ export function TodayPage() {
   const [error, setError] = useState<unknown>(null);
   const [skipKind, setSkipKind] = useState<SessionKind | null>(null);
 
-  if (plan.isLoading || ex.loading || training.isLoading) return <Page title="Hôm nay"><Skeleton /></Page>;
-  if (plan.error) return <Page title="Hôm nay"><ErrorBox error={plan.error} /></Page>;
-  if (!plan.data) return <Page title="Hôm nay"><Banner tone="warn">Chưa có lộ trình active</Banner></Page>;
+  if (plan.isLoading || ex.loading || training.isLoading) return <Page title={t('Hôm nay')}><Skeleton /></Page>;
+  if (plan.error) return <Page title={t('Hôm nay')}><ErrorBox error={plan.error} /></Page>;
+  if (!plan.data) return <Page title={t('Hôm nay')}><Banner tone="warn">{t('Chưa có lộ trình active')}</Banner></Page>;
 
   const content = plan.data.content;
   const day = dayPlanFor(content, today);
@@ -124,8 +125,8 @@ export function TodayPage() {
       <LiftSwap
         title={title}
         options={liftOptions.filter((k) => k !== scheduled && !opts.exclude?.includes(k))}
-        hint={tomorrowName ? `mai là ${tomorrowName}, tránh trùng nhóm cơ hoặc chọn bản nhẹ` : null}
-        legsBlocked={!liftOptions.includes('legs') && content.templates.some((t) => t.key === 'legs')}
+        hint={tomorrowName ? t('mai là {name}, tránh trùng nhóm cơ hoặc chọn bản nhẹ', { name: tomorrowName }) : null}
+        legsBlocked={!liftOptions.includes('legs') && content.templates.some((tmpl) => tmpl.key === 'legs')}
         disabled={starting}
         defaultOpen={opts.defaultOpen}
         divider={opts.divider}
@@ -140,12 +141,12 @@ export function TodayPage() {
         .filter((s) => s.kind !== scheduled)
         .map((s) => (
           <Button key={s.id} block className="mt-2" onClick={() => nav(`/training/session/${s.id}`)}>
-            Xem buổi {SESSION_KIND_LABEL[s.kind]} đã tập
+            {t('Xem buổi {kind} đã tập', { kind: SESSION_KIND_LABEL[s.kind] })}
           </Button>
         ))}
       {withContinue && inProgress.data && (
         <Button variant="primary" size="lg" block className="mt-2" onClick={() => nav(`/workout/${inProgress.data!.id}`)}>
-          Tiếp tục buổi {SESSION_KIND_LABEL[inProgress.data.kind]}
+          {t('Tiếp tục buổi {kind}', { kind: SESSION_KIND_LABEL[inProgress.data.kind] })}
         </Button>
       )}
     </>
@@ -156,7 +157,7 @@ export function TodayPage() {
   const lightDoneRow = lightDone.length > 0 && (
     <div className="mb-2 flex flex-wrap gap-1.5">
       {lightDone.map((s) => (
-        <Badge key={s.id} tone="ok">Đã ghi {SESSION_KIND_LABEL[s.kind].toLowerCase()}{s.duration_min ? ` ${s.duration_min}′` : ''}</Badge>
+        <Badge key={s.id} tone="ok">{t('Đã ghi {kind}', { kind: SESSION_KIND_LABEL[s.kind].toLowerCase() })}{s.duration_min ? ` ${s.duration_min}′` : ''}</Badge>
       ))}
     </div>
   );
@@ -173,46 +174,46 @@ export function TodayPage() {
       return (
         <div className="glass-subtle rounded-ctl flex items-center gap-3 px-3.5 py-3 text-sm">
           <div className="min-w-0 flex-1">
-            <Badge tone="warn">Đã nghỉ</Badge> {skipped.note && <span className="text-muted">{skipped.note}</span>}
+            <Badge tone="warn">{t('Đã nghỉ')}</Badge> {skipped.note && <span className="text-muted">{skipped.note}</span>}
           </div>
-          <Button size="sm" variant="ghost" onClick={() => void unskip(skipped.id)}>Huỷ</Button>
+          <Button size="sm" variant="ghost" onClick={() => void unskip(skipped.id)}>{t('Huỷ')}</Button>
         </div>
       );
     }
     return inProgress.data ? null : (
-      <Button variant="ghost" block className="mt-2" onClick={() => setSkipKind(kind)}>Nghỉ buổi này</Button>
+      <Button variant="ghost" block className="mt-2" onClick={() => setSkipKind(kind)}>{t('Nghỉ buổi này')}</Button>
     );
   };
 
   const startButton = (kind: SessionKind) =>
     inProgress.data ? (
       <Button variant="primary" size="lg" block onClick={() => nav(`/workout/${inProgress.data!.id}`)}>
-        Tiếp tục buổi tập
+        {t('Tiếp tục buổi tập')}
       </Button>
     ) : (
       <Button variant="primary" size="lg" block disabled={starting} onClick={() => void start(kind)}>
-        {starting ? 'Đang tạo buổi…' : 'Bắt đầu buổi tập'}
+        {starting ? t('Đang tạo buổi…') : t('Bắt đầu buổi tập')}
       </Button>
     );
 
   return (
-    <Page title={`Hôm nay · ${WEEKDAY_LABEL[weekdayOf(today)]}, ${formatVN(today)}`}>
+    <Page title={t('Hôm nay · {weekday}, {date}', { weekday: WEEKDAY_LABEL[weekdayOf(today)], date: formatVN(today) })}>
       {drafts.length > 0 && (
-        <Banner tone="accent" onClick={() => nav(`/more/plans/${drafts[0].id}`)} action={<b>Xem ›</b>}>
-          Có {drafts.length} lộ trình mới chờ duyệt
+        <Banner tone="accent" onClick={() => nav(`/more/plans/${drafts[0].id}`)} action={<b>{t('Xem ›')}</b>}>
+          {t('Có {n} lộ trình mới chờ duyệt', { n: drafts.length })}
         </Banner>
       )}
       {unread.length > 0 && (
-        <Banner tone="info" onClick={() => nav('/more/reviews')} action={<b>Đọc ›</b>}>
-          Nhận xét tuần mới từ coach
+        <Banner tone="info" onClick={() => nav('/more/reviews')} action={<b>{t('Đọc ›')}</b>}>
+          {t('Nhận xét tuần mới từ coach')}
         </Banner>
       )}
       {isMonday && !reviewedThisWeek && drafts.length === 0 && new Date().getHours() >= 10 && (
-        <Banner tone="warn">Chưa review tuần này — chạy review với Claude Code trên máy tính</Banner>
+        <Banner tone="warn">{t('Chưa review tuần này — chạy review với Claude Code trên máy tính')}</Banner>
       )}
       {conflict && <Banner tone="warn">{conflict}</Banner>}
-      {inb.due && <Banner tone="info" onClick={() => nav('/body/inbody')}>Đến hạn đo InBody (đã {inb.daysSince ?? '—'} ngày)</Banner>}
-      {photoDue && <Banner tone="info" onClick={() => nav('/body/photos/capture')}>Đến lượt chụp ảnh tiến độ (2 tuần/lần)</Banner>}
+      {inb.due && <Banner tone="info" onClick={() => nav('/body/inbody')}>{t('Đến hạn đo InBody (đã {n} ngày)', { n: inb.daysSince ?? '—' })}</Banner>}
+      {photoDue && <Banner tone="info" onClick={() => nav('/body/photos/capture')}>{t('Đến lượt chụp ảnh tiến độ (2 tuần/lần)')}</Banner>}
       {error ? <ErrorBox error={error} /> : null}
 
       {goal && (
@@ -222,23 +223,30 @@ export function TodayPage() {
             <Badge tone={goal.status === 'behind' ? 'warn' : 'ok'}>{GOAL_STATUS_LABEL[goal.status]}</Badge>
           </div>
           <div className="tabular mb-2 text-sm text-muted">
-            Còn {goal.daysLeft} ngày ({formatNumberVN(goal.weeksLeft, 1)} tuần) · cần −{formatNumberVN(goal.requiredKgPerWeek, 2)} kg/tuần
-            · còn {formatNumberVN(goal.gapKg, 1)} kg
+            {t('Còn {days} ngày ({weeks} tuần) · cần −{rate} kg/tuần · còn {gap} kg', {
+              days: goal.daysLeft,
+              weeks: formatNumberVN(goal.weeksLeft, 1),
+              rate: formatNumberVN(goal.requiredKgPerWeek, 2),
+              gap: formatNumberVN(goal.gapKg, 1),
+            })}
           </div>
           <ProgressBar value={startKg - (lastWeight?.weight_kg ?? startKg)} max={startKg - goal.goal.target_weight_max} />
           <div className="tabular mt-1 flex justify-between text-xs text-muted">
             <span>{formatNumberVN(lastWeight?.weight_kg ?? 0, 1)} kg</span>
             <span>
-              mục tiêu {formatNumberVN(goal.goal.target_weight_min, 0)}
-              {goal.goal.target_weight_min !== goal.goal.target_weight_max && `–${formatNumberVN(goal.goal.target_weight_max, 0)}`} kg
-              {goal.estimatedBodyFatPct !== null && ` · mỡ ~${formatNumberVN(goal.estimatedBodyFatPct, 1)}%`}
+              {t('mục tiêu {range} kg', {
+                range:
+                  formatNumberVN(goal.goal.target_weight_min, 0) +
+                  (goal.goal.target_weight_min !== goal.goal.target_weight_max ? `–${formatNumberVN(goal.goal.target_weight_max, 0)}` : ''),
+              })}
+              {goal.estimatedBodyFatPct !== null && ` · ${t('mỡ ~{pct}%', { pct: formatNumberVN(goal.estimatedBodyFatPct, 1) })}`}
             </span>
           </div>
-          {goal.unsafe && <Banner tone="bad">Mốc này cần giảm nhanh hơn 0,7 kg/tuần — cân nhắc dời mốc, không giảm calo dưới 1.700</Banner>}
+          {goal.unsafe && <Banner tone="bad">{t('Mốc này cần giảm nhanh hơn 0,7 kg/tuần — cân nhắc dời mốc, không giảm calo dưới 1.700')}</Banner>}
         </Card>
       )}
 
-      <SectionTitle>Buổi hôm nay</SectionTitle>
+      <SectionTitle>{t('Buổi hôm nay')}</SectionTitle>
       {day.kind === 'session' && (() => {
         const tmpl = templateFor(content, day.template)!;
         const done = doneToday.find((s) => s.kind === day.template);
@@ -247,12 +255,16 @@ export function TodayPage() {
           <Card>
             <div className="mb-1 flex items-center justify-between">
               <h3 className="text-xl font-bold">{tmpl.name}</h3>
-              {done && <Badge tone="ok">Đã tập</Badge>}
+              {done && <Badge tone="ok">{t('Đã tập')}</Badge>}
             </div>
             {tmpl.warmup.cardio && (
               <p className="mb-2 text-sm text-muted">
-                Khởi động: {ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name} {tmpl.warmup.cardio.minutes}' · {String(tmpl.warmup.cardio.speed_kmh_min).replace('.', ',')}–
-                {tmpl.warmup.cardio.speed_kmh_max} km/h
+                {t("Khởi động: {name} {min}' · {from}–{to} km/h", {
+                  name: ex.bySlug.get(tmpl.warmup.cardio.exercise)?.name ?? '',
+                  min: tmpl.warmup.cardio.minutes,
+                  from: fmtKg(tmpl.warmup.cardio.speed_kmh_min),
+                  to: fmtKg(tmpl.warmup.cardio.speed_kmh_max),
+                })}
               </p>
             )}
             <div className="mb-3 divide-y divide-line">
@@ -261,7 +273,7 @@ export function TodayPage() {
               ))}
             </div>
             {done ? (
-              <Button block onClick={() => nav(`/training/session/${done.id}`)}>Xem buổi đã tập</Button>
+              <Button block onClick={() => nav(`/training/session/${done.id}`)}>{t('Xem buổi đã tập')}</Button>
             ) : skipped ? (
               skipRow(day.template)
             ) : (
@@ -271,18 +283,18 @@ export function TodayPage() {
               </>
             )}
             {extraLifts(day.template, skipped)}
-            {!done && liftSwap(day.template, 'Đổi sang buổi khác')}
+            {!done && liftSwap(day.template, t('Đổi sang buổi khác'))}
           </Card>
         );
       })()}
 
       {day.kind === 'badminton' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">Cầu lông</h3>
-          <p className="mb-2 text-sm text-muted">{day.minutes_min}–{day.minutes_max} phút, nhẹ nhàng</p>
-          {day.warmup && <p className="mb-3 text-sm">Khởi động {day.warmup.minutes}′: {day.warmup.mobility.join(' · ')}</p>}
+          <h3 className="mb-1 text-xl font-bold">{t('Cầu lông')}</h3>
+          <p className="mb-2 text-sm text-muted">{t('{min}–{max} phút, nhẹ nhàng', { min: day.minutes_min ?? '', max: day.minutes_max ?? '' })}</p>
+          {day.warmup && <p className="mb-3 text-sm">{t('Khởi động {n}′: {list}', { n: day.warmup.minutes ?? '', list: day.warmup.mobility.join(' · ') })}</p>}
           {doneToday.some((s) => s.kind === 'badminton') ? (
-            <Badge tone="ok">Đã ghi</Badge>
+            <Badge tone="ok">{t('Đã ghi')}</Badge>
           ) : skippedToday.some((s) => s.kind === 'badminton') ? (
             <>
               {lightDoneRow}
@@ -290,20 +302,20 @@ export function TodayPage() {
             </>
           ) : (
             <>
-              <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>Ghi buổi cầu lông</Button>
+              <Button variant="primary" size="lg" block onClick={() => nav('/training/simple/badminton')}>{t('Ghi buổi cầu lông')}</Button>
               {skipRow('badminton')}
             </>
           )}
           {extraLifts('badminton', true)}
           {!doneToday.some((s) => s.kind === 'badminton') && lightDone.length === 0 && liftDone.length === 0 && !inProgress.data && (
             <div className="mt-3 border-t border-line pt-3" data-testid="badminton-replace">
-              <p className="mb-2 text-sm text-muted">Không đánh được? Thay bằng cardio nhẹ cùng thời lượng:</p>
+              <p className="mb-2 text-sm text-muted">{t('Không đánh được? Thay bằng cardio nhẹ cùng thời lượng:')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {BADMINTON_SUBSTITUTES.map((k) => (
                   <Button key={k} onClick={() => nav(`/training/simple/${k}?thay=badminton`)}>{SESSION_KIND_LABEL[k]}</Button>
                 ))}
               </div>
-              {liftSwap('badminton', 'Hoặc tập một buổi tạ', { defaultOpen: true, divider: false })}
+              {liftSwap('badminton', t('Hoặc tập một buổi tạ'), { defaultOpen: true, divider: false })}
             </div>
           )}
         </Card>
@@ -311,14 +323,15 @@ export function TodayPage() {
 
       {day.kind === 'rest' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">Nghỉ</h3>
+          <h3 className="mb-1 text-xl font-bold">{t('Nghỉ')}</h3>
           {(() => {
             const opts = restDayOptions(content, today);
             return (
               <>
                 <p className="mb-3 text-sm text-muted">
-                  Nghỉ là chính. Muốn vận động thì chọn 1 buổi nhẹ (không tạ)
-                  {opts.includes('zone2') ? '.' : ' — mai Legs nên chỉ đi bộ nhẹ hoặc core, giữ chân khoẻ.'}
+                  {opts.includes('zone2')
+                    ? t('Nghỉ là chính. Muốn vận động thì chọn 1 buổi nhẹ (không tạ).')
+                    : t('Nghỉ là chính. Muốn vận động thì chọn 1 buổi nhẹ (không tạ) — mai Legs nên chỉ đi bộ nhẹ hoặc core, giữ chân khoẻ.')}
                 </p>
                 {lightDoneRow}
                 <div className="grid gap-2">
@@ -330,14 +343,14 @@ export function TodayPage() {
             );
           })()}
           {extraLifts(null, true)}
-          {liftSwap(null, 'Vẫn muốn tập tạ')}
+          {liftSwap(null, t('Vẫn muốn tập tạ'))}
         </Card>
       )}
 
       {day.kind === 'optional' && (
         <Card>
-          <h3 className="mb-1 text-xl font-bold">Chủ nhật · tuỳ chọn</h3>
-          <p className="mb-3 text-sm text-muted">Chọn một: Push/Pull nhẹ = mỗi bài bớt 1 hiệp. Không gán Legs.</p>
+          <h3 className="mb-1 text-xl font-bold">{t('Chủ nhật · tuỳ chọn')}</h3>
+          <p className="mb-3 text-sm text-muted">{t('Chọn một: Push/Pull nhẹ = mỗi bài bớt 1 hiệp. Không gán Legs.')}</p>
           <div className="grid gap-2">
             {day.options.map((o) =>
               o === 'push_light' || o === 'pull_light' ? (
@@ -352,21 +365,22 @@ export function TodayPage() {
             )}
           </div>
           {extraLifts(null, true)}
-          {liftSwap(null, 'Buổi tạ khác', { exclude: day.options.filter((o): o is 'push_light' | 'pull_light' => o === 'push_light' || o === 'pull_light') })}
+          {liftSwap(null, t('Buổi tạ khác'), { exclude: day.options.filter((o): o is 'push_light' | 'pull_light' => o === 'push_light' || o === 'pull_light') })}
         </Card>
       )}
 
       {week && (
         <>
-          <SectionTitle>Tuần này</SectionTitle>
+          <SectionTitle>{t('Tuần này')}</SectionTitle>
           <Card onClick={() => nav('/training')}>
             <div className="tabular flex justify-between text-sm">
-              <span>Buổi đã tập</span>
+              <span>{t('Buổi đã tập')}</span>
               <b>{week.doneSessions}/{week.plannedSessions}</b>
             </div>
             <div className="mt-2"><ProgressBar value={week.doneSessions} max={week.plannedSessions} tone="ok" /></div>
             <div className="mt-2 text-xs text-muted">
-              Khởi động {week.sessionsWithWarmup}/{week.strengthSessions} buổi tạ · {sessions.filter((s) => s.session_date === today).map((s) => SESSION_KIND_LABEL[s.kind]).join(', ') || 'chưa tập hôm nay'}
+              {t('Khởi động {done}/{total} buổi tạ', { done: week.sessionsWithWarmup, total: week.strengthSessions })} ·{' '}
+              {sessions.filter((s) => s.session_date === today).map((s) => SESSION_KIND_LABEL[s.kind]).join(', ') || t('chưa tập hôm nay')}
             </div>
           </Card>
         </>
@@ -379,8 +393,13 @@ export function TodayPage() {
       <SkipDaySheet kind={skipKind} date={today} onClose={() => setSkipKind(null)} />
 
       <p className="mt-4 px-1 text-xs text-muted">
-        Tham khảo (không ghi): ăn ~{formatNumberVN(content.nutrition.calories_kcal)} kcal · đạm ~{content.nutrition.protein_g}g · nước{' '}
-        {content.hydration.water_ml_min / 1000}–{content.hydration.water_ml_max / 1000}L · {content.activity.steps_min / 1000}–{content.activity.steps_max / 1000}k bước · ngủ {content.sleep.hours_min}–{content.sleep.hours_max}h
+        {t('Tham khảo (không ghi): ăn ~{kcal} kcal · đạm ~{protein}g · nước {water}L · {steps}k bước · ngủ {sleep}h', {
+          kcal: formatNumberVN(content.nutrition.calories_kcal),
+          protein: content.nutrition.protein_g,
+          water: `${content.hydration.water_ml_min / 1000}–${content.hydration.water_ml_max / 1000}`,
+          steps: `${content.activity.steps_min / 1000}–${content.activity.steps_max / 1000}`,
+          sleep: `${content.sleep.hours_min}–${content.sleep.hours_max}`,
+        })}
       </p>
     </Page>
   );

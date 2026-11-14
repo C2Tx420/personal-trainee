@@ -10,13 +10,14 @@ import { IconWifiOff } from '@/ui/icons';
 import { ForceUpdate } from './ForceUpdate';
 import { LoginPage } from './LoginPage';
 import { PinLock } from './PinLock';
+import { t } from '@/i18n';
 
 type AuthCtx = { userId: string; signOut: () => Promise<void> };
 const Ctx = createContext<AuthCtx | null>(null);
 
 export function useAuth(): AuthCtx {
   const c = useContext(Ctx);
-  if (!c) throw new Error('useAuth ngoài AuthGate');
+  if (!c) throw new Error('useAuth outside AuthGate');
   return c;
 }
 
@@ -114,17 +115,17 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (bootError) {
     return (
       <div className="mx-auto max-w-md p-6">
-        <Banner tone="bad">Không tải được dữ liệu: {bootError}</Banner>
+        <Banner tone="bad">{t('Không tải được dữ liệu: {error}', { error: bootError ?? '' })}</Banner>
         <Button variant="primary" block onClick={() => {
             setBootError(null);
             setBooted(false);
           }}>
-          Thử lại
+          {t('Thử lại')}
         </Button>
       </div>
     );
   }
-  if (!booted && !warm) return <Splash label="Đang chuẩn bị dữ liệu…" />;
+  if (!booted && !warm) return <Splash label={t('Đang chuẩn bị dữ liệu…')} />;
   return <Ctx.Provider value={{ userId: session.user.id, signOut }}>{children}</Ctx.Provider>;
 }
 
@@ -133,10 +134,10 @@ function OfflineScreen() {
     <div className="grid min-h-dvh place-items-center p-6 text-center">
       <div>
         <IconWifiOff className="mx-auto mb-3 size-10 text-muted" />
-        <h1 className="mb-2 text-xl font-semibold">Cần kết nối mạng</h1>
-        <p className="mb-5 text-sm text-muted">App lưu dữ liệu trên Supabase và không hỗ trợ dùng offline. Bật Wi-Fi hoặc 4G rồi thử lại.</p>
+        <h1 className="mb-2 text-xl font-semibold">{t('Cần kết nối mạng')}</h1>
+        <p className="mb-5 text-sm text-muted">{t('App lưu dữ liệu trên Supabase và không hỗ trợ dùng offline. Bật Wi-Fi hoặc 4G rồi thử lại.')}</p>
         <Button variant="primary" onClick={() => location.reload()}>
-          Thử lại
+          {t('Thử lại')}
         </Button>
       </div>
     </div>

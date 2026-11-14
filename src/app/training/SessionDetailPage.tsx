@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { deleteSession, saveSet } from '@/data/api';
 import { qk, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail, useWeights } from '@/data/queries';
 import { formatVN, WEEKDAY_LABEL, weekdayOf } from '@/engine/dates';
+import { formatNumberVN } from '@/engine/math';
 import { formatSet, lastPerformance } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
 import { reflectionLocked, reviewedWeeks } from '@/engine/reflection';
@@ -10,6 +11,7 @@ import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { FEEL_LABEL, KG_CHANGE_LABEL, type SetRow, SUBSTITUTION_LABEL } from '@/engine/types';
 import { setLabel } from '@/engine/warmup';
 import { sessionSummary } from '@/engine/workout-summary';
+import { t } from '@/i18n';
 import { Badge, Banner, Button, Card, cx, ErrorBox, ExerciseImg, Page, Sheet, Skeleton, Stat } from '@/ui/components';
 import { fmtKg } from '../shared';
 import { RecordsCard } from '../workout/RecordsCard';
@@ -31,8 +33,8 @@ export function SessionDetailPage() {
   const reviews = useReviews();
   const weights = useWeights();
 
-  if (detail.isLoading || ex.loading) return <Page title="Buổi tập" back="/training"><Skeleton /></Page>;
-  if (detail.error || !detail.data) return <Page title="Buổi tập" back="/training"><ErrorBox error={detail.error} /></Page>;
+  if (detail.isLoading || ex.loading) return <Page title={t('Buổi tập')} back="/training"><Skeleton /></Page>;
+  if (detail.error || !detail.data) return <Page title={t('Buổi tập')} back="/training"><ErrorBox error={detail.error} /></Page>;
   const { session, items, sets } = detail.data;
   const sum = sessionSummary(session, items, sets, ex.byId, weights.data?.at(-1)?.weight_kg ?? null);
   const w = session.warmup;
@@ -49,20 +51,24 @@ export function SessionDetailPage() {
     <Page title={`${SESSION_KIND_LABEL[session.kind]} · ${formatVN(session.session_date)}`} back="/training">
       <p className="mb-3 text-sm text-muted">
         {WEEKDAY_LABEL[weekdayOf(session.session_date)]}, {formatVN(session.session_date, true)}
-        {session.is_backfill && ' · ghi bù'}
-        {session.note && session.status !== 'skipped' && !session.note.startsWith('Ghi nhanh') && ` · ${session.note}`}
+        {session.is_backfill && ` · ${t('ghi bù')}`}
+        {session.note && session.status !== 'skipped' && !session.note.startsWith('Ghi nhanh') && ` · ${session.note}`}{/* i18n-ignore: stored note prefix */}
       </p>
-      {session.status === 'skipped' && <Banner tone="warn">Đã nghỉ buổi này{session.note ? ` — ${session.note}` : ''}</Banner>}
+      {session.status === 'skipped' && <Banner tone="warn">{session.note ? t('Đã nghỉ buổi này — {note}', { note: session.note }) : t('Đã nghỉ buổi này')}</Banner>}
       {session.status === 'in_progress' && (
-        <Banner tone="accent" onClick={() => nav(`/workout/${session.id}`)} action={<b>Tiếp tục ›</b>}>Buổi đang tập dở</Banner>
+        <Banner tone="accent" onClick={() => nav(`/workout/${session.id}`)} action={<b>{t('Tiếp tục ›')}</b>}>{t('Buổi đang tập dở')}</Banner>
       )}
 
       {items.length > 0 && (
         <div className="mb-3 grid grid-cols-2 gap-2">
-          <Stat label="Bài" value={`${sum.itemsDone}/${sum.itemsTotal}`} />
-          <Stat label="Hiệp chính" value={`${sum.workingSetsDone}/${sum.workingSetsPlanned}`} />
-          <Stat label="Khối lượng" value={`${sum.volumeKg.toLocaleString('vi-VN')} kg`} sub={sum.missingKgExercises.length ? `${sum.missingKgExercises.length} bài không có số kg` : undefined} />
-          <Stat label="Thời gian" value={sum.durationMin ? `${sum.durationMin} phút` : '—'} />
+          <Stat label={t('Bài')} value={`${sum.itemsDone}/${sum.itemsTotal}`} />
+          <Stat label={t('Hiệp chính')} value={`${sum.workingSetsDone}/${sum.workingSetsPlanned}`} />
+          <Stat
+            label={t('Khối lượng')}
+            value={`${formatNumberVN(sum.volumeKg, 2)} kg`}
+            sub={sum.missingKgExercises.length ? t('{n} bài không có số kg', { n: sum.missingKgExercises.length }) : undefined}
+          />
+          <Stat label={t('Thời gian')} value={sum.durationMin ? t('{n} phút', { n: sum.durationMin }) : '—'} />
         </div>
       )}
       <RecordsCard records={records} byId={ex.byId} />
@@ -82,18 +88,21 @@ export function SessionDetailPage() {
         <ReflectionCard session={session} locked={reflectionLocked(session.session_date, reviewedWeeks(reviews.data))} />
       )}
       {session.kind === 'badminton' && session.status !== 'skipped' && (
-        <Card>Cầu lông · {session.duration_min} phút · cường độ {session.badminton_intensity === 'light' ? 'nhẹ' : session.badminton_intensity === 'moderate' ? 'vừa' : 'nặng'} · ≈ {session.est_kcal} kcal</Card>
+        <Card>
+          {t('Cầu lông')} · {t('{n} phút', { n: session.duration_min ?? '' })} ·{' '}
+          {t('cường độ {level}', { level: session.badminton_intensity === 'light' ? t('nhẹ') : session.badminton_intensity === 'moderate' ? t('vừa') : t('nặng') })} · ≈ {session.est_kcal} kcal
+        </Card>
       )}
       {w && (
         <Card>
-          Khởi động:{' '}
+          {t('Khởi động:')}{' '}
           {w.skipped ? (
-            <span className="text-warn">bỏ qua</span>
+            <span className="text-warn">{t('bỏ qua')}</span>
           ) : (
             <>
               {w.cardio ? `${ex.bySlug.get(w.cardio.exercise)?.name ?? w.cardio.exercise} ${w.cardio.minutes}′` : ''}
-              {w.cardio?.speed_kmh_min ? ` · ${String(w.cardio.speed_kmh_min).replace('.', ',')}–${w.cardio.speed_kmh_max} km/h` : ''}
-              {w.mobility_done ? ' · khớp ✓' : ''}
+              {w.cardio?.speed_kmh_min ? ` · ${formatNumberVN(w.cardio.speed_kmh_min, 2)}–${w.cardio.speed_kmh_max} km/h` : ''}
+              {w.mobility_done ? ` · ${t('khớp ✓')}` : ''}
             </>
           )}
         </Card>
@@ -110,10 +119,10 @@ export function SessionDetailPage() {
               <div className="min-w-0 flex-1">
                 <div className="font-semibold">{e?.name}</div>
                 {it.substitution_reason && (
-                  <div className="text-xs text-info">thay {planned?.name} · {SUBSTITUTION_LABEL[it.substitution_reason]}{it.substitution_note ? ` — ${it.substitution_note}` : ''}</div>
+                  <div className="text-xs text-info">{t('thay {name}', { name: planned?.name ?? '' })} · {SUBSTITUTION_LABEL[it.substitution_reason]}{it.substitution_note ? ` — ${it.substitution_note}` : ''}</div>
                 )}
-                {it.template_item_position === null && <Badge>ngoài kế hoạch</Badge>}
-                {it.status === 'skipped' && <Badge tone="bad">bỏ{it.skip_reason ? `: ${it.skip_reason}` : ''}</Badge>}
+                {it.template_item_position === null && <Badge>{t('ngoài kế hoạch')}</Badge>}
+                {it.status === 'skipped' && <Badge tone="bad">{t('bỏ')}{it.skip_reason ? `: ${it.skip_reason}` : ''}</Badge>}
                 {it.note && <div className="text-xs text-muted">{it.note}</div>}
               </div>
             </div>
@@ -135,10 +144,10 @@ export function SessionDetailPage() {
         );
       })}
 
-      <Button variant="danger" block className="mt-4" onClick={() => setConfirmDelete(true)}>Xoá buổi này</Button>
+      <Button variant="danger" block className="mt-4" onClick={() => setConfirmDelete(true)}>{t('Xoá buổi này')}</Button>
 
-      <Sheet open={confirmDelete} onClose={() => setConfirmDelete(false)} title="Xoá buổi tập?">
-        <p className="mb-3 text-sm text-muted">Xoá cả các bài và hiệp đã ghi của buổi này. Không hoàn tác được.</p>
+      <Sheet open={confirmDelete} onClose={() => setConfirmDelete(false)} title={t('Xoá buổi tập?')}>
+        <p className="mb-3 text-sm text-muted">{t('Xoá cả các bài và hiệp đã ghi của buổi này. Không hoàn tác được.')}</p>
         <Button
           variant="danger"
           size="lg"
@@ -149,11 +158,11 @@ export function SessionDetailPage() {
             nav('/training', { replace: true });
           }}
         >
-          Xoá
+          {t('Xoá')}
         </Button>
       </Sheet>
 
-      <Sheet open={!!edit} onClose={() => setEdit(null)} title="Sửa hiệp">
+      <Sheet open={!!edit} onClose={() => setEdit(null)} title={t('Sửa hiệp')}>
         {edit && editItem && ex.byId.get(editItem.exercise_id) && (
           <SetCard
             item={editItem}
@@ -163,7 +172,7 @@ export function SessionDetailPage() {
             workingTotal={editItem.target.sets}
             initialKg={edit.weight_kg}
             existing={edit}
-            saveLabel="Lưu"
+            saveLabel={t('Lưu')}
             onSave={async (s) => {
               await saveSet(s);
               setEdit(null);

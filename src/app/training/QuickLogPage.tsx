@@ -4,18 +4,23 @@ import { qk, useActivePlan, useExerciseMaps, useInvalidate, useTraining } from '
 import { formatVN, todayVN } from '@/engine/dates';
 import { expandSets, type ParsedLog, parseQuickLog, suggestWarmup } from '@/engine/quick-log-parser';
 import { SESSION_KIND_LABEL, SESSION_KINDS, type SessionKind } from '@/engine/schedule';
+import { formatNumberVN } from '@/engine/math';
 import { searchExercises } from '@/engine/substitutions';
+import { t } from '@/i18n';
 import { Banner, Button, Card, ErrorBox, Field, Input, Page, TextArea } from '@/ui/components';
 import { type EditorItem, newKey, SessionEditor } from './SessionEditor';
 import { saveEditor } from './save-editor';
 
-const PLACEHOLDER = `hôm nay pull full máy
-warm up 10p đi bộ 3.5-5
-kéo xô
-2 set x 10 25kg
-3 set x 10 35kg
-face pull
-3x15x12.5`;
+// sample of the input syntax the parser understands, so it stays Vietnamese
+const PLACEHOLDER = [
+  'hôm nay pull full máy', // i18n-ignore: parser input syntax
+  'warm up 10p đi bộ 3.5-5', // i18n-ignore: parser input syntax
+  'kéo xô', // i18n-ignore: parser input syntax
+  '2 set x 10 25kg',
+  '3 set x 10 35kg',
+  'face pull',
+  '3x15x12.5',
+].join('\n');
 
 /** ✎ Free-text quick log (§6.2a): type/paste notes → preview → save. */
 export function QuickLogPage() {
@@ -73,7 +78,7 @@ export function QuickLogPage() {
         warmup: parsed?.warmup
           ? { cardio: { exercise: 'treadmill_walk', minutes: parsed.warmup.minutes, speed_kmh_min: parsed.warmup.speedMin, speed_kmh_max: parsed.warmup.speedMax, done: true }, mobility_done: null }
           : null,
-        note: `Ghi nhanh:\n${text}`,
+        note: `Ghi nhanh:\n${text}`, // i18n-ignore: saved to the database
         content: plan.data?.content ?? null,
         planVersionId: date === todayVN() ? (plan.data?.id ?? null) : null,
       });
@@ -87,23 +92,23 @@ export function QuickLogPage() {
   }
 
   return (
-    <Page title="Ghi nhanh bằng chữ" back="/training">
+    <Page title={t('Ghi nhanh bằng chữ')} back="/training">
       {!parsed ? (
         <>
-          <p className="mb-2 text-sm text-muted">Gõ hoặc dán ghi chú buổi tập y như khi nhắn tin. App tự tách bài + hiệp, anh xem lại rồi mới lưu.</p>
-          <TextArea rows={12} value={text} onChange={(e) => setText(e.target.value)} placeholder={PLACEHOLDER} aria-label="Ghi chú buổi tập" />
+          <p className="mb-2 text-sm text-muted">{t('Gõ hoặc dán ghi chú buổi tập y như khi nhắn tin. App tự tách bài + hiệp, anh xem lại rồi mới lưu.')}</p>
+          <TextArea rows={12} value={text} onChange={(e) => setText(e.target.value)} placeholder={PLACEHOLDER} aria-label={t('Ghi chú buổi tập')} />
           <Button variant="primary" size="lg" block className="mt-3" disabled={!text.trim()} onClick={parse}>
-            Tách thành bài + hiệp →
+            {t('Tách thành bài + hiệp →')}
           </Button>
         </>
       ) : (
         <>
           <Card>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Ngày">
+              <Field label={t('Ngày')}>
                 <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
               </Field>
-              <Field label="Loại buổi">
+              <Field label={t('Loại buổi')}>
                 <select className="h-11 w-full rounded-xl border border-line bg-card px-3" value={kind} onChange={(e) => setKind(e.target.value as SessionKind)}>
                   {SESSION_KINDS.map((k) => (
                     <option key={k} value={k}>{SESSION_KIND_LABEL[k]}</option>
@@ -112,21 +117,25 @@ export function QuickLogPage() {
               </Field>
             </div>
             <div className="text-sm text-muted">
-              {formatVN(date, true)} · {parsed.warmup ? `khởi động ${parsed.warmup.minutes}′${parsed.warmup.speedMin ? ` · ${String(parsed.warmup.speedMin).replace('.', ',')}–${parsed.warmup.speedMax} km/h` : ''}` : 'không ghi khởi động'}
+              {formatVN(date, true)} ·{' '}
+              {parsed.warmup
+                ? `${t('khởi động {min}′', { min: parsed.warmup.minutes })}${parsed.warmup.speedMin ? ` · ${formatNumberVN(parsed.warmup.speedMin, 2)}–${parsed.warmup.speedMax} km/h` : ''}`
+                : t('không ghi khởi động')}
             </div>
           </Card>
           {warmupMarked.length > 0 && (
             <Banner tone="info">
-              Đã đánh dấu {warmupMarked.length === 1 ? 'hiệp nhẹ đầu' : 'các hiệp nhẹ đầu'} là <b>làm nóng</b> (mẫu 2 hiệp nhẹ + 3 hiệp nặng). Bấm vào nhãn hiệp để đổi.
+              {warmupMarked.length === 1 ? t('Đã đánh dấu hiệp nhẹ đầu là') : t('Đã đánh dấu các hiệp nhẹ đầu là')} <b>{t('làm nóng')}</b>{' '}
+              {t('(mẫu 2 hiệp nhẹ + 3 hiệp nặng). Bấm vào nhãn hiệp để đổi.')}
             </Banner>
           )}
-          {parsed.unparsed.length > 0 && <Banner tone="warn">Không hiểu: {parsed.unparsed.join(' · ')}</Banner>}
+          {parsed.unparsed.length > 0 && <Banner tone="warn">{t('Không hiểu: {lines}', { lines: parsed.unparsed.join(' · ') })}</Banner>}
           <SessionEditor items={items} onChange={setItems} library={ex.list} history={training.data?.sets} />
           {error ? <ErrorBox error={error} /> : null}
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button onClick={() => setParsed(null)}>← Sửa chữ</Button>
+            <Button onClick={() => setParsed(null)}>{t('← Sửa chữ')}</Button>
             <Button variant="primary" disabled={busy || items.length === 0} onClick={() => void save()}>
-              {busy ? 'Đang lưu…' : 'Lưu buổi tập'}
+              {busy ? t('Đang lưu…') : t('Lưu buổi tập')}
             </Button>
           </div>
         </>

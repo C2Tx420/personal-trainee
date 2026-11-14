@@ -1,5 +1,7 @@
 import type { PlanItem } from '@/engine/plan-schema';
+import { formatNumberVN } from '@/engine/math';
 import type { ExerciseRow } from '@/engine/types';
+import { t } from '@/i18n';
 import { ExerciseImg } from '@/ui/components';
 
 /** "2 + 3 × 8–10 · 35 kg" */
@@ -9,7 +11,7 @@ export function itemSummary(it: PlanItem): string {
   const kg = it.target_kg_per_set
     ? ` · ${it.target_kg_per_set.join('/')} kg`
     : it.target_kg !== null && it.unit === 'reps'
-      ? ` · ${String(it.target_kg).replace('.', ',')} kg${it.backoff_steps ? `, hiệp sau −${it.backoff_steps} nấc` : ''}`
+      ? ` · ${formatNumberVN(it.target_kg, 2)} kg${it.backoff_steps ? t(', hiệp sau −{n} nấc', { n: it.backoff_steps }) : ''}`
       : '';
   return `${warm}${it.sets} × ${reps}${kg}`;
 }
@@ -21,7 +23,7 @@ export function ExerciseLine({ ex, item, right }: { ex: ExerciseRow | undefined;
       <div className="min-w-0 flex-1">
         <div className="truncate font-medium">
           {ex?.name ?? item.exercise}
-          {ex && !ex.available_at_gym && <span className="ml-1 text-xs text-warn">(không có máy)</span>}
+          {ex && !ex.available_at_gym && <span className="ml-1 text-xs text-warn">{t('(không có máy)')}</span>}
         </div>
         <div className="tabular text-sm text-muted">{itemSummary(item)}</div>
       </div>
@@ -31,5 +33,5 @@ export function ExerciseLine({ ex, item, right }: { ex: ExerciseRow | undefined;
 }
 
 export function fmtKg(v: number | null | undefined): string {
-  return v === null || v === undefined ? '—' : String(Math.round(v * 100) / 100).replace('.', ',');
+  return v === null || v === undefined ? '—' : formatNumberVN(v, 2);
 }

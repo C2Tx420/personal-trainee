@@ -16,6 +16,7 @@ import type {
   WarmupLog,
 } from '@/engine/types';
 import { must, supabase } from '@/lib/supabase';
+import { t } from '@/i18n';
 
 /**
  * All of the app's Supabase reads/writes. IDs are generated on the client (crypto.randomUUID)
@@ -190,7 +191,7 @@ export async function bootstrap(): Promise<boolean> {
 
 export async function verifyPin(pin: string): Promise<{ ok: boolean; attempts_left: number; locked_out: boolean }> {
   const { data, error } = await supabase.functions.invoke('verify-pin', { body: { pin } });
-  if (error) throw new Error('Không kiểm tra được PIN — kiểm tra kết nối mạng');
+  if (error) throw new Error(t('Không kiểm tra được PIN — kiểm tra kết nối mạng'));
   return data;
 }
 
@@ -225,7 +226,7 @@ export async function startSession({ kind, date, plan, items, templateKey, exerc
   );
   const rows = items.map((it, i) => {
     const ex = bySlug.get(it.exercise);
-    if (!ex) throw new Error(`Bài "${it.exercise}" chưa có trong thư viện`);
+    if (!ex) throw new Error(t('Bài "{slug}" chưa có trong thư viện', { slug: it.exercise }));
     return {
       id: crypto.randomUUID(),
       session_id: id,
@@ -328,7 +329,7 @@ export async function substituteItem(args: {
     must(
       await supabase
         .from('exercises')
-        .update({ available_at_gym: false, unavailable_note: args.note ?? `Không có máy (${todayVN()})` })
+        .update({ available_at_gym: false, unavailable_note: args.note ?? `Không có máy (${todayVN()})` }) // i18n-ignore: stored note
         .eq('id', args.item.planned_exercise_id),
     );
   }
@@ -500,7 +501,7 @@ export async function createBackfillSession(args: {
 }
 
 export async function setExerciseAvailable(id: string, available: boolean): Promise<void> {
-  must(await supabase.from('exercises').update({ available_at_gym: available, unavailable_note: available ? null : `Đánh dấu ${todayVN()}` }).eq('id', id));
+  must(await supabase.from('exercises').update({ available_at_gym: available, unavailable_note: available ? null : `Đánh dấu ${todayVN()}` }).eq('id', id)); // i18n-ignore: stored note
 }
 
 /** lb-stack machine ↔ plain 2,5 kg step (the load step is what marks a Matrix lb stack). */
@@ -569,12 +570,12 @@ function b64ToUint8(b64: string): Uint8Array<ArrayBuffer> {
 
 export async function subscribePush(): Promise<void> {
   const key = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
-  if (!key) throw new Error('Thiếu VITE_VAPID_PUBLIC_KEY');
+  if (!key) throw new Error('Missing VITE_VAPID_PUBLIC_KEY');
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    throw new Error('Trình duyệt không hỗ trợ thông báo đẩy (iPhone: cần "Thêm vào MH chính" trước)');
+    throw new Error(t('Trình duyệt không hỗ trợ thông báo đẩy (iPhone: cần "Thêm vào MH chính" trước)'));
   }
   const perm = await Notification.requestPermission();
-  if (perm !== 'granted') throw new Error('Chưa cho phép thông báo');
+  if (perm !== 'granted') throw new Error(t('Chưa cho phép thông báo'));
   const reg = await navigator.serviceWorker.ready;
   const sub = (await reg.pushManager.getSubscription()) ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToUint8(key) }));
   const j = sub.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } };
@@ -587,7 +588,7 @@ export async function subscribePush(): Promise<void> {
 
 export async function sendTestPush(): Promise<number> {
   const { data, error } = await supabase.functions.invoke('send-reminders', { body: { test: true } });
-  if (error) throw new Error('Không gửi được thông báo thử');
+  if (error) throw new Error(t('Không gửi được thông báo thử'));
   return (data as { sent: number }).sent;
 }
 
@@ -609,7 +610,7 @@ export async function uploadPhoto(args: { userId: string; date: IsoDate; angle: 
 /** 60-second signed URL → download as blob (no-store) → blob URL; the caller revokes it. */
 export async function photoObjectUrl(path: string): Promise<string> {
   const { data, error } = await supabase.storage.from('progress-photos').createSignedUrl(path, 60);
-  if (error || !data) throw new Error(error?.message ?? 'Không tạo được link ảnh');
+  if (error || !data) throw new Error(error?.message ?? t('Không tạo được link ảnh'));
   const res = await fetch(data.signedUrl, { cache: 'no-store' });
   return URL.createObjectURL(await res.blob());
 }

@@ -58,7 +58,7 @@ test('02 Hôm nay (luôn giao diện tối, kể cả khi máy để chế độ
   // first open after an update: "Có gì mới" once per device
   const news = page.getByRole('dialog', { name: 'Có gì mới' });
   await expect(news).toBeVisible();
-  await expect(news.getByText('Đổi buổi tập bất kỳ ngày nào', { exact: true })).toBeVisible();
+  await expect(news.getByText('Chọn ngôn ngữ', { exact: true })).toBeVisible();
   await shot(page, '03b-whats-new', 'Có gì mới — hiện 1 lần sau mỗi bản cập nhật');
   await news.getByRole('button', { name: 'Đã hiểu' }).click();
   await expect(news).toBeHidden();
@@ -520,5 +520,58 @@ test('12 mất mạng + khoá sau 5 lần sai PIN', async () => {
   await shot(page, '42-locked-out', 'Sai PIN 5 lần → thu hồi phiên, phải đăng nhập lại');
   await login(page);
   await unlock(page);
+  expect(errors).toEqual([]);
+});
+
+test('13 README screenshots (English UI)', async () => {
+  const dir = path.join(ROOT, '.github/screenshots');
+  // viewport only (tab bar included), like a phone screen
+  const snap = async (file: string) => {
+    await page.waitForLoadState('networkidle').catch(() => undefined);
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: path.join(dir, `${file}.png`) });
+  };
+  const dismissPrompts = async () => {
+    for (const [name, button] of [["What's new", 'Got it'], ['Turn on reminders', 'Later']]) {
+      const d = page.getByRole('dialog', { name });
+      if (await d.isVisible().catch(() => false)) await d.getByRole('button', { name: button }).click();
+    }
+  };
+
+  await page.evaluate(() => localStorage.setItem('pt-locale', 'en'));
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Enter PIN' })).toBeVisible();
+  await enterPin(page, E2E_PIN);
+  await expect(page.getByRole('heading', { name: /Today/ })).toBeVisible({ timeout: 20_000 });
+  await dismissPrompts();
+  await snap('today');
+
+  await nav(page, '/training');
+  await snap('training');
+  await nav(page, '/body');
+  await snap('body');
+  await nav(page, '/exercises/machine_chest_press');
+  await expect(page.getByRole('heading', { name: 'Machine Chest Press' })).toBeVisible();
+  await snap('exercise');
+  await nav(page, `/more/plans/${psql("select id from plan_versions where status = 'active'")}`);
+  await snap('plan-review');
+  await nav(page, '/more/reviews');
+  await snap('coach-review');
+  await nav(page, `/training/session/${psql("select id from workout_sessions where session_date = '2026-10-27' and kind = 'pull'")}`);
+  await snap('summary');
+
+  await nav(page, '/');
+  await page.getByRole('button', { name: 'Start workout' }).click();
+  await page.getByRole('button', { name: 'Start timer' }).click();
+  await page.getByRole('button', { name: 'Next →' }).click();
+  await page.getByRole('button', { name: 'Start exercise' }).click();
+  await expect(page.getByRole('button', { name: 'Set done' })).toBeVisible();
+  await snap('set');
+  await page.getByRole('button', { name: 'Set done' }).click();
+  await expect(page.getByRole('timer', { name: 'Rest timer' })).toBeVisible();
+  await snap('rest');
+  await page.getByRole('timer', { name: 'Rest timer' }).getByRole('button', { name: 'Skip' }).click();
+
+  await page.evaluate(() => localStorage.removeItem('pt-locale'));
   expect(errors).toEqual([]);
 });

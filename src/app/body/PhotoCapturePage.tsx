@@ -4,21 +4,22 @@ import { useAuth } from '@/auth/AuthGate';
 import { photoObjectUrl, uploadPhoto } from '@/data/api';
 import { qk, useInvalidate, usePhotos } from '@/data/queries';
 import { todayVN } from '@/engine/dates';
+import { t } from '@/i18n';
 import { Banner, Button, Chip, Page } from '@/ui/components';
 import { prepareImage } from './image-pipeline';
 
 const ANGLES = [
-  { key: 'front', label: 'Chính diện' },
-  { key: 'side', label: 'Nghiêng' },
-  { key: 'back', label: 'Lưng' },
+  { key: 'front', label: t('Chính diện') },
+  { key: 'side', label: t('Nghiêng') },
+  { key: 'back', label: t('Lưng') },
 ] as const;
 type Angle = (typeof ANGLES)[number]['key'];
 
 /** How strongly last time's photo shows over the camera (to line up the same pose). */
 const GHOST_LEVELS = [
-  { label: 'Tắt', opacity: 0 },
-  { label: 'Mờ', opacity: 0.3 },
-  { label: 'Rõ', opacity: 0.55 },
+  { label: t('Tắt'), opacity: 0 },
+  { label: t('Mờ'), opacity: 0.3 },
+  { label: t('Rõ'), opacity: 0.55 },
 ] as const;
 
 /** Body outline guide overlaid on the camera. */
@@ -66,8 +67,8 @@ export function PhotoCapturePage() {
         setStream(st);
         if (videoRef.current) videoRef.current.srcObject = st;
       })
-      .catch(() => setCamError('Không mở được camera — dùng nút chọn ảnh bên dưới'));
-    return () => s?.getTracks().forEach((t) => t.stop());
+      .catch(() => setCamError(t('Không mở được camera — dùng nút chọn ảnh bên dưới')));
+    return () => s?.getTracks().forEach((track) => track.stop());
   }, []);
 
   // faded photo from the previous set at the same angle (ghost overlay)
@@ -100,11 +101,11 @@ export function PhotoCapturePage() {
   function shoot() {
     let n = 5;
     setCountdown(n);
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       n -= 1;
       setCountdown(n);
       if (n <= 0) {
-        clearInterval(t);
+        clearInterval(timer);
         setCountdown(null);
         const v = videoRef.current;
         if (!v) return;
@@ -118,7 +119,7 @@ export function PhotoCapturePage() {
   }
 
   return (
-    <Page title={`Chụp ảnh · ${ANGLES[step]?.label ?? ''} (${step + 1}/3)`} back="/body/photos">
+    <Page title={t('Chụp ảnh · {angle} ({n}/3)', { angle: ANGLES[step]?.label ?? '', n: step + 1 })} back="/body/photos">
       <div className="mb-3 flex gap-2 text-sm">
         {ANGLES.map((a, i) => (
           <span key={a.key} className={`flex-1 rounded-lg py-1 text-center ${done.includes(a.key) ? 'bg-ok-soft text-ok' : i === step ? 'bg-accent-soft text-accent' : 'bg-card-2 text-muted'}`}>
@@ -131,11 +132,11 @@ export function PhotoCapturePage() {
         {ghost && ghostOpacity > 0 && <img src={ghost} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: ghostOpacity }} />}
         {angle && <Silhouette angle={angle} />}
         {countdown !== null && <div className="absolute inset-0 grid place-items-center text-8xl font-bold text-white drop-shadow">{countdown}</div>}
-        {!stream && <div className="absolute inset-x-0 bottom-3 text-center text-sm text-white/80">{camError ?? 'Đang mở camera…'}</div>}
+        {!stream && <div className="absolute inset-x-0 bottom-3 text-center text-sm text-white/80">{camError ?? t('Đang mở camera…')}</div>}
       </div>
       {ghost && (
-        <div className="mb-3 flex items-center gap-2 text-sm" aria-label="Ảnh lần trước">
-          <span className="text-muted">Ảnh lần trước:</span>
+        <div className="mb-3 flex items-center gap-2 text-sm" aria-label={t('Ảnh lần trước')}>
+          <span className="text-muted">{t('Ảnh lần trước:')}</span>
           {GHOST_LEVELS.map((g) => (
             <Chip key={g.label} active={ghostOpacity === g.opacity} onClick={() => setGhostOpacity(g.opacity)}>
               {g.label}
@@ -144,16 +145,16 @@ export function PhotoCapturePage() {
         </div>
       )}
       <p className="mb-3 text-xs text-muted">
-        Đứng vào khung, giữ cùng ánh sáng và khoảng cách như lần trước. Ảnh được xoá EXIF (GPS, thiết bị), nén còn 1080px và lưu riêng tư — chỉ anh xem được.
+        {t('Đứng vào khung, giữ cùng ánh sáng và khoảng cách như lần trước. Ảnh được xoá EXIF (GPS, thiết bị), nén còn 1080px và lưu riêng tư — chỉ anh xem được.')}
       </p>
       {error && <Banner tone="bad">{error}</Banner>}
       {stream && (
         <Button variant="primary" size="xl" block disabled={busy || countdown !== null} onClick={shoot}>
-          {busy ? 'Đang xử lý…' : 'Chụp (đếm 5 giây)'}
+          {busy ? t('Đang xử lý…') : t('Chụp (đếm 5 giây)')}
         </Button>
       )}
       <Button block className="mt-2" disabled={busy} onClick={() => fileRef.current?.click()}>
-        Chọn ảnh có sẵn
+        {t('Chọn ảnh có sẵn')}
       </Button>
       <input
         ref={fileRef}

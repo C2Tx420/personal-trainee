@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
+import { t } from '@/i18n';
 import { Badge, Button, cx, Sheet } from '@/ui/components';
-import { LATEST_ID, markWhatsNewSeen, RELEASES, useWhatsNewUnseen, type WhatsNewRelease } from './whats-new';
+import { LATEST_ID, markWhatsNewSeen, RELEASES, releaseDate, useWhatsNewUnseen, type WhatsNewRelease } from './whats-new';
 
 /** One release: icon · title · body, with "Thử ›" when the change lives on a screen. */
 export function ReleaseItems({ release, onGo }: { release: WhatsNewRelease; onGo?: () => void }) {
@@ -24,7 +25,7 @@ export function ReleaseItems({ release, onGo }: { release: WhatsNewRelease; onGo
                     nav(it.to!);
                   }}
                 >
-                  Thử ›
+                  {t('Thử ›')}
                 </button>
               )}
             </div>
@@ -41,9 +42,9 @@ export function ReleaseHeader({ release, className }: { release: WhatsNewRelease
     <div className={cx('mb-1 flex items-center gap-2', className)}>
       <div className="min-w-0 flex-1">
         <div className="text-lg font-bold tracking-tight">{release.title}</div>
-        <div className="tabular text-xs text-muted">{release.date} · plan {release.plan}</div>
+        <div className="tabular text-xs text-muted">{releaseDate(release)} · plan {release.plan}</div>
       </div>
-      {release.id === LATEST_ID && <Badge tone="accent">Mới nhất</Badge>}
+      {release.id === LATEST_ID && <Badge tone="accent">{t('Mới nhất')}</Badge>}
     </div>
   );
 }
@@ -54,7 +55,7 @@ export function WhatsNewSheet({ blocked }: { blocked: boolean }) {
   const unseen = useWhatsNewUnseen();
   const latest = RELEASES[0];
   return (
-    <Sheet open={unseen && !blocked} onClose={markWhatsNewSeen} title="Có gì mới">
+    <Sheet open={unseen && !blocked} onClose={markWhatsNewSeen} title={t('Có gì mới')}>
       <ReleaseHeader release={latest} />
       <ReleaseItems release={latest} onGo={markWhatsNewSeen} />
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -64,10 +65,10 @@ export function WhatsNewSheet({ blocked }: { blocked: boolean }) {
             nav('/more/whats-new');
           }}
         >
-          Xem tất cả
+          {t('Xem tất cả')}
         </Button>
         <Button variant="primary" onClick={markWhatsNewSeen}>
-          Đã hiểu
+          {t('Đã hiểu')}
         </Button>
       </div>
     </Sheet>

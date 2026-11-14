@@ -6,7 +6,7 @@ The app ships continuously, so releases are named by date. Each one matches an e
 
 | Release | Highlights | Plan | Migration |
 |---|---|---|---|
-| [Unreleased](#unreleased) | Public repo: sample seed, README, MIT license | v2.8 | `20261108000100` |
+| [Unreleased](#unreleased) | English UI, public repo: sample seed, README, MIT license | v2.8 | `20261108000100` |
 | [2026-11-13](#2026-11-13--flexible-sessions) | Swap sessions on any day | v2.8 | `20261108000100` |
 | [2026-11-08](#2026-11-08--friday-upper-day) | 4th gym day, `db:migrate` | v2.8 | `20261108000100` |
 | [2026-11-06](#2026-11-06--smarter-coaching) | English names, assisted machines, draft checks | v2.7 | `20261106000400` |
@@ -18,10 +18,17 @@ The app ships continuously, so releases are named by date. Each one matches an e
 
 ## Unreleased
 
+### Added
+- **English UI.** Thêm → "Ngôn ngữ / Language" switches between Tiếng Việt (default) and English, saved per device (`localStorage['pt-locale']`).
+  - gettext style (`src/i18n/`): the Vietnamese string stays in the code as the key, `t('…')` looks it up in `src/i18n/en/*` and falls back to Vietnamese.
+  - Dates (`formatVN`) and numbers (`formatNumberVN`) follow the language: "27 Oct", "1,452.5".
+  - Not translated: anything stored in the DB (skip notes, session names), user and coach content (exercise cues, coach notes), the quick-log input syntax, push notifications from the server, and the coach CLI.
+  - `src/i18n/i18n.test.ts` fails on Vietnamese UI text outside `t()`, a missing or unused English entry, or mismatched placeholders; `// i18n-ignore` marks lines that must stay Vietnamese.
+
 ### Changed
 - **Personal data out of the repo.** The seed profile, goals and InBody are sample values; the hosted DB keeps the real ones (`0600` already ran there). The coach's profile and one-off notes moved to the gitignored `coach/CLAUDE.local.md`.
 - **Goal line from the first weigh-in.** The weight chart and the Today goal bar start from the first logged weight instead of a hard-coded value; kcal estimates before any weigh-in use `DEFAULT_BODY_WEIGHT_KG` (70).
-- **README for a public repo.** Screenshots in `.github/screenshots/` (from the e2e run on sample data), measured test / Lighthouse / bundle numbers, local and hosted setup, the coach workflow. MIT `LICENSE`.
+- **README for a public repo.** English screenshots in `.github/screenshots/` (from the e2e run on sample data), measured test / Lighthouse / bundle numbers, local and hosted setup, the coach workflow. MIT `LICENSE`.
 - **Editor and agent settings untracked.** `.claude/` and `.vscode/` are now gitignored.
 
 ### Fixed

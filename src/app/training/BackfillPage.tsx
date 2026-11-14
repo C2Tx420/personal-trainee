@@ -8,6 +8,7 @@ import { plannedSets } from '@/engine/warmup';
 import { Button, Card, ErrorBox, Field, Input, Page } from '@/ui/components';
 import { type EditorItem, newKey, SessionEditor } from './SessionEditor';
 import { saveEditor } from './save-editor';
+import { t } from '@/i18n';
 
 /** + Backfill a past session: pick date + session type, fill in sets, no timers. */
 export function BackfillPage() {
@@ -73,7 +74,7 @@ export function BackfillPage() {
         kind,
         items,
         warmup: mins > 0 ? { cardio: { exercise: 'treadmill_walk', minutes: mins, speed_kmh_min: null, speed_kmh_max: null, done: true }, mobility_done: null } : { cardio: null, mobility_done: false, skipped: true },
-        note: 'Ghi bù',
+        note: 'Ghi bù', // i18n-ignore: saved to the database
         content: plan.data?.content ?? null,
         planVersionId: null,
       });
@@ -88,13 +89,13 @@ export function BackfillPage() {
   }
 
   return (
-    <Page title="+ Ghi bù buổi đã tập" back="/training">
+    <Page title={t('+ Ghi bù buổi đã tập')} back="/training">
       <Card>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Ngày">
+          <Field label={t('Ngày')}>
             <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
           </Field>
-          <Field label="Loại buổi">
+          <Field label={t('Loại buổi')}>
             <select className="h-11 w-full rounded-xl border border-line bg-card px-3" value={kind} onChange={(e) => setKind(e.target.value as SessionKind)}>
               {SESSION_KINDS.filter((k) => !['badminton', 'walk', 'zone2', 'core'].includes(k)).map((k) => (
                 <option key={k} value={k}>{SESSION_KIND_LABEL[k]}</option>
@@ -105,8 +106,8 @@ export function BackfillPage() {
         {scheduled && (
           <div className="glass-subtle rounded-ctl mb-3 p-3 text-sm" data-testid="backfill-replace">
             <p className="mb-2">
-              {formatVN(date)} theo lịch là {SESSION_KIND_LABEL[scheduled]}, chưa ghi gì.
-              {scheduled === 'badminton' && ' Không đánh thì thay bằng cardio nhẹ:'}
+              {t('{date} theo lịch là {kind}, chưa ghi gì.', { date: formatVN(date), kind: SESSION_KIND_LABEL[scheduled] })}
+              {scheduled === 'badminton' && ` ${t('Không đánh thì thay bằng cardio nhẹ:')}`}
             </p>
             {scheduled === 'badminton' && (
               <div className="mb-2 grid grid-cols-2 gap-2">
@@ -116,24 +117,26 @@ export function BackfillPage() {
               </div>
             )}
             {!canReplace ? (
-              kind === 'legs' && <p className="text-xs text-muted">Legs không thay được buổi ngày này (sát ngày cầu lông hoặc Chủ nhật) — buổi này ghi riêng.</p>
+              kind === 'legs' && <p className="text-xs text-muted">{t('Legs không thay được buổi ngày này (sát ngày cầu lông hoặc Chủ nhật) — buổi này ghi riêng.')}</p>
             ) : (
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={replaceScheduled} onChange={(e) => setReplaceScheduled(e.target.checked)} />
-                {scheduled === 'badminton' ? 'Hoặc: b' : 'B'}uổi {SESSION_KIND_LABEL[kind]} này thay {SESSION_KIND_LABEL[scheduled]} (ghi {SESSION_KIND_LABEL[scheduled]} là nghỉ)
+                {scheduled === 'badminton'
+                  ? t('Hoặc: buổi {kind} này thay {scheduled} (ghi {scheduled} là nghỉ)', { kind: SESSION_KIND_LABEL[kind], scheduled: SESSION_KIND_LABEL[scheduled] })
+                  : t('Buổi {kind} này thay {scheduled} (ghi {scheduled} là nghỉ)', { kind: SESSION_KIND_LABEL[kind], scheduled: SESSION_KIND_LABEL[scheduled] })}
               </label>
             )}
           </div>
         )}
-        <Field label="Khởi động (phút đi bộ, 0 = không)">
+        <Field label={t('Khởi động (phút đi bộ, 0 = không)')}>
           <Input inputMode="numeric" value={warmupMin} onChange={(e) => setWarmupMin(e.target.value)} />
         </Field>
-        <Button block onClick={fromTemplate}>Điền theo lộ trình {SESSION_KIND_LABEL[kind]}</Button>
+        <Button block onClick={fromTemplate}>{t('Điền theo lộ trình {kind}', { kind: SESSION_KIND_LABEL[kind] })}</Button>
       </Card>
       <SessionEditor items={items} onChange={setItems} library={ex.list} history={training.data?.sets} />
       {error ? <ErrorBox error={error} /> : null}
       <Button variant="primary" size="lg" block className="mt-3" disabled={busy || items.length === 0} onClick={() => void save()}>
-        {busy ? 'Đang lưu…' : 'Lưu buổi ghi bù'}
+        {busy ? t('Đang lưu…') : t('Lưu buổi ghi bù')}
       </Button>
     </Page>
   );

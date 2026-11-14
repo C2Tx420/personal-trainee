@@ -1,5 +1,6 @@
 import { suspiciousSet } from '@/engine/analytics';
 import type { ExerciseRow, SetRow } from '@/engine/types';
+import { t } from '@/i18n';
 import { Button, Card, Chip, cx, ExerciseImg, Input } from '@/ui/components';
 import { ExercisePicker, type PickResult } from '../workout/ExercisePicker';
 
@@ -17,9 +18,9 @@ export type EditorItem = {
 export const newKey = () => Math.random().toString(36).slice(2);
 
 const toNum = (s: string) => {
-  const t = s.replace(',', '.').trim();
-  if (t === '') return null;
-  const n = Number(t);
+  const v = s.replace(',', '.').trim();
+  if (v === '') return null;
+  const n = Number(v);
   return Number.isNaN(n) ? null : n;
 };
 
@@ -51,14 +52,14 @@ export function SessionEditor({
             <div className="mb-2 flex items-center gap-3">
               {ex && <ExerciseImg svg={ex.illustration_svg} name={ex.name} className="w-20 shrink-0" />}
               <div className="min-w-0 flex-1">
-                <div className="text-xs text-muted">Bài {idx + 1}{it.rawName ? ` · anh ghi “${it.rawName}”` : ''}</div>
-                <div className="font-semibold">{ex?.name ?? (it.pick && 'newName' in it.pick ? `${it.pick.newName} (bài tạm mới)` : 'Chưa khớp bài — chọn bên dưới')}</div>
+                <div className="text-xs text-muted">{t('Bài {n}', { n: idx + 1 })}{it.rawName ? ` · ${t('anh ghi “{text}”', { text: it.rawName })}` : ''}</div>
+                <div className="font-semibold">{ex?.name ?? (it.pick && 'newName' in it.pick ? t('{name} (bài tạm mới)', { name: it.pick.newName }) : t('Chưa khớp bài — chọn bên dưới'))}</div>
               </div>
-              <Button size="sm" variant="ghost" aria-label="Xoá bài" onClick={() => onChange(items.filter((x) => x.key !== it.key))}>✕</Button>
+              <Button size="sm" variant="ghost" aria-label={t('Xoá bài')} onClick={() => onChange(items.filter((x) => x.key !== it.key))}>✕</Button>
             </div>
             {(unmatched || !ex) && (
               <div className="mb-3">
-                <ExercisePicker label="Chọn bài" library={library} quick={[]} value={it.pick} onChange={(p) => update(it.key, { pick: p })} />
+                <ExercisePicker label={t('Chọn bài')} library={library} quick={[]} value={it.pick} onChange={(p) => update(it.key, { pick: p })} />
               </div>
             )}
             <div className="space-y-2">
@@ -67,6 +68,7 @@ export function SessionEditor({
                   ex && !timeBased && s.set_type === 'working'
                     ? suspiciousSet({ kg: s.kg, reps: s.reps }, history.filter((h) => h.exercise_id === ex.id), { loadStepKg: ex.load_step_kg })
                     : null;
+                const nth = it.sets.slice(0, si + 1).filter((x) => x.set_type === s.set_type).length;
                 return (
                   <div key={s.key}>
                     <div className="flex items-center gap-2" data-index={si}>
@@ -75,21 +77,21 @@ export function SessionEditor({
                         onClick={() => updateSet(it.key, s.key, { set_type: s.set_type === 'warmup' ? 'working' : 'warmup' })}
                         className={cx('h-10 w-24 shrink-0 rounded-lg text-xs font-semibold', s.set_type === 'warmup' ? 'bg-card-2 text-muted' : 'bg-accent-soft text-accent')}
                       >
-                        {s.set_type === 'warmup' ? 'Làm nóng' : 'Chính'} {it.sets.slice(0, si + 1).filter((x) => x.set_type === s.set_type).length}
+                        {s.set_type === 'warmup' ? t('Làm nóng {n}', { n: nth }) : t('Chính {n}', { n: nth })}
                       </button>
                       {!timeBased && (
                         <Input aria-label="kg" inputMode="decimal" placeholder="kg" value={s.kg ?? ''} onChange={(e) => updateSet(it.key, s.key, { kg: toNum(e.target.value) })} />
                       )}
                       <Input
-                        aria-label={timeBased ? 'giây' : 'lần'}
+                        aria-label={timeBased ? t('giây') : t('lần')}
                         inputMode="numeric"
-                        placeholder={timeBased ? 'giây' : 'lần'}
+                        placeholder={timeBased ? t('giây') : t('lần')}
                         value={(timeBased ? s.seconds : s.reps) ?? ''}
                         onChange={(e) => updateSet(it.key, s.key, timeBased ? { seconds: toNum(e.target.value) } : { reps: toNum(e.target.value) })}
                       />
-                      <button aria-label="Xoá hiệp" className="px-2 text-muted" onClick={() => update(it.key, { sets: it.sets.filter((x) => x.key !== s.key) })}>✕</button>
+                      <button aria-label={t('Xoá hiệp')} className="px-2 text-muted" onClick={() => update(it.key, { sets: it.sets.filter((x) => x.key !== s.key) })}>✕</button>
                     </div>
-                    {typo && <p className="mt-1 text-xs text-warn" data-testid="typo-guard">Kiểm tra lại: {typo}</p>}
+                    {typo && <p className="mt-1 text-xs text-warn" data-testid="typo-guard">{t('Kiểm tra lại: {msg}', { msg: typo })}</p>}
                   </div>
                 );
               })}
@@ -101,15 +103,15 @@ export function SessionEditor({
                   update(it.key, { sets: [...it.sets, { key: newKey(), set_type: 'working', kg: last?.kg ?? null, reps: last?.reps ?? null, seconds: last?.seconds ?? null }] });
                 }}
               >
-                + Hiệp
+                {t('+ Hiệp')}
               </Chip>
             </div>
-            <Input className="mt-2" placeholder="Ghi chú bài (tuỳ chọn)" value={it.note} onChange={(e) => update(it.key, { note: e.target.value })} />
+            <Input className="mt-2" placeholder={t('Ghi chú bài (tuỳ chọn)')} value={it.note} onChange={(e) => update(it.key, { note: e.target.value })} />
           </Card>
         );
       })}
       <Button block onClick={() => onChange([...items, { key: newKey(), rawName: null, pick: null, templateItemPosition: null, sets: [{ key: newKey(), set_type: 'working', kg: null, reps: null, seconds: null }], note: '' }])}>
-        + Thêm bài
+        {t('+ Thêm bài')}
       </Button>
     </div>
   );

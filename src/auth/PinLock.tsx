@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { verifyPin } from '@/data/api';
 import { cx } from '@/ui/components';
 import { IconLock } from '@/ui/icons';
+import { t } from '@/i18n';
 
 const LENGTH = 4;
 
@@ -22,10 +23,10 @@ export function PinLock({ onUnlock, onLockedOut, email }: { onUnlock: () => void
         setTimeout(() => setShake(false), 400);
         setPin('');
         if (r.locked_out) {
-          setMsg('Sai 5 lần — cần đăng nhập lại bằng mật khẩu');
+          setMsg(t('Sai 5 lần — cần đăng nhập lại bằng mật khẩu'));
           setTimeout(onLockedOut, 1200);
         } else {
-          setMsg(`Sai PIN — còn ${r.attempts_left} lần thử`);
+          setMsg(t('Sai PIN — còn {n} lần thử', { n: r.attempts_left }));
         }
       })
       .catch((e: Error) => {
@@ -42,21 +43,21 @@ export function PinLock({ onUnlock, onLockedOut, email }: { onUnlock: () => void
       <div className="glass mb-4 grid size-16 place-items-center rounded-card text-accent">
         <IconLock className="size-7" />
       </div>
-      <h1 className="text-2xl font-bold tracking-tight">Nhập PIN</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t('Nhập PIN')}</h1>
       <p className="mb-7 text-xs text-muted">{email}</p>
-      <div className={cx('mb-4 flex gap-4', shake && 'animate-pulse')} aria-label="PIN đã nhập" role="status">
+      <div className={cx('mb-4 flex gap-4', shake && 'animate-pulse')} aria-label={t('PIN đã nhập')} role="status">
         {Array.from({ length: LENGTH }, (_, i) => (
           <span key={i} className={cx('size-3.5 rounded-full border border-white/25 transition', i < pin.length && 'scale-110 border-transparent bg-accent')} />
         ))}
       </div>
-      <p className={cx('mb-6 h-5 text-sm', msg ? 'text-bad' : 'text-muted')}>{busy ? 'Đang kiểm tra…' : msg}</p>
+      <p className={cx('mb-6 h-5 text-sm', msg ? 'text-bad' : 'text-muted')}>{busy ? t('Đang kiểm tra…') : msg}</p>
       <div className="grid w-full max-w-[300px] grid-cols-3 gap-4">
         {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => (
           <PinKey key={d} label={d} onClick={() => press(d)} disabled={busy} />
         ))}
         <span />
         <PinKey label="0" onClick={() => press('0')} disabled={busy} />
-        <PinKey label="⌫" aria="Xoá" onClick={() => setPin((p) => p.slice(0, -1))} disabled={busy} />
+        <PinKey label="⌫" aria={t('Xoá')} onClick={() => setPin((p) => p.slice(0, -1))} disabled={busy} />
       </div>
     </div>
   );

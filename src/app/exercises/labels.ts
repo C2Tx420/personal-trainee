@@ -1,10 +1,12 @@
+import { t } from '@/i18n';
+
 export const MUSCLE_LABEL: Record<string, string> = {
-  chest: 'Ngực', front_delt: 'Vai trước', side_delt: 'Vai giữa', rear_delt: 'Vai sau', lats: 'Xô', upper_back: 'Lưng trên',
-  traps: 'Cầu vai', biceps: 'Tay trước', triceps: 'Tay sau', forearms: 'Cẳng tay', quads: 'Đùi trước', hamstrings: 'Đùi sau',
-  glutes: 'Mông', calves: 'Bắp chân', abs: 'Bụng', obliques: 'Bụng xiên', lower_back: 'Lưng dưới', adductors: 'Đùi trong', cardio: 'Tim mạch',
+  chest: t('Ngực'), front_delt: t('Vai trước'), side_delt: t('Vai giữa'), rear_delt: t('Vai sau'), lats: t('Xô'), upper_back: t('Lưng trên'),
+  traps: t('Cầu vai'), biceps: t('Tay trước'), triceps: t('Tay sau'), forearms: t('Cẳng tay'), quads: t('Đùi trước'), hamstrings: t('Đùi sau'),
+  glutes: t('Mông'), calves: t('Bắp chân'), abs: t('Bụng'), obliques: t('Bụng xiên'), lower_back: t('Lưng dưới'), adductors: t('Đùi trong'), cardio: t('Tim mạch'),
 };
 
 export const EQUIPMENT_LABEL: Record<string, string> = {
-  machine: 'Máy', cable: 'Cáp', dumbbell: 'Tạ đơn', barbell: 'Tạ đòn', bodyweight: 'Thân người', smith: 'Smith',
-  cardio_machine: 'Máy cardio', none: 'Không dụng cụ',
+  machine: t('Máy'), cable: t('Cáp'), dumbbell: t('Tạ đơn'), barbell: t('Tạ đòn'), bodyweight: t('Thân người'), smith: 'Smith',
+  cardio_machine: t('Máy cardio'), none: t('Không dụng cụ'),
 };

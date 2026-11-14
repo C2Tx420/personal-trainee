@@ -6,8 +6,10 @@ import { AuthGate } from './auth/AuthGate';
 import { queryClient } from './data/queries';
 import { applyOnNavigation, startSwUpdates } from './lib/sw-update';
 import './index.css';
+import { getLocale } from './i18n';
 import { router } from './router';
 
+document.documentElement.lang = getLocale();
 startSwUpdates();
 applyOnNavigation(router);
 

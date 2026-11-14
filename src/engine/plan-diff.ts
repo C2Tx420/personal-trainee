@@ -2,6 +2,8 @@ import { WEEKDAY_LABEL, WEEKDAYS } from './dates';
 import type { DayPlan, ExerciseDef, PlanContent, PlanItem, PlanTemplate } from './plan-schema';
 import { legsBadmintonAdjacency, parsePlanContent } from './plan-schema';
 import { SESSION_KIND_LABEL } from './schedule';
+import { t } from '../i18n';
+import { formatNumberVN } from './math';
 
 export type DiffKind =
   | 'added'
@@ -22,7 +24,7 @@ export type DiffKind =
 
 export type DiffEntry = { kind: DiffKind; scope: string; text: string; warning?: string; slug?: string };
 
-const kg = (v: number | null) => (v === null ? '—' : `${String(v).replace('.', ',')} kg`);
+const kg = (v: number | null) => (v === null ? '—' : `${formatNumberVN(v, 2)} kg`);
 const reps = (i: PlanItem) => `${i.rep_min}–${i.rep_max}${i.unit === 'seconds' ? 's' : ''}`;
 
 function dayLabel(p: DayPlan): string {
@@ -30,11 +32,11 @@ function dayLabel(p: DayPlan): string {
     case 'session':
       return SESSION_KIND_LABEL[p.template];
     case 'rest':
-      return 'Nghỉ';
+      return t('Nghỉ');
     case 'badminton':
-      return 'Cầu lông';
+      return t('Cầu lông');
     case 'optional':
-      return 'Tuỳ chọn';
+      return t('Tuỳ chọn');
   }
 }
 
@@ -61,12 +63,12 @@ function matchItems(ai: PlanItem[], bi: PlanItem[]) {
 
 const kgSpec = (i: PlanItem) =>
   i.target_kg_per_set
-    ? i.target_kg_per_set.map((x) => String(x).replace('.', ',')).join('/') + ' kg'
-    : kg(i.target_kg) + (i.backoff_steps && i.target_kg !== null ? `, hiệp sau −${i.backoff_steps} nấc` : '');
+    ? i.target_kg_per_set.map((x) => formatNumberVN(x, 2)).join('/') + ' kg'
+    : kg(i.target_kg) + (i.backoff_steps && i.target_kg !== null ? t(', hiệp sau −{n} nấc', { n: i.backoff_steps }) : '');
 const kgKey = (i: PlanItem) => JSON.stringify(i.target_kg_per_set) + i.target_kg + ':' + (i.backoff_steps ?? 0);
 
-function warmupText(t: PlanTemplate, names: (s: string) => string) {
-  return [t.warmup.cardio ? `${names(t.warmup.cardio.exercise)} ${t.warmup.cardio.minutes}'` : 'không cardio', ...t.warmup.mobility].join(' · ');
+function warmupText(tpl: PlanTemplate, names: (s: string) => string) {
+  return [tpl.warmup.cardio ? `${names(tpl.warmup.cardio.exercise)} ${tpl.warmup.cardio.minutes}'` : t('không cardio'), ...tpl.warmup.mobility].join(' · ');
 }
 
 function diffTemplate(a: PlanTemplate | undefined, b: PlanTemplate | undefined, names: (s: string) => string): DiffEntry[] {
@@ -87,24 +89,24 @@ function diffTemplate(a: PlanTemplate | undefined, b: PlanTemplate | undefined, 
     const o = ai.find((x) => x.exercise === n.exercise);
     if (!o) continue;
     const nm = names(n.exercise);
-    if (o.sets !== n.sets) out.push({ kind: 'sets', scope, text: `${nm}: ${o.sets} → ${n.sets} hiệp chính` });
+    if (o.sets !== n.sets) out.push({ kind: 'sets', scope, text: t('{name}: {a} → {b} hiệp chính', { name: nm, a: o.sets, b: n.sets }) });
     if (o.rep_min !== n.rep_min || o.rep_max !== n.rep_max) out.push({ kind: 'reps', scope, text: `${nm}: ${reps(o)} → ${reps(n)}` });
     if (o.rest_sec_min !== n.rest_sec_min || o.rest_sec_max !== n.rest_sec_max) {
-      out.push({ kind: 'rest', scope, text: `${nm}: nghỉ ${o.rest_sec_min}–${o.rest_sec_max}s → ${n.rest_sec_min}–${n.rest_sec_max}s` });
+      out.push({ kind: 'rest', scope, text: t('{name}: nghỉ {a} → {b}', { name: nm, a: `${o.rest_sec_min}–${o.rest_sec_max}s`, b: `${n.rest_sec_min}–${n.rest_sec_max}s` }) });
     }
     if (kgKey(o) !== kgKey(n)) {
       out.push({ kind: 'target_kg', scope, text: `${nm}: ${kgSpec(o)} → ${kgSpec(n)}` });
     }
     if (JSON.stringify(o.warmup_sets) !== JSON.stringify(n.warmup_sets)) {
-      out.push({ kind: 'warmup_sets', scope, text: `${nm}: làm nóng ${o.warmup_sets.length} → ${n.warmup_sets.length} hiệp` });
+      out.push({ kind: 'warmup_sets', scope, text: t('{name}: làm nóng {a} → {b} hiệp', { name: nm, a: o.warmup_sets.length, b: n.warmup_sets.length }) });
     }
     if (o.coach_note !== n.coach_note && n.coach_note) out.push({ kind: 'coach_note', scope, text: `${nm}: "${n.coach_note}"` });
   }
 
-  if (reordered) out.push({ kind: 'order', scope, text: `Đổi thứ tự: ${commonB.map(names).join(' → ')}` });
+  if (reordered) out.push({ kind: 'order', scope, text: t('Đổi thứ tự: {order}', { order: commonB.map(names).join(' → ') }) });
 
   if (a && b && JSON.stringify(a.warmup) !== JSON.stringify(b.warmup)) {
-    out.push({ kind: 'warmup', scope, text: `Khởi động: ${warmupText(a, names)} → ${warmupText(b, names)}` });
+    out.push({ kind: 'warmup', scope, text: t('Khởi động: {a} → {b}', { a: warmupText(a, names), b: warmupText(b, names) }) });
   }
   return out;
 }
@@ -115,8 +117,8 @@ function diffExercises(a: ExerciseDef[], b: ExerciseDef[], knownBefore: Set<stri
     const isNew = !knownBefore.has(e.slug) && !prev;
     return {
       kind: isNew ? 'exercise_new' : 'exercise_edit',
-      scope: 'Thư viện bài tập',
-      text: isNew ? `Bài mới: ${e.name}` : `Sửa bài: ${e.name}`,
+      scope: t('Thư viện bài tập'),
+      text: isNew ? t('Bài mới: {name}', { name: e.name }) : t('Sửa bài: {name}', { name: e.name }),
       slug: e.slug,
     };
   });
@@ -137,11 +139,11 @@ export function diffPlans(
     const pa = a.schedule[d];
     const pb = b.schedule[d];
     if (JSON.stringify(pa) !== JSON.stringify(pb)) {
-      out.push({ kind: 'schedule', scope: 'Lịch', text: `${WEEKDAY_LABEL[d]}: ${dayLabel(pa)} → ${dayLabel(pb)}` });
+      out.push({ kind: 'schedule', scope: t('Lịch'), text: `${WEEKDAY_LABEL[d]}: ${dayLabel(pa)} → ${dayLabel(pb)}` });
     }
   }
   if (legsBadmintonAdjacency(b.schedule).length > 0 && out.some((x) => x.kind === 'schedule')) {
-    out[out.length - 1].warning = 'Vi phạm rule: Legs và cầu lông liền ngày';
+    out[out.length - 1].warning = t('Vi phạm rule: Legs và cầu lông liền ngày');
   }
   const keys = new Set([...a.templates.map((t) => t.key), ...b.templates.map((t) => t.key)]);
   for (const k of keys) {
@@ -152,10 +154,10 @@ export function diffPlans(
   const nb = b.nutrition;
   if (na.calories_kcal !== nb.calories_kcal) {
     const d = nb.calories_kcal - na.calories_kcal;
-    out.push({ kind: 'nutrition', scope: 'Calo tham khảo', text: `${na.calories_kcal} → ${nb.calories_kcal} kcal (${d > 0 ? '+' : ''}${d})` });
+    out.push({ kind: 'nutrition', scope: t('Calo tham khảo'), text: `${na.calories_kcal} → ${nb.calories_kcal} kcal (${d > 0 ? '+' : ''}${d})` });
   }
-  for (const [k, label] of [['protein_g', 'Đạm'], ['carb_g', 'Carb'], ['fat_g', 'Béo']] as const) {
-    if (na[k] !== nb[k]) out.push({ kind: 'nutrition', scope: 'Macro tham khảo', text: `${label}: ${na[k]} → ${nb[k]} g` });
+  for (const [k, label] of [['protein_g', t('Đạm')], ['carb_g', 'Carb'], ['fat_g', t('Béo')]] as const) {
+    if (na[k] !== nb[k]) out.push({ kind: 'nutrition', scope: t('Macro tham khảo'), text: `${label}: ${na[k]} → ${nb[k]} g` });
   }
   return out;
 }
@@ -244,16 +246,16 @@ function itemChanges(o: PlanItem, n: PlanItem, assisted: boolean): ItemChange[] 
     const b = firstKg(n);
     // up = harder: more kg, or less assistance on assisted machines
     const dir = a !== null && b !== null && a !== b ? (b > a !== assisted ? 'up' : 'down') : undefined;
-    const text = b === null ? `${kgSpec(o)} → tự chọn mức` : a === null ? `đặt ${kgSpec(n)}` : `${kgSpec(o)} → ${kgSpec(n)}`;
+    const text = b === null ? t('{kg} → tự chọn mức', { kg: kgSpec(o) }) : a === null ? t('đặt {kg}', { kg: kgSpec(n) }) : `${kgSpec(o)} → ${kgSpec(n)}`;
     out.push({ kind: 'target_kg', text, dir });
   }
-  if (o.sets !== n.sets) out.push({ kind: 'sets', text: `${o.sets} → ${n.sets} hiệp`, dir: n.sets > o.sets ? 'up' : 'down' });
-  if (o.rep_min !== n.rep_min || o.rep_max !== n.rep_max) out.push({ kind: 'reps', text: `${reps(o)} → ${reps(n)} lần` });
+  if (o.sets !== n.sets) out.push({ kind: 'sets', text: t('{a} → {b} hiệp', { a: o.sets, b: n.sets }), dir: n.sets > o.sets ? 'up' : 'down' });
+  if (o.rep_min !== n.rep_min || o.rep_max !== n.rep_max) out.push({ kind: 'reps', text: t('{a} → {b} lần', { a: reps(o), b: reps(n) }) });
   if (o.rest_sec_min !== n.rest_sec_min || o.rest_sec_max !== n.rest_sec_max) {
-    out.push({ kind: 'rest', text: `nghỉ ${o.rest_sec_min}–${o.rest_sec_max}s → ${n.rest_sec_min}–${n.rest_sec_max}s` });
+    out.push({ kind: 'rest', text: t('nghỉ {a} → {b}', { a: `${o.rest_sec_min}–${o.rest_sec_max}s`, b: `${n.rest_sec_min}–${n.rest_sec_max}s` }) });
   }
   if (JSON.stringify(o.warmup_sets) !== JSON.stringify(n.warmup_sets)) {
-    out.push({ kind: 'warmup_sets', text: `làm nóng ${o.warmup_sets.length} → ${n.warmup_sets.length} hiệp` });
+    out.push({ kind: 'warmup_sets', text: t('làm nóng {a} → {b} hiệp', { a: o.warmup_sets.length, b: n.warmup_sets.length }) });
   }
   return out;
 }

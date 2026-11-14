@@ -5,6 +5,8 @@
  * date strings are converted to UTC 00:00 and shifted by whole days.
  */
 
+import { getLocale, t } from '../i18n';
+
 const TIMEZONE = 'Asia/Ho_Chi_Minh';
 const MS_PER_DAY = 86_400_000;
 
@@ -14,13 +16,13 @@ export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as con
 export type Weekday = (typeof WEEKDAYS)[number];
 
 export const WEEKDAY_LABEL: Record<Weekday, string> = {
-  mon: 'Thứ 2',
-  tue: 'Thứ 3',
-  wed: 'Thứ 4',
-  thu: 'Thứ 5',
-  fri: 'Thứ 6',
-  sat: 'Thứ 7',
-  sun: 'Chủ nhật',
+  mon: t('Thứ 2'),
+  tue: t('Thứ 3'),
+  wed: t('Thứ 4'),
+  thu: t('Thứ 5'),
+  fri: t('Thứ 6'),
+  sat: t('Thứ 7'),
+  sun: t('Chủ nhật'),
 };
 
 function toUtcMs(date: IsoDate): number {
@@ -62,8 +64,11 @@ export function todayVN(now: Date = new Date()): IsoDate {
   }).format(now);
 }
 
-/** "27/10" or "27/10/2026". */
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "27/10" or "27/10/2026"; in English "27 Oct" or "27 Oct 2026". */
 export function formatVN(date: IsoDate, withYear = false): string {
   const [y, m, d] = date.split('-');
+  if (getLocale() === 'en') return `${Number(d)} ${MONTHS_EN[Number(m) - 1]}${withYear ? ` ${y}` : ''}`;
   return withYear ? `${d}/${m}/${y}` : `${d}/${m}`;
 }

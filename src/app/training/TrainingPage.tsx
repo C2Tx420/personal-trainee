@@ -9,6 +9,7 @@ import { missingReflection, reviewedWeeks } from '@/engine/reflection';
 import { SESSION_KIND_LABEL } from '@/engine/schedule';
 import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { topSetSeries, volumeKg, weeklyVolumeByExercise, weekSummary } from '@/engine/workout-summary';
+import { t } from '@/i18n';
 import { SimpleBars, SimpleLine } from '@/ui/charts';
 import { MuscleSetsCard } from './MuscleSetsCard';
 import { Badge, Button, Card, Empty, ErrorBox, Page, ProgressBar, SectionTitle, Segmented, Skeleton, Stat } from '@/ui/components';
@@ -31,8 +32,8 @@ export function TrainingPage() {
     return [...ids].map((i) => ex.byId.get(i)).filter(Boolean).sort((a, b) => a!.name.localeCompare(b!.name));
   }, [data, ex.byId]);
 
-  if (training.isLoading || plan.isLoading) return <Page title="Tập"><Skeleton /></Page>;
-  if (training.error) return <Page title="Tập"><ErrorBox error={training.error} /></Page>;
+  if (training.isLoading || plan.isLoading) return <Page title={t('Tập')}><Skeleton /></Page>;
+  if (training.error) return <Page title={t('Tập')}><ErrorBox error={training.error} /></Page>;
   const sessions = data?.sessions ?? [];
   const reviewed = reviews.data ? reviewedWeeks(reviews.data) : null;
   const content = plan.data?.content;
@@ -46,83 +47,83 @@ export function TrainingPage() {
   const selectedAssisted = !!ex.byId.get(selected)?.is_assisted;
   const vol = data ? weeklyVolumeByExercise(group, sessions, data.sets, weekStarts, loads).map((v) => ({ label: formatVN(v.week), volume: v.volume })) : [];
   const top = data
-    ? topSetSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted).map((t) => ({ label: formatVN(t.date), top: t.topKg, target: t.targetKg }))
+    ? topSetSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted).map((p) => ({ label: formatVN(p.date), top: p.topKg, target: p.targetKg }))
     : [];
   const e1 = data
-    ? e1rmSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted, loads.bodyKg).map((t) => ({ label: formatVN(t.date), e1rm: t.e1rm }))
+    ? e1rmSeries(group, sessions.filter((s) => s.session_date >= weekStarts[0]), data.sets, selectedAssisted, loads.bodyKg).map((p) => ({ label: formatVN(p.date), e1rm: p.e1rm }))
     : [];
 
   return (
-    <Page title="Tập">
+    <Page title={t('Tập')}>
       <div className="mb-3 grid grid-cols-2 gap-2">
-        <Button onClick={() => nav('/training/backfill')}>+ Ghi bù</Button>
-        <Button onClick={() => nav('/training/quick')}>Ghi nhanh</Button>
+        <Button onClick={() => nav('/training/backfill')}>{t('+ Ghi bù')}</Button>
+        <Button onClick={() => nav('/training/quick')}>{t('Ghi nhanh')}</Button>
       </div>
 
       {week && (
         <Card>
           <div className="mb-2 flex items-center justify-between">
-            <div className="font-semibold">Tuần {formatVN(ws)} – {formatVN(addDays(ws, 6))}</div>
+            <div className="font-semibold">{t('Tuần {from} – {to}', { from: formatVN(ws), to: formatVN(addDays(ws, 6)) })}</div>
             <Badge tone={week.doneSessions >= week.plannedSessions ? 'ok' : 'muted'}>
-              {week.doneSessions}/{week.plannedSessions} buổi
+              {t('{done}/{total} buổi', { done: week.doneSessions, total: week.plannedSessions })}
             </Badge>
           </div>
           <ProgressBar value={week.doneSessions} max={week.plannedSessions} tone="ok" />
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Stat label="Hoàn thành hiệp" value={week.setCompletionPct === null ? '—' : `${week.setCompletionPct}%`} />
-            <Stat label="Cầu lông" value={`${week.badmintonSessions} buổi`} />
-            <Stat label="Có khởi động" value={`${week.sessionsWithWarmup}/${week.strengthSessions}`} />
-            <Stat label="Calo tập ước tính" value={`${formatNumberVN(week.estKcal)} kcal`} sub="tham khảo, không ăn bù" />
+            <Stat label={t('Hoàn thành hiệp')} value={week.setCompletionPct === null ? '—' : `${week.setCompletionPct}%`} />
+            <Stat label={t('Cầu lông')} value={t('{n} buổi', { n: week.badmintonSessions })} />
+            <Stat label={t('Có khởi động')} value={`${week.sessionsWithWarmup}/${week.strengthSessions}`} />
+            <Stat label={t('Calo tập ước tính')} value={`${formatNumberVN(week.estKcal)} kcal`} sub={t('tham khảo, không ăn bù')} />
           </div>
         </Card>
       )}
 
       {data && <MuscleSetsCard weekStart={ws} sessions={sessions} sets={data.sets} byId={ex.byId} />}
 
-      <SectionTitle>Biểu đồ theo bài</SectionTitle>
+      <SectionTitle>{t('Biểu đồ theo bài')}</SectionTitle>
       <Card>
         {trainedExercises.length === 0 ? (
-          <Empty>Chưa có dữ liệu tạ</Empty>
+          <Empty>{t('Chưa có dữ liệu tạ')}</Empty>
         ) : (
           <>
-            <select aria-label="Chọn bài" className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={selected} onChange={(e) => setExId(e.target.value)}>
+            <select aria-label={t('Chọn bài')} className="mb-3 h-11 w-full rounded-xl border border-line bg-card px-3" value={selected} onChange={(e) => setExId(e.target.value)}>
               {trainedExercises.map((e) => (
                 <option key={e!.id} value={e!.id}>{e!.name}</option>
               ))}
             </select>
-            <Segmented value={weeks} onChange={setWeeks} options={[{ value: '4', label: '4 tuần' }, { value: '8', label: '8 tuần' }]} />
-            <div className="mb-1 text-sm font-medium">Khối lượng mỗi tuần (kg)</div>
-            <SimpleBars data={vol} dataKey="volume" name="Khối lượng" />
+            <Segmented value={weeks} onChange={setWeeks} options={[{ value: '4', label: t('4 tuần') }, { value: '8', label: t('8 tuần') }]} />
+            <div className="mb-1 text-sm font-medium">{t('Khối lượng mỗi tuần (kg)')}</div>
+            <SimpleBars data={vol} dataKey="volume" name={t('Khối lượng')} />
             <div className="mt-4">
-              <Segmented value={metric} onChange={setMetric} options={[{ value: 'kg', label: 'Tạ' }, { value: 'e1rm', label: 'e1RM' }]} />
+              <Segmented value={metric} onChange={setMetric} options={[{ value: 'kg', label: t('Tạ') }, { value: 'e1rm', label: 'e1RM' }]} />
             </div>
             <div className="mb-1 text-sm font-medium">
               {metric === 'e1rm'
-                ? 'Sức mạnh ước tính (e1RM)'
+                ? t('Sức mạnh ước tính (e1RM)')
                 : selectedAssisted
-                  ? 'Kg trợ lực ít nhất vs mục tiêu (thấp hơn = khoẻ hơn)'
-                  : 'Tạ hiệp chính nặng nhất vs mục tiêu'}
+                  ? t('Kg trợ lực ít nhất vs mục tiêu (thấp hơn = khoẻ hơn)')
+                  : t('Tạ hiệp chính nặng nhất vs mục tiêu')}
             </div>
             {metric === 'e1rm' ? (
               e1.length ? (
                 <>
                   <SimpleLine data={e1} lines={[{ key: 'e1rm', name: 'e1RM' }]} unit="kg" />
-                  <p className="mt-1 text-xs text-muted">Ước tính từ kg × lần (hiệp ≤ 15 lần) — để xem xu hướng, không phải mức tạ 1 lần thật.</p>
+                  <p className="mt-1 text-xs text-muted">{t('Ước tính từ kg × lần (hiệp ≤ 15 lần) — để xem xu hướng, không phải mức tạ 1 lần thật.')}</p>
                 </>
               ) : (
-                <Empty>Chưa đủ số liệu (cần hiệp có kg, ≤ 15 lần{selectedAssisted ? ', và cân nặng' : ''})</Empty>
+                <Empty>{selectedAssisted ? t('Chưa đủ số liệu (cần hiệp có kg, ≤ 15 lần, và cân nặng)') : t('Chưa đủ số liệu (cần hiệp có kg, ≤ 15 lần)')}</Empty>
               )
             ) : top.length ? (
-              <SimpleLine data={top} lines={[{ key: 'top', name: 'Thực tế' }, { key: 'target', name: 'Mục tiêu', color: 'var(--ok)', dashed: true }]} unit="kg" />
+              <SimpleLine data={top} lines={[{ key: 'top', name: t('Thực tế') }, { key: 'target', name: t('Mục tiêu'), color: 'var(--ok)', dashed: true }]} unit="kg" />
             ) : (
-              <Empty>Chưa có buổi trong khoảng này</Empty>
+              <Empty>{t('Chưa có buổi trong khoảng này')}</Empty>
             )}
           </>
         )}
       </Card>
 
-      <SectionTitle>Lịch sử</SectionTitle>
-      {sessions.length === 0 && <Empty>Chưa có buổi tập nào</Empty>}
+      <SectionTitle>{t('Lịch sử')}</SectionTitle>
+      {sessions.length === 0 && <Empty>{t('Chưa có buổi tập nào')}</Empty>}
       {sessions.map((s) => {
         const sets = data!.sets.filter((x) => x.session_id === s.id);
         const items = data!.items.filter((x) => x.session_id === s.id);
@@ -132,18 +133,18 @@ export function TrainingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold">
-                  {SESSION_KIND_LABEL[s.kind]} {s.is_backfill && <Badge>ghi bù</Badge>} {s.status === 'in_progress' && <Badge tone="accent">đang tập</Badge>}{' '}
-                  {s.status === 'skipped' && <Badge tone="warn">nghỉ</Badge>}
+                  {SESSION_KIND_LABEL[s.kind]} {s.is_backfill && <Badge>{t('ghi bù')}</Badge>} {s.status === 'in_progress' && <Badge tone="accent">{t('đang tập')}</Badge>}{' '}
+                  {s.status === 'skipped' && <Badge tone="warn">{t('nghỉ')}</Badge>}
                 </div>
                 <div className="text-sm text-muted">
                   {WEEKDAY_LABEL[weekdayOf(s.session_date)]}, {formatVN(s.session_date, true)}
-                  {s.duration_min ? ` · ${s.duration_min} phút` : ''}
+                  {s.duration_min ? ` · ${t('{n} phút', { n: s.duration_min })}` : ''}
                   {s.status === 'skipped' && s.note ? ` · ${s.note}` : ''}
                 </div>
-                {reviewed && missingReflection(s, reviewed) && <div className="text-xs text-accent">✎ Chưa ghi cảm nhận</div>}
+                {reviewed && missingReflection(s, reviewed) && <div className="text-xs text-accent">✎ {t('Chưa ghi cảm nhận')}</div>}
               </div>
               <div className="tabular text-right text-sm">
-                {items.length > 0 ? <div>{items.filter((i) => i.status === 'done' || i.status === 'partial').length}/{items.length} bài</div> : null}
+                {items.length > 0 ? <div>{t('{done}/{total} bài', { done: items.filter((i) => i.status === 'done' || i.status === 'partial').length, total: items.length })}</div> : null}
                 {v > 0 && <div className="text-muted">{formatNumberVN(v)} kg</div>}
                 {s.kind === 'badminton' && s.est_kcal ? <div className="text-muted">≈ {s.est_kcal} kcal</div> : null}
               </div>

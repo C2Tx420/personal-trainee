@@ -1,5 +1,6 @@
 import type { PersonalRecord } from '@/engine/progress';
 import type { ExerciseRow } from '@/engine/types';
+import { t } from '@/i18n';
 import { Card } from '@/ui/components';
 import { fmtKg } from '../shared';
 
@@ -8,16 +9,16 @@ export function RecordsCard({ records, byId }: { records: PersonalRecord[]; byId
   if (records.length === 0) return null;
   return (
     <Card>
-      <div className="mb-1 font-semibold text-ok">🏆 Kỷ lục mới</div>
+      <div className="mb-1 font-semibold text-ok">{t('🏆 Kỷ lục mới')}</div>
       {records.map((r) => (
         <div key={r.setId} className="tabular text-sm" data-testid="record">
           {byId.get(r.exerciseId)?.name ?? '?'}: <b>{fmtKg(r.kg)} kg × {r.reps}</b>
           <span className="text-muted">
             {r.kind === 'kg'
               ? byId.get(r.exerciseId)?.is_assisted
-                ? ` · ít trợ lực nhất từ trước tới giờ (trước ${fmtKg(r.prevKg)} kg)`
-                : ` · nặng nhất từ trước tới giờ (trước ${fmtKg(r.prevKg)} kg)`
-              : ` · nhiều lần nhất ở mức ${fmtKg(r.kg)} kg (trước ${r.prevReps})`}
+                ? ` · ${t('ít trợ lực nhất từ trước tới giờ (trước {kg} kg)', { kg: fmtKg(r.prevKg) })}`
+                : ` · ${t('nặng nhất từ trước tới giờ (trước {kg} kg)', { kg: fmtKg(r.prevKg) })}`
+              : ` · ${t('nhiều lần nhất ở mức {kg} kg (trước {reps})', { kg: fmtKg(r.kg), reps: r.prevReps ?? '' })}`}
           </span>
         </div>
       ))}

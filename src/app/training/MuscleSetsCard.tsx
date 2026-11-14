@@ -1,6 +1,7 @@
 import { averageMuscleSets, MUSCLE_SETS_BAND, weeklyMuscleSets } from '@/engine/analytics';
 import { addDays, type IsoDate } from '@/engine/dates';
 import { formatNumberVN } from '@/engine/math';
+import { t } from '@/i18n';
 import type { ExerciseRow, SessionRow, SetRow } from '@/engine/types';
 import { Card, cx } from '@/ui/components';
 import { MUSCLE_LABEL } from '../exercises/labels';
@@ -16,9 +17,9 @@ export function MuscleSetsCard({ weekStart, sessions, sets, byId }: { weekStart:
   const pct = (v: number) => `${Math.min(100, (v / SCALE) * 100)}%`;
   return (
     <Card>
-      <div className="mb-1 font-semibold">Hiệp theo nhóm cơ</div>
+      <div className="mb-1 font-semibold">{t('Hiệp theo nhóm cơ')}</div>
       <p className="mb-3 text-xs text-muted">
-        Tuần này · nhóm chính 1 hiệp, nhóm phụ 0,5 · vùng xanh {MUSCLE_SETS_BAND.low}–{MUSCLE_SETS_BAND.high} hiệp/tuần là tham khảo · số nhỏ = TB 4 tuần trước
+        {t('Tuần này · nhóm chính 1 hiệp, nhóm phụ 0,5 · vùng xanh {low}–{high} hiệp/tuần là tham khảo · số nhỏ = TB 4 tuần trước', { low: MUSCLE_SETS_BAND.low, high: MUSCLE_SETS_BAND.high })}
       </p>
       <div className="grid gap-2" data-testid="muscle-sets">
         {muscles.map((m) => {

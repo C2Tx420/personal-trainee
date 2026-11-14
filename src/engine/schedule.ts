@@ -1,5 +1,6 @@
 import { addDays, diffDays, weekdayOf, type IsoDate } from './dates';
 import { type DayPlan, type PlanContent, type PlanItem, type PlanTemplate, TEMPLATE_KEYS, type TemplateKey } from './plan-schema';
+import { t } from '../i18n';
 
 /** Scheduled session for a given date. */
 export function dayPlanFor(content: PlanContent, date: IsoDate): DayPlan {
@@ -11,11 +12,11 @@ export function templateFor(content: PlanContent, key: TemplateKey): PlanTemplat
 }
 
 /** Push/Pull on Sunday: one fewer working set per exercise (minimum 1). */
-export function lightenTemplate(t: PlanTemplate): PlanTemplate {
+export function lightenTemplate(tpl: PlanTemplate): PlanTemplate {
   return {
-    ...t,
-    name: `${t.name} nhẹ`,
-    items: t.items.map(
+    ...tpl,
+    name: `${tpl.name} nhẹ`, // i18n-ignore: session name is stored with the session
+    items: tpl.items.map(
       (i): PlanItem => ({
         ...i,
         sets: Math.max(1, i.sets - 1),
@@ -30,15 +31,29 @@ export const SESSION_KINDS = [
 ] as const;
 export type SessionKind = (typeof SESSION_KINDS)[number];
 
+/** Vietnamese labels — also used for notes written to the DB, so never translated. */
+export const SESSION_KIND_LABEL_VI: Record<SessionKind, string> = {
+  push: 'Push',
+  pull: 'Pull',
+  legs: 'Legs',
+  upper: 'Thân trên', // i18n-ignore
+  push_light: 'Push nhẹ', // i18n-ignore
+  pull_light: 'Pull nhẹ', // i18n-ignore
+  badminton: 'Cầu lông', // i18n-ignore
+  walk: 'Đi bộ', // i18n-ignore
+  zone2: 'Cardio zone 2',
+  core: 'Core',
+};
+
 export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
   push: 'Push',
   pull: 'Pull',
   legs: 'Legs',
-  upper: 'Thân trên',
-  push_light: 'Push nhẹ',
-  pull_light: 'Pull nhẹ',
-  badminton: 'Cầu lông',
-  walk: 'Đi bộ',
+  upper: t('Thân trên'),
+  push_light: t('Push nhẹ'),
+  pull_light: t('Pull nhẹ'),
+  badminton: t('Cầu lông'),
+  walk: t('Đi bộ'),
   zone2: 'Cardio zone 2',
   core: 'Core',
 };
@@ -95,8 +110,12 @@ export function todayConflictWarning(
   const hit = window.find((s) => s.kind === other);
   if (!hit) return null;
   return todayKind === 'legs'
-    ? `Hôm ${hit.date === addDays(today, -1) ? 'qua' : 'mai'} có cầu lông — Legs và cầu lông nên cách nhau ít nhất 1 ngày`
-    : `Hôm ${hit.date === addDays(today, -1) ? 'qua' : 'mai'} có Legs — cầu lông và Legs nên cách nhau ít nhất 1 ngày`;
+    ? hit.date === addDays(today, -1)
+      ? t('Hôm qua có cầu lông — Legs và cầu lông nên cách nhau ít nhất 1 ngày')
+      : t('Hôm mai có cầu lông — Legs và cầu lông nên cách nhau ít nhất 1 ngày')
+    : hit.date === addDays(today, -1)
+      ? t('Hôm qua có Legs — cầu lông và Legs nên cách nhau ít nhất 1 ngày')
+      : t('Hôm mai có Legs — cầu lông và Legs nên cách nhau ít nhất 1 ngày');
 }
 
 /** Light activity that fits a rest day or replaces badminton. */
@@ -125,8 +144,8 @@ export function scheduledOpenOn(content: PlanContent, date: IsoDate, logged: Log
 
 /** Skip note stored on the scheduled session when another one replaces it. */
 export function replacedNote(scheduled: SessionKind, by: SessionKind): string {
-  const label = SESSION_KIND_LABEL[by].toLowerCase();
-  return scheduled === 'badminton' ? `Không đánh — thay bằng ${label}` : `Đổi sang ${label}`;
+  const label = SESSION_KIND_LABEL_VI[by].toLowerCase();
+  return scheduled === 'badminton' ? `Không đánh — thay bằng ${label}` : `Đổi sang ${label}`; // i18n-ignore: stored note
 }
 
 /**

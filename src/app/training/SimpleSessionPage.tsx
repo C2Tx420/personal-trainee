@@ -7,9 +7,10 @@ import { INTENSITIES, type Intensity } from '@/engine/plan-schema';
 import { BADMINTON_SUBSTITUTES, type LightKind, replacedNote, scheduledOpenOn, SESSION_KIND_LABEL, type SessionKind } from '@/engine/schedule';
 import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { estimateSessionKcal } from '@/engine/workout-summary';
+import { t } from '@/i18n';
 import { Banner, Button, Card, Chip, ErrorBox, Field, Input, Page } from '@/ui/components';
 
-const INTENSITY_LABEL: Record<Intensity, string> = { light: 'Nhẹ', moderate: 'Vừa', hard: 'Nặng' };
+const INTENSITY_LABEL: Record<Intensity, string> = { light: t('Nhẹ'), moderate: t('Vừa'), hard: t('Nặng') };
 const DEFAULT_MIN: Record<string, number> = { badminton: 75, walk: 35, zone2: 30, core: 12 };
 /** Replacing a badminton session (?thay=badminton): similar length. */
 const SUBSTITUTE_MIN: Record<string, number> = { walk: 50, zone2: 45 };
@@ -32,7 +33,7 @@ export function SimpleSessionPage() {
   const [replace, setReplace] = useState(replacesBadminton);
   const [intensity, setIntensity] = useState<Intensity>('light');
   const [warmupDone, setWarmupDone] = useState(true);
-  const [note, setNote] = useState(replacesBadminton ? 'Thay buổi cầu lông' : '');
+  const [note, setNote] = useState(replacesBadminton ? 'Thay buổi cầu lông' : ''); // i18n-ignore: default note saved to the database
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
@@ -62,23 +63,23 @@ export function SimpleSessionPage() {
   }
 
   return (
-    <Page title={`Ghi ${SESSION_KIND_LABEL[k]}`} back>
+    <Page title={t('Ghi {kind}', { kind: SESSION_KIND_LABEL[k] })} back>
       <Card>
-        <Field label="Ngày">
+        <Field label={t('Ngày')}>
           <Input type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} />
         </Field>
         {canReplace && (
           <label className="mb-3 flex items-center gap-2 text-sm">
             <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
-            Thay buổi cầu lông {date === today ? 'hôm nay' : formatVN(date)} (ghi cầu lông là nghỉ)
+            {date === today ? t('Thay buổi cầu lông hôm nay (ghi cầu lông là nghỉ)') : t('Thay buổi cầu lông {date} (ghi cầu lông là nghỉ)', { date: formatVN(date) })}
           </label>
         )}
-        <Field label="Thời lượng (phút)">
+        <Field label={t('Thời lượng (phút)')}>
           <Input inputMode="numeric" value={minutes} onChange={(e) => setMinutes(Number(e.target.value) || 0)} />
         </Field>
         {k === 'badminton' && (
           <>
-            <span className="mb-1 block text-sm font-medium text-muted">Cường độ</span>
+            <span className="mb-1 block text-sm font-medium text-muted">{t('Cường độ')}</span>
             <div className="mb-3 flex gap-2">
               {INTENSITIES.map((i) => (
                 <Chip key={i} active={intensity === i} onClick={() => setIntensity(i)}>{INTENSITY_LABEL[i]}</Chip>
@@ -86,20 +87,20 @@ export function SimpleSessionPage() {
             </div>
             <label className="mb-3 flex items-center gap-2 text-sm">
               <input type="checkbox" className="size-5 accent-[var(--accent)]" checked={warmupDone} onChange={(e) => setWarmupDone(e.target.checked)} />
-              Đã khởi động khớp 8 phút
+              {t('Đã khởi động khớp 8 phút')}
             </label>
           </>
         )}
-        <Field label="Ghi chú">
+        <Field label={t('Ghi chú')}>
           <Input value={note} onChange={(e) => setNote(e.target.value)} />
         </Field>
         <div className="tabular text-lg font-semibold">≈ {kcal} kcal</div>
-        <p className="text-xs text-muted">Calo tập ước tính — để tham khảo, không ăn bù.</p>
+        <p className="text-xs text-muted">{t('Calo tập ước tính — để tham khảo, không ăn bù.')}</p>
       </Card>
-      {k === 'badminton' && <Banner tone="info">Nhớ: Legs và cầu lông cách nhau ít nhất 1 ngày.</Banner>}
+      {k === 'badminton' && <Banner tone="info">{t('Nhớ: Legs và cầu lông cách nhau ít nhất 1 ngày.')}</Banner>}
       {error ? <ErrorBox error={error} /> : null}
       <Button variant="primary" size="lg" block disabled={busy || minutes <= 0} onClick={() => void save()}>
-        {busy ? 'Đang lưu…' : 'Lưu'}
+        {busy ? t('Đang lưu…') : t('Lưu')}
       </Button>
     </Page>
   );

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import changelog from '../../../CHANGELOG.md?raw';
+import { t } from '@/i18n';
 import { APP_VERSION } from '@/lib/version';
 import { Card, Page } from '@/ui/components';
 import { ReleaseHeader, ReleaseItems } from '../WhatsNew';
@@ -9,7 +10,7 @@ import { markWhatsNewSeen, RELEASES } from '../whats-new';
 export function WhatsNewPage() {
   useEffect(markWhatsNewSeen, []);
   return (
-    <Page title="Có gì mới" back="/more">
+    <Page title={t('Có gì mới')} back="/more">
       {RELEASES.map((r) => (
         <Card key={r.id}>
           <ReleaseHeader release={r} />
@@ -17,7 +18,7 @@ export function WhatsNewPage() {
         </Card>
       ))}
       <details className="glass rounded-card mt-3 px-4 py-3 text-sm">
-        <summary className="cursor-pointer font-medium">Nhật ký kỹ thuật (CHANGELOG · phiên bản {APP_VERSION})</summary>
+        <summary className="cursor-pointer font-medium">{t('Nhật ký kỹ thuật (CHANGELOG · phiên bản {v})', { v: APP_VERSION })}</summary>
         <pre className="mt-2 text-xs leading-relaxed whitespace-pre-wrap text-muted">{changelog}</pre>
       </details>
     </Page>

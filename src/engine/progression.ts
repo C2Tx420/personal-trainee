@@ -3,6 +3,8 @@ import type { PlanItem } from './plan-schema';
 import { isLbStack, stackStep } from './stack';
 import type { SetRow } from './types';
 import type { PlannedSet } from './warmup';
+import { t } from '../i18n';
+import { formatNumberVN } from './math';
 
 export type PastSession = { date: IsoDate; sets: SetRow[] };
 
@@ -55,15 +57,15 @@ export function progressionHint(item: PlanItem, last: PastSession | null, loadSt
   const lastSet = [...last.sets].sort((a, b) => a.set_index - b.set_index).at(-1);
   if (!lastSet) return null;
   if (item.unit === 'seconds') {
-    return (lastSet.seconds ?? 0) >= item.rep_max ? `Thử ${item.rep_max + 5} giây` : null;
+    return (lastSet.seconds ?? 0) >= item.rep_max ? t('Thử {n} giây', { n: item.rep_max + 5 }) : null;
   }
   if (lastSet.weight_kg === null || (lastSet.reps ?? 0) < item.rep_max) return null;
   const dir = assisted ? -1 : 1;
   const next = isLbStack(loadStepKg) ? stackStep(lastSet.weight_kg, dir) : lastSet.weight_kg + dir * loadStepKg;
   if (assisted) {
     return next <= 0 || next >= lastSet.weight_kg
-      ? `Lần trước đủ ${item.rep_max} lần — thử bớt trợ lực`
-      : `Lần trước đủ ${item.rep_max} lần — thử ${String(next).replace('.', ',')} kg trợ lực`;
+      ? t('Lần trước đủ {reps} lần — thử bớt trợ lực', { reps: item.rep_max })
+      : t('Lần trước đủ {reps} lần — thử {kg} kg trợ lực', { reps: item.rep_max, kg: formatNumberVN(next, 2) });
   }
-  return `Lần trước đủ ${item.rep_max} lần — thử ${String(next).replace('.', ',')} kg`;
+  return t('Lần trước đủ {reps} lần — thử {kg} kg', { reps: item.rep_max, kg: formatNumberVN(next, 2) });
 }

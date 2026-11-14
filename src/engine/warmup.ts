@@ -1,5 +1,6 @@
 import type { PlanItem, WarmupSet } from './plan-schema';
 import { capBelow, isLbStack, roundLoad, stackStep } from './stack';
+import { t } from '../i18n';
 
 export type PlannedSet = {
   setType: 'warmup' | 'working';
@@ -43,8 +44,10 @@ export function plannedSets(item: PlanItem, loadStepKg: number, fallbackWorkingK
 
 export function setLabel(s: Pick<PlannedSet, 'setType' | 'index'>, totalWorking?: number): string {
   return s.setType === 'warmup'
-    ? `Làm nóng ${s.index}`
-    : `Hiệp chính ${s.index}${totalWorking ? `/${totalWorking}` : ''}`;
+    ? t('Làm nóng {n}', { n: s.index })
+    : totalWorking
+      ? t('Hiệp chính {n}/{total}', { n: s.index, total: totalWorking })
+      : t('Hiệp chính {n}', { n: s.index });
 }
 
 /**

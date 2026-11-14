@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { addExtraItem, createProvisionalExercise, finishSession, saveSet, type SetInput, updateItem } from '@/data/api';
 import { qk, useActivePlan, useExerciseHistory, useExerciseMaps, useInvalidate, useReviews, useSessionDetail, useWeights } from '@/data/queries';
+import { formatNumberVN } from '@/engine/math';
 import { lastPerformance, formatSet, prefillKg, progressionHint } from '@/engine/progression';
 import { personalRecords } from '@/engine/progress';
 import { reflectionLocked, reviewedWeeks } from '@/engine/reflection';
@@ -12,6 +13,8 @@ import { FEEL_LABEL, KG_CHANGE_LABEL, SUBSTITUTION_LABEL, type ExerciseRow, type
 import { setLabel } from '@/engine/warmup';
 import { DEFAULT_BODY_WEIGHT_KG } from '@/engine/weight';
 import { estimateSessionKcal, sessionSummary } from '@/engine/workout-summary';
+import { formatVN } from '@/engine/dates';
+import { t } from '@/i18n';
 import { useNow, useWakeLock } from '@/lib/hooks';
 import { Badge, Banner, Button, Card, Chip, cx, ErrorBox, ExerciseImg, GLASS_HEADER, Input, ProgressBar, Sheet, Spinner, Stat, TextArea } from '@/ui/components';
 import { IconClose, IconList } from '@/ui/icons';
@@ -25,7 +28,13 @@ import { SetCard } from './SetCard';
 import { SubstituteSheet } from './SubstituteSheet';
 import { WarmupStep } from './WarmupStep';
 
-const SKIP_REASONS = ['Hết giờ', 'Máy bận lâu', 'Đau / mỏi', 'Không muốn tập'];
+// `value` is saved as skip_reason and stays Vietnamese for the coach
+const SKIP_REASONS: { value: string; label: string }[] = [
+  { value: 'Hết giờ', label: t('Hết giờ') }, // i18n-ignore: stored value
+  { value: 'Máy bận lâu', label: t('Máy bận lâu') }, // i18n-ignore: stored value
+  { value: 'Đau / mỏi', label: t('Đau / mỏi') }, // i18n-ignore: stored value
+  { value: 'Không muốn tập', label: t('Không muốn tập') }, // i18n-ignore: stored value
+];
 
 /** ▶ Step-by-step workout flow (§6.2). State is always recomputed from the DB. */
 export function WorkoutFlowPage() {
@@ -110,9 +119,9 @@ export function WorkoutFlowPage() {
     if (ended) nav(`/training/session/${id}`, { replace: true });
   }, [ended, id, nav]);
 
-  if (detail.isLoading || ex.loading) return <Spinner label="Đang mở buổi tập…" />;
-  if (detail.error || !session) return <div className="p-4"><ErrorBox error={detail.error ?? 'Không tìm thấy buổi tập'} /></div>;
-  if (ended) return <Spinner label="Đang mở buổi đã lưu…" />;
+  if (detail.isLoading || ex.loading) return <Spinner label={t('Đang mở buổi tập…')} />;
+  if (detail.error || !session) return <div className="p-4"><ErrorBox error={detail.error ?? t('Không tìm thấy buổi tập')} /></div>;
+  if (ended) return <Spinner label={t('Đang mở buổi đã lưu…')} />;
 
   // ── current step (may be overridden by "jump to exercise")
   let step: FlowStep = forceSummary ? { type: 'summary' } : nextStep(session, flowItems, sets);
@@ -205,18 +214,26 @@ export function WorkoutFlowPage() {
     const sum = sessionSummary(session, items, sets, ex.byId, weights.data?.at(-1)?.weight_kg ?? null);
     body = (
       <div>
-        <h2 className="mb-3 text-[26px] font-bold tracking-tight">Tổng kết buổi</h2>
+        <h2 className="mb-3 text-[26px] font-bold tracking-tight">{t('Tổng kết buổi')}</h2>
         <div className="mb-3 grid grid-cols-2 gap-2">
-          <Stat label="Bài hoàn thành" value={`${sum.itemsDone}/${sum.itemsTotal}`} sub={sum.itemsSkipped ? `${sum.itemsSkipped} bài bỏ` : undefined} />
-          <Stat label="Hiệp chính" value={`${sum.workingSetsDone}/${sum.workingSetsPlanned}`} />
-          <Stat label="Khối lượng" value={`${sum.volumeKg.toLocaleString('vi-VN')} kg`} sub={sum.missingKgExercises.length ? `${sum.missingKgExercises.length} bài không có số kg` : undefined} />
-          <Stat label="Thời gian" value={`${sum.durationMin ?? '—'} phút`} sub={sum.warmupDone === null ? undefined : sum.warmupDone ? 'Có khởi động' : 'Bỏ khởi động'} />
+          <Stat label={t('Bài hoàn thành')} value={`${sum.itemsDone}/${sum.itemsTotal}`} sub={sum.itemsSkipped ? t('{n} bài bỏ', { n: sum.itemsSkipped }) : undefined} />
+          <Stat label={t('Hiệp chính')} value={`${sum.workingSetsDone}/${sum.workingSetsPlanned}`} />
+          <Stat
+            label={t('Khối lượng')}
+            value={`${formatNumberVN(sum.volumeKg, 2)} kg`}
+            sub={sum.missingKgExercises.length ? t('{n} bài không có số kg', { n: sum.missingKgExercises.length }) : undefined}
+          />
+          <Stat
+            label={t('Thời gian')}
+            value={t('{n} phút', { n: sum.durationMin ?? '—' })}
+            sub={sum.warmupDone === null ? undefined : sum.warmupDone ? t('Có khởi động') : t('Bỏ khởi động')}
+          />
         </div>
         <RecordsCard records={records} byId={ex.byId} />
         <TrendCard items={items} sets={sets} byId={ex.byId} lastFor={(exId) => lastFor(exId)?.sets ?? null} />
         {sum.itemsSubstituted.length > 0 && (
           <Card>
-            <div className="mb-1 font-semibold">Đổi bài</div>
+            <div className="mb-1 font-semibold">{t('Đổi bài')}</div>
             {sum.itemsSubstituted.map((s, i) => (
               <div key={i} className="text-sm">
                 {s.planned} → <b>{s.done}</b> · {SUBSTITUTION_LABEL[s.reason]}
@@ -227,10 +244,10 @@ export function WorkoutFlowPage() {
         )}
         {sum.kgChanges.length > 0 && (
           <Card>
-            <div className="mb-1 font-semibold">Kg khác kế hoạch</div>
+            <div className="mb-1 font-semibold">{t('Kg khác kế hoạch')}</div>
             {sum.kgChanges.map((k, i) => (
               <div key={i} className="tabular text-sm">
-                {k.exercise} · hiệp {k.setIndex}: kế hoạch {fmtKg(k.targetKg)}kg → thực tế <b>{fmtKg(k.actualKg)}kg</b> ({KG_CHANGE_LABEL[k.reason]}
+                {k.exercise} · {t('hiệp {n}: kế hoạch {kg}kg → thực tế', { n: k.setIndex, kg: fmtKg(k.targetKg) })} <b>{fmtKg(k.actualKg)}kg</b> ({KG_CHANGE_LABEL[k.reason]}
                 {k.note ? `: ${k.note}` : ''})
               </div>
             ))}
@@ -238,18 +255,18 @@ export function WorkoutFlowPage() {
         )}
         {reviews.data && !reflectionLocked(session.session_date, reviewedWeeks(reviews.data)) && (
           <Card>
-            <div className="mb-2 font-semibold">Cảm nhận sau buổi</div>
-            <TextArea aria-label="Cảm nhận sau buổi" rows={3} maxLength={2000} placeholder={REFLECTION_PLACEHOLDER} value={reflection} onChange={(e) => setReflection(e.target.value)} />
-            <p className="mt-1 text-xs text-muted">Tuỳ chọn — ghi bù sau ở chi tiết buổi cũng được, đến khi tuần đó được review.</p>
+            <div className="mb-2 font-semibold">{t('Cảm nhận sau buổi')}</div>
+            <TextArea aria-label={t('Cảm nhận sau buổi')} rows={3} maxLength={2000} placeholder={REFLECTION_PLACEHOLDER} value={reflection} onChange={(e) => setReflection(e.target.value)} />
+            <p className="mt-1 text-xs text-muted">{t('Tuỳ chọn — ghi bù sau ở chi tiết buổi cũng được, đến khi tuần đó được review.')}</p>
           </Card>
         )}
         {error ? <ErrorBox error={error} /> : null}
         <Button variant="primary" size="xl" block disabled={finishing} onClick={() => void finish()}>
-          {finishing ? 'Đang lưu…' : 'Lưu & kết thúc'}
+          {finishing ? t('Đang lưu…') : t('Lưu & kết thúc')}
         </Button>
         {forceSummary && (
           <Button variant="ghost" block className="mt-2" onClick={() => setForceSummary(false)}>
-            ← Quay lại tập tiếp
+            {t('← Quay lại tập tiếp')}
           </Button>
         )}
       </div>
@@ -272,31 +289,34 @@ export function WorkoutFlowPage() {
         <ExerciseImg svg={exercise?.illustration_svg} name={exercise?.name ?? ''} className={cx('mb-3', step.type === 'set' && 'mx-auto max-w-[260px]')} />
         <div className="mb-1 flex items-start justify-between gap-2">
           <h2 className="text-[26px] leading-tight font-bold tracking-tight">{exercise?.name}</h2>
-          {exercise?.is_provisional && <Badge tone="info">bài tạm</Badge>}
+          {exercise?.is_provisional && <Badge tone="info">{t('bài tạm')}</Badge>}
         </div>
         {item.substitution_reason && (
           <p className="mb-1 text-sm text-info">
-            Thay cho {planned?.name} · {SUBSTITUTION_LABEL[item.substitution_reason]}
+            {t('Thay cho {name}', { name: planned?.name ?? '' })} · {SUBSTITUTION_LABEL[item.substitution_reason]}
             {item.substitution_note ? ` — ${item.substitution_note}` : ''}
           </p>
         )}
-        <p className="tabular text-sm text-muted">{itemSummary(item.target)} · nghỉ {Math.round(item.target.rest_sec_min / 60 * 10) / 10}′</p>
+        <p className="tabular text-sm text-muted">{itemSummary(item.target)} · {t('nghỉ {n}′', { n: Math.round(item.target.rest_sec_min / 60 * 10) / 10 })}</p>
         {last && (
           <p className="tabular mt-1 text-sm">
-            Lần trước {last.date.slice(8)}/{last.date.slice(5, 7)}: {last.sets.map((s) => `${formatSet(s)}${s.feel ? ` (${FEEL_LABEL[s.feel].toLowerCase()})` : ''}`).join(' · ')}
+            {t('Lần trước {date}: {sets}', {
+              date: formatVN(last.date),
+              sets: last.sets.map((s) => `${formatSet(s)}${s.feel ? ` (${FEEL_LABEL[s.feel].toLowerCase()})` : ''}`).join(' · '),
+            })}
           </p>
         )}
         {item.target.coach_note && <p className="mt-1 rounded-lg bg-info-soft px-2 py-1 text-sm text-info">Coach: “{item.target.coach_note}”</p>}
         {hint && <p className="mt-1 text-sm font-medium text-accent">{hint}</p>}
         {exercise && !exercise.available_at_gym && !item.substitution_reason && (
-          <Banner tone="warn">Bài này đang đánh dấu “không có máy” — bấm ⇄ Đổi bài</Banner>
+          <Banner tone="warn">{t('Bài này đang đánh dấu “không có máy” — bấm ⇄ Đổi bài')}</Banner>
         )}
         {exercise && exercise.cues.length > 0 && (
           <details className="mt-3 rounded-ctl border border-white/[0.06] bg-white/[0.04] px-3.5 py-2.5 text-sm">
-            <summary className="cursor-pointer font-medium">Điểm kỹ thuật</summary>
+            <summary className="cursor-pointer font-medium">{t('Điểm kỹ thuật')}</summary>
             <ul className="mt-1 list-disc pl-5">{exercise.cues.map((c) => <li key={c}>{c}</li>)}</ul>
             {exercise.common_mistakes.length > 0 && (
-              <p className="mt-1 text-muted">Tránh: {exercise.common_mistakes.join(' · ')}</p>
+              <p className="mt-1 text-muted">{t('Tránh: {list}', { list: exercise.common_mistakes.join(' · ') })}</p>
             )}
           </details>
         )}
@@ -304,7 +324,7 @@ export function WorkoutFlowPage() {
         <div className="mt-4">
           {step.type === 'intro' ? (
             <Button variant="primary" size="xl" block onClick={() => void startItem(item)}>
-              Bắt đầu bài
+              {t('Bắt đầu bài')}
             </Button>
           ) : (
             exercise && (
@@ -329,7 +349,7 @@ export function WorkoutFlowPage() {
         </div>
 
         {doneHere.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2" aria-label="Hiệp đã xong">
+          <div className="mt-3 flex flex-wrap gap-2" aria-label={t('Hiệp đã xong')}>
             {allPlanned
               .map((p) => doneHere.find((s) => s.set_type === p.setType && s.set_index === p.index))
               .filter((s): s is SetRow => !!s)
@@ -347,9 +367,9 @@ export function WorkoutFlowPage() {
         )}
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Button size="sm" onClick={() => setSubItem(item)}>Đổi bài</Button>
-          <Button size="sm" onClick={() => void defer(item)}>Để sau</Button>
-          <Button size="sm" variant="danger" onClick={() => setSkipItem(item)}>Bỏ bài</Button>
+          <Button size="sm" onClick={() => setSubItem(item)}>{t('Đổi bài')}</Button>
+          <Button size="sm" onClick={() => void defer(item)}>{t('Để sau')}</Button>
+          <Button size="sm" variant="danger" onClick={() => setSkipItem(item)}>{t('Bỏ bài')}</Button>
         </div>
       </div>
     );
@@ -364,17 +384,21 @@ export function WorkoutFlowPage() {
     <div className="mx-auto min-h-dvh max-w-xl px-4 pb-10">
       <header className={cx(GLASS_HEADER, 'mb-4 px-4 pb-2.5')}>
         <div className="flex min-h-12 items-center gap-2">
-          <button aria-label="Thoát (buổi vẫn được giữ)" onClick={() => nav('/')} className="glass-subtle -ml-1 grid size-9 place-items-center rounded-full text-muted">
+          <button aria-label={t('Thoát (buổi vẫn được giữ)')} onClick={() => nav('/')} className="glass-subtle -ml-1 grid size-9 place-items-center rounded-full text-muted">
             <IconClose className="size-4" />
           </button>
           <div className="min-w-0 flex-1">
             <div className="truncate text-[17px] font-bold tracking-tight">{snapshot?.name ?? SESSION_KIND_LABEL[session.kind]}</div>
             <div className="text-xs text-muted">
-              {step.type === 'set' || step.type === 'intro' ? `Bài ${step.order}/${step.total}` : step.type === 'warmup' ? 'Khởi động' : 'Tổng kết'} · {progress.done}/
-              {progress.total} hiệp chính
+              {step.type === 'set' || step.type === 'intro'
+                ? t('Bài {n}/{total}', { n: step.order, total: step.total })
+                : step.type === 'warmup'
+                  ? t('Khởi động')
+                  : t('Tổng kết')}{' '}
+              · {t('{done}/{total} hiệp chính', { done: progress.done, total: progress.total })}
             </div>
           </div>
-          <Button size="sm" aria-label="Danh sách bài" onClick={() => setOverview(true)}><IconList className="size-[18px]" /></Button>
+          <Button size="sm" aria-label={t('Danh sách bài')} onClick={() => setOverview(true)}><IconList className="size-[18px]" /></Button>
         </div>
         <ProgressBar value={progress.done} max={progress.total} />
       </header>
@@ -384,7 +408,7 @@ export function WorkoutFlowPage() {
       {showRest && lastDone && (
         <RestOverlay
           endsAt={restEndsAt}
-          next={step.type === 'set' ? `${ex.byId.get(step.item.exercise_id)?.name} · ${setLabel(step.planned, step.workingTotal)}` : step.type === 'intro' ? `Bài tiếp: ${ex.byId.get(step.item.exercise_id)?.name}` : ''}
+          next={step.type === 'set' ? `${ex.byId.get(step.item.exercise_id)?.name} · ${setLabel(step.planned, step.workingTotal)}` : step.type === 'intro' ? t('Bài tiếp: {name}', { name: ex.byId.get(step.item.exercise_id)?.name ?? '' }) : ''}
           onAdd30={() => setRestExtra((x) => x + 30_000)}
           onSkip={() => setRestDismissed(lastDone.id)}
         />
@@ -394,19 +418,23 @@ export function WorkoutFlowPage() {
         <SubstituteSheet open onClose={() => setSubItem(null)} item={subItem} original={subOriginal} library={ex.list} bySlug={ex.bySlug} onDone={() => void refresh()} />
       )}
 
-      <Sheet open={!!skipItem} onClose={() => setSkipItem(null)} title="Bỏ bài này?">
+      <Sheet open={!!skipItem} onClose={() => setSkipItem(null)} title={t('Bỏ bài này?')}>
         <div className="mb-3 flex flex-wrap gap-2">
           {SKIP_REASONS.map((r) => (
-            <Chip key={r} active={skipReason === r} onClick={() => setSkipReason(r)}>{r}</Chip>
+            <Chip key={r.value} active={skipReason === r.value} onClick={() => setSkipReason(r.value)}>{r.label}</Chip>
           ))}
         </div>
-        <Input placeholder="Lý do khác…" value={skipReason} onChange={(e) => setSkipReason(e.target.value)} />
+        <Input
+          placeholder={t('Lý do khác…')}
+          value={SKIP_REASONS.find((r) => r.value === skipReason)?.label ?? skipReason}
+          onChange={(e) => setSkipReason(e.target.value)}
+        />
         <Button variant="danger" size="lg" block className="mt-3" onClick={() => void skip()}>
-          Bỏ bài
+          {t('Bỏ bài')}
         </Button>
       </Sheet>
 
-      <Sheet open={!!editSet} onClose={() => setEditSet(null)} title="Sửa hiệp đã ghi">
+      <Sheet open={!!editSet} onClose={() => setEditSet(null)} title={t('Sửa hiệp đã ghi')}>
         {editSet && editItem && editPlanned && ex.byId.get(editItem.exercise_id) && (
           <SetCard
             item={editItem}
@@ -416,7 +444,7 @@ export function WorkoutFlowPage() {
             workingTotal={editItem.target.sets}
             initialKg={editSet.weight_kg}
             existing={editSet}
-            saveLabel="Lưu"
+            saveLabel={t('Lưu')}
             onSave={async (s) => {
               await saveSet(s);
               setEditSet(null);
@@ -427,12 +455,12 @@ export function WorkoutFlowPage() {
         )}
       </Sheet>
 
-      <Sheet open={overview} onClose={() => setOverview(false)} title="Danh sách bài">
+      <Sheet open={overview} onClose={() => setOverview(false)} title={t('Danh sách bài')}>
         <div className="glass mb-3 divide-y divide-white/[0.06] overflow-hidden rounded-card">
           {orderedItems(flowItems).map(({ item }) => {
             const badge = itemBadge(item, currentItem);
             const e = ex.byId.get(item.exercise_id);
-            const label = { done: 'xong', current: 'đang tập', pending: 'chờ', skipped: 'bỏ', substituted: 'đã đổi', deferred: 'để sau' }[badge];
+            const label = { done: t('xong'), current: t('đang tập'), pending: t('chờ'), skipped: t('bỏ'), substituted: t('đã đổi'), deferred: t('để sau') }[badge];
             return (
               <button
                 key={item.id}
@@ -455,15 +483,15 @@ export function WorkoutFlowPage() {
           })}
         </div>
         <div className="grid gap-2">
-          <Button onClick={() => { setOverview(false); setAddOpen(true); }}>+ Thêm bài ngoài kế hoạch</Button>
-          <Button variant="primary" onClick={() => { setOverview(false); setForceSummary(true); }}>Kết thúc buổi</Button>
+          <Button onClick={() => { setOverview(false); setAddOpen(true); }}>{t('+ Thêm bài ngoài kế hoạch')}</Button>
+          <Button variant="primary" onClick={() => { setOverview(false); setForceSummary(true); }}>{t('Kết thúc buổi')}</Button>
         </div>
       </Sheet>
 
-      <Sheet open={addOpen} onClose={() => setAddOpen(false)} title="Thêm bài">
-        <ExercisePicker label="Bài muốn thêm" library={ex.list} quick={[]} value={addPick} onChange={setAddPick} />
+      <Sheet open={addOpen} onClose={() => setAddOpen(false)} title={t('Thêm bài')}>
+        <ExercisePicker label={t('Bài muốn thêm')} library={ex.list} quick={[]} value={addPick} onChange={setAddPick} />
         <Button variant="primary" size="lg" block className="mt-3" disabled={!addPick} onClick={() => void addItem()}>
-          Thêm vào buổi
+          {t('Thêm vào buổi')}
         </Button>
       </Sheet>
     </div>

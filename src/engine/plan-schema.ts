@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { WEEKDAYS, type Weekday } from './dates';
+import { t } from '../i18n';
 
 /**
  * Schema `plan-content/1` — the full content of one plan version.
@@ -11,7 +12,7 @@ import { WEEKDAYS, type Weekday } from './dates';
 export const CALORIES_FLOOR = 1700;
 export const MAX_SAFE_LOSS_KG_PER_WEEK = 0.7;
 
-const slugSchema = z.string().regex(/^[a-z0-9_]+$/, 'slug chỉ gồm a-z, 0-9, _');
+const slugSchema = z.string().regex(/^[a-z0-9_]+$/, t('slug chỉ gồm a-z, 0-9, _'));
 
 const MUSCLES = [
   'chest', 'front_delt', 'side_delt', 'rear_delt', 'lats', 'upper_back', 'traps',
@@ -49,7 +50,7 @@ export const exerciseDefSchema = z.object({
   is_assisted: z.boolean().optional(),
   canonical_slug: slugSchema.nullable().optional(),
 })
-  .refine((d) => !!(d.name ?? d.name_vi), 'bài cần name')
+  .refine((d) => !!(d.name ?? d.name_vi), t('bài cần name'))
   .transform(({ name_vi, ...d }) => ({ ...d, name: (d.name ?? name_vi) as string }));
 export type ExerciseDef = z.infer<typeof exerciseDefSchema>;
 
@@ -60,7 +61,7 @@ const warmupSetSchema = z
     kg: z.number().nonnegative().optional(),
     reps: z.union([z.number().int().positive(), z.literal('same')]),
   })
-  .refine((w) => w.pct !== undefined || w.kg !== undefined, 'hiệp làm nóng cần pct hoặc kg');
+  .refine((w) => w.pct !== undefined || w.kg !== undefined, t('hiệp làm nóng cần pct hoặc kg'));
 export type WarmupSet = z.infer<typeof warmupSetSchema>;
 
 export const planItemSchema = z
@@ -81,13 +82,13 @@ export const planItemSchema = z
     coach_note: z.string().default(''),
     note: z.string().default(''),
   })
-  .refine((i) => i.rep_min <= i.rep_max, 'rep_min phải ≤ rep_max')
-  .refine((i) => i.rest_sec_min <= i.rest_sec_max, 'rest_sec_min phải ≤ rest_sec_max')
+  .refine((i) => i.rep_min <= i.rep_max, t('rep_min phải ≤ rep_max'))
+  .refine((i) => i.rest_sec_min <= i.rest_sec_max, t('rest_sec_min phải ≤ rest_sec_max'))
   .refine(
     (i) => i.target_kg_per_set === null || i.target_kg_per_set.length === i.sets,
-    'target_kg_per_set phải có đúng số phần tử = sets',
+    t('target_kg_per_set phải có đúng số phần tử = sets'),
   )
-  .refine((i) => !((i.backoff_steps ?? 0) > 0 && i.target_kg_per_set !== null), 'không dùng chung backoff_steps với target_kg_per_set');
+  .refine((i) => !((i.backoff_steps ?? 0) > 0 && i.target_kg_per_set !== null), t('không dùng chung backoff_steps với target_kg_per_set'));
 export type PlanItem = z.infer<typeof planItemSchema>;
 
 const cardioWarmupSchema = z.object({
@@ -147,7 +148,7 @@ export const planContentSchema = z.object({
   templates: z.array(templateSchema).min(1),
   exercise_upserts: z.array(exerciseDefSchema).default([]),
   nutrition: z.object({
-    calories_kcal: z.number().int().min(CALORIES_FLOOR, `calo không được dưới ${CALORIES_FLOOR}`),
+    calories_kcal: z.number().int().min(CALORIES_FLOOR, t('calo không được dưới {n}', { n: CALORIES_FLOOR })),
     protein_g: z.number().int().positive(),
     carb_g: z.number().int().positive(),
     fat_g: z.number().int().positive(),
@@ -183,28 +184,28 @@ export function validatePlanRules(content: PlanContent, knownSlugs: Iterable<str
 
   const sun = content.schedule.sun;
   if (sun.kind === 'session' && sun.template === 'legs') {
-    issues.push({ level: 'error', message: 'Chủ nhật không được gán Legs' });
+    issues.push({ level: 'error', message: t('Chủ nhật không được gán Legs') });
   }
 
   const templateKeys = new Set(content.templates.map((t) => t.key));
   for (const day of WEEKDAYS) {
     const p = content.schedule[day];
     if (p.kind === 'session' && !templateKeys.has(p.template)) {
-      issues.push({ level: 'error', message: `Lịch ${day} tham chiếu buổi "${p.template}" không có trong templates` });
+      issues.push({ level: 'error', message: t('Lịch {day} tham chiếu buổi "{key}" không có trong templates', { day, key: p.template }) });
     }
   }
 
   for (const [a, b] of legsBadmintonAdjacency(content.schedule)) {
     issues.push({
       level: 'error',
-      message: `Legs (${a}) và cầu lông (${b}) nằm 2 ngày liền nhau — cần cách ít nhất 1 ngày`,
+      message: t('Legs ({a}) và cầu lông ({b}) nằm 2 ngày liền nhau — cần cách ít nhất 1 ngày', { a, b }),
     });
   }
 
-  for (const t of content.templates) {
-    for (const item of t.items) {
+  for (const tpl of content.templates) {
+    for (const item of tpl.items) {
       for (const s of [item.exercise, ...item.alternatives]) {
-        if (!slugs.has(s)) issues.push({ level: 'error', message: `${t.name}: bài "${s}" không có trong thư viện` });
+        if (!slugs.has(s)) issues.push({ level: 'error', message: t('{session}: bài "{slug}" không có trong thư viện', { session: tpl.name, slug: s }) });
       }
     }
   }

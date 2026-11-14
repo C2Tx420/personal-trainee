@@ -3,21 +3,28 @@ import type { PlanVersion } from '@/data/api';
 import { useGoals, usePlans } from '@/data/queries';
 import { type PlanLabel, planLabels, programStartOf, reviewWeekLabel } from '@/engine/plan-week';
 import { inlineBold, type ReviewLine } from '@/engine/review-note';
+import { getLocale, t } from '@/i18n';
 import { Badge, cx } from '@/ui/components';
 
 const STATUS_LABEL: Record<PlanVersion['status'], string> = {
-  draft: 'Chờ duyệt',
-  scheduled: 'Hẹn ngày',
-  active: 'Đang dùng',
-  archived: 'Lưu trữ',
-  rejected: 'Từ chối',
+  draft: t('Chờ duyệt'),
+  scheduled: t('Hẹn ngày'),
+  active: t('Đang dùng'),
+  archived: t('Lưu trữ'),
+  // the Vietnamese key is shared with the "Reject" button, so English needs its own word here
+  rejected: getLocale() === 'en' ? 'Rejected' : t('Từ chối'),
 };
 
 export const CREATED_BY_LABEL: Record<PlanVersion['created_by'], string> = {
-  user: 'Anh',
+  user: t('Anh'),
   claude_code: 'Claude Code',
-  system: 'Tự động (cân đứng)',
+  system: t('Tự động (cân đứng)'),
 };
+
+/** Week title inside a sentence: lowercased in Vietnamese ("lộ trình tuần 2 · noel"), kept as is in English. */
+export function inlineTitle(title: string): string {
+  return getLocale() === 'en' ? title : title.toLowerCase();
+}
 
 export function StatusBadge({ status }: { status: PlanVersion['status'] }) {
   const tone = { draft: 'accent', scheduled: 'info', active: 'ok', archived: 'muted', rejected: 'bad' } as const;
@@ -77,5 +84,5 @@ export function noteToLines(text: string): ReviewLine[] {
   const raw = text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
   const parts = raw.length > 1 ? raw : text.split(/;\s+/).map((s) => s.trim()).filter(Boolean);
   if (parts.length <= 1) return [{ kind: 'text', text: text.trim() }];
-  return parts.map((t) => ({ kind: 'bullet', text: t.replace(/^[-*•]\s+/, '').replace(/\.$/, '') }));
+  return parts.map((part) => ({ kind: 'bullet', text: part.replace(/^[-*•]\s+/, '').replace(/\.$/, '') }));
 }

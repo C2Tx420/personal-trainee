@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePhotos } from '@/data/queries';
 import { formatVN } from '@/engine/dates';
+import { t } from '@/i18n';
 import { Chip, Empty, Page, Segmented, Skeleton } from '@/ui/components';
 import { PhotoThumb } from './PhotoThumb';
 
@@ -13,7 +14,7 @@ export function PhotoComparePage() {
   const [b, setB] = useState<string | null>(null);
   const [pos, setPos] = useState(50);
 
-  if (photos.isLoading) return <Page title="So sánh ảnh" back="/body/photos"><Skeleton /></Page>;
+  if (photos.isLoading) return <Page title={t('So sánh ảnh')} back="/body/photos"><Skeleton /></Page>;
   const list = photos.data ?? [];
   const dates = [...new Set(list.map((p) => p.taken_on))].sort();
   const dA = a ?? dates[0];
@@ -22,16 +23,16 @@ export function PhotoComparePage() {
   const pb = list.find((p) => p.taken_on === dB && p.angle === angle);
 
   return (
-    <Page title="So sánh ảnh" back="/body/photos">
+    <Page title={t('So sánh ảnh')} back="/body/photos">
       {dates.length === 0 ? (
-        <Empty>Chưa có ảnh</Empty>
+        <Empty>{t('Chưa có ảnh')}</Empty>
       ) : (
         <>
-          <Segmented value={angle} onChange={setAngle} options={[{ value: 'front', label: 'Chính diện' }, { value: 'side', label: 'Nghiêng' }, { value: 'back', label: 'Lưng' }]} />
-          <Segmented value={mode} onChange={setMode} options={[{ value: 'side', label: 'Cạnh nhau' }, { value: 'slider', label: 'Trượt' }]} />
-          <div className="mb-2 text-sm text-muted">Ngày trước</div>
+          <Segmented value={angle} onChange={setAngle} options={[{ value: 'front', label: t('Chính diện') }, { value: 'side', label: t('Nghiêng') }, { value: 'back', label: t('Lưng') }]} />
+          <Segmented value={mode} onChange={setMode} options={[{ value: 'side', label: t('Cạnh nhau') }, { value: 'slider', label: t('Trượt') }]} />
+          <div className="mb-2 text-sm text-muted">{t('Ngày trước')}</div>
           <div className="mb-2 flex flex-wrap gap-2">{dates.map((d) => <Chip key={d} active={d === dA} onClick={() => setA(d)}>{formatVN(d)}</Chip>)}</div>
-          <div className="mb-2 text-sm text-muted">Ngày sau</div>
+          <div className="mb-2 text-sm text-muted">{t('Ngày sau')}</div>
           <div className="mb-3 flex flex-wrap gap-2">{dates.map((d) => <Chip key={d} active={d === dB} onClick={() => setB(d)}>{formatVN(d)}</Chip>)}</div>
           {mode === 'side' ? (
             <div className="grid grid-cols-2 gap-2">
@@ -47,7 +48,7 @@ export function PhotoComparePage() {
                 </div>
                 <div className="absolute inset-y-0 w-0.5 bg-white" style={{ left: `${pos}%` }} />
               </div>
-              <input aria-label="Thanh trượt so sánh" type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="mt-3 w-full accent-[var(--accent)]" />
+              <input aria-label={t('Thanh trượt so sánh')} type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="mt-3 w-full accent-[var(--accent)]" />
               <div className="flex justify-between text-xs text-muted"><span>{dA && formatVN(dA, true)}</span><span>{dB && formatVN(dB, true)}</span></div>
             </div>
           )}

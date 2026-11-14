@@ -1,5 +1,6 @@
 import { addDays, diffDays, formatVN, type IsoDate, todayVN, weekStart } from './dates';
 import type { Goal } from './goals';
+import { t } from '../i18n';
 
 /** Training week inside a goal phase: "Noel · tuần 2/9". */
 export type PlanWeek = {
@@ -66,7 +67,7 @@ export function planLabels(plans: PlanLike[], goals: Goal[]): Map<string, PlanLa
   for (const list of byWeek.values()) {
     list.forEach((p, i) => {
       const w = planWeek(planDate(p), goals, programStart);
-      out.set(p.id, { ...w, title: `Tuần ${w.week}${list.length > 1 ? ` · bản ${i + 1}` : ''}`, sub: weekSub(w) });
+      out.set(p.id, { ...w, title: list.length > 1 ? t('Tuần {week} · bản {n}', { week: w.week, n: i + 1 }) : t('Tuần {week}', { week: w.week }), sub: weekSub(w) });
     });
   }
   return out;
@@ -75,10 +76,10 @@ export function planLabels(plans: PlanLike[], goals: Goal[]): Map<string, PlanLa
 /** Label for a review note's week (`week_start` = the week that was reviewed). */
 export function reviewWeekLabel(weekStartDate: IsoDate, goals: Goal[], programStart: IsoDate): PlanLabel {
   const w = planWeek(weekStartDate, goals, programStart);
-  return { ...w, title: `Tuần ${w.week}`, sub: weekSub(w) };
+  return { ...w, title: t('Tuần {week}', { week: w.week }), sub: weekSub(w) };
 }
 
 function weekSub(w: PlanWeek): string {
-  const phase = w.goalName ? `${w.goalName} · tuần ${w.week}/${w.totalWeeks}` : `tuần ${w.week}`;
+  const phase = w.goalName ? t('{goal} · tuần {week}/{total}', { goal: w.goalName, week: w.week, total: String(w.totalWeeks) }) : t('tuần {week}', { week: w.week });
   return `${phase} · ${formatVN(w.start)}–${formatVN(addDays(w.start, 6))}`;
 }

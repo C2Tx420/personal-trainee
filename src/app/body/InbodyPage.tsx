@@ -5,18 +5,19 @@ import { formatVN, todayVN } from '@/engine/dates';
 import { estimateBodyFatPct } from '@/engine/goals';
 import { compareInbody, fatMassKg, inbodyDue, latestFfm } from '@/engine/inbody';
 import { formatNumberVN } from '@/engine/math';
+import { t } from '@/i18n';
 import { SimpleLine } from '@/ui/charts';
 import { Badge, Banner, Button, Card, Field, Input, Page, SectionTitle, Skeleton } from '@/ui/components';
 
 const FIELDS = [
-  ['weight_kg', 'Cân nặng (kg)'],
-  ['smm_kg', 'SMM — cơ xương (kg)'],
-  ['pbf_pct', 'PBF — % mỡ'],
-  ['visceral_fat_level', 'Mỡ nội tạng'],
+  ['weight_kg', t('Cân nặng (kg)')],
+  ['smm_kg', t('SMM — cơ xương (kg)')],
+  ['pbf_pct', t('PBF — % mỡ')],
+  ['visceral_fat_level', t('Mỡ nội tạng')],
   ['whr', 'WHR'],
-  ['ffm_kg', 'FFM — khối nạc (kg)'],
+  ['ffm_kg', t('FFM — khối nạc (kg)')],
   ['bmr_kcal', 'BMR (kcal)'],
-  ['inbody_score', 'Điểm InBody'],
+  ['inbody_score', t('Điểm InBody')],
 ] as const;
 
 export function InbodyPage() {
@@ -59,16 +60,16 @@ export function InbodyPage() {
     v === null ? '—' : <Badge tone={v === 0 ? 'muted' : (v < 0) === goodWhenDown ? 'ok' : 'bad'}>{v > 0 ? '+' : ''}{formatNumberVN(v, 1)}{unit}</Badge>;
 
   return (
-    <Page title="InBody hằng tháng" back="/body">
+    <Page title={t('InBody hằng tháng')} back="/body">
       {due.due ? (
-        <Banner tone="info">Đến hạn đo InBody{due.daysSince !== null ? ` — đã ${due.daysSince} ngày từ lần trước` : ''}</Banner>
+        <Banner tone="info">{due.daysSince !== null ? t('Đến hạn đo InBody — đã {n} ngày từ lần trước', { n: due.daysSince }) : t('Đến hạn đo InBody')}</Banner>
       ) : (
-        <p className="mb-3 text-sm text-muted">Lần đo gần nhất {formatVN(latest!.measured_on, true)} · đo lại sau {30 - (due.daysSince ?? 0)} ngày nữa</p>
+        <p className="mb-3 text-sm text-muted">{t('Lần đo gần nhất {date} · đo lại sau {n} ngày nữa', { date: formatVN(latest!.measured_on, true), n: 30 - (due.daysSince ?? 0) })}</p>
       )}
 
       {latest && (
         <Card>
-          <div className="mb-2 font-semibold">Lần gần nhất · {formatVN(latest.measured_on, true)}</div>
+          <div className="mb-2 font-semibold">{t('Lần gần nhất · {date}', { date: formatVN(latest.measured_on, true) })}</div>
           <div className="tabular grid grid-cols-2 gap-y-1 text-sm">
             {FIELDS.map(([k, l]) => (
               <div key={k} className="contents">
@@ -76,7 +77,7 @@ export function InbodyPage() {
                 <span className="text-right font-semibold">{latest[k] === null ? '—' : formatNumberVN(latest[k] as number, 1)}</span>
               </div>
             ))}
-            <span className="text-muted">Khối mỡ (kg)</span>
+            <span className="text-muted">{t('Khối mỡ (kg)')}</span>
             <span className="text-right font-semibold">{fatMassKg(latest) === null ? '—' : formatNumberVN(fatMassKg(latest)!, 1)}</span>
           </div>
         </Card>
@@ -84,20 +85,20 @@ export function InbodyPage() {
 
       {d && (
         <Card>
-          <div className="mb-2 font-semibold">So với lần trước ({formatVN(prev!.measured_on)})</div>
+          <div className="mb-2 font-semibold">{t('So với lần trước ({date})', { date: formatVN(prev!.measured_on) })}</div>
           <div className="tabular grid grid-cols-2 gap-y-1.5 text-sm">
-            <span>Cân nặng</span><span className="text-right">{delta(d.weightKg, true, ' kg')}</span>
-            <span>Khối mỡ</span><span className="text-right">{delta(d.fatKg, true, ' kg')}</span>
-            <span>% mỡ</span><span className="text-right">{delta(d.pbfPct, true, '%')}</span>
-            <span>Khối cơ (SMM)</span><span className="text-right">{delta(d.smmKg, false, ' kg')}</span>
-            <span>Mỡ nội tạng</span><span className="text-right">{delta(d.visceral, true, '')}</span>
+            <span>{t('Cân nặng')}</span><span className="text-right">{delta(d.weightKg, true, ' kg')}</span>
+            <span>{t('Khối mỡ')}</span><span className="text-right">{delta(d.fatKg, true, ' kg')}</span>
+            <span>{t('% mỡ')}</span><span className="text-right">{delta(d.pbfPct, true, '%')}</span>
+            <span>{t('Khối cơ (SMM)')}</span><span className="text-right">{delta(d.smmKg, false, ' kg')}</span>
+            <span>{t('Mỡ nội tạng')}</span><span className="text-right">{delta(d.visceral, true, '')}</span>
           </div>
         </Card>
       )}
 
       {ffm && goals.data && (
         <Card>
-          <div className="mb-2 font-semibold">Ước tính % mỡ tại các mốc (giữ FFM {formatNumberVN(ffm, 1)} kg)</div>
+          <div className="mb-2 font-semibold">{t('Ước tính % mỡ tại các mốc (giữ FFM {ffm} kg)', { ffm: formatNumberVN(ffm, 1) })}</div>
           {goals.data.map((g) => (
             <div key={g.id} className="tabular flex justify-between border-b border-line py-1.5 text-sm last:border-0">
               <span>{g.name} · {formatVN(g.target_date)} · {formatNumberVN(g.target_weight_max, 0)} kg</span>
@@ -109,17 +110,17 @@ export function InbodyPage() {
 
       {logs.length > 1 && (
         <Card>
-          <div className="mb-1 text-sm font-medium">% mỡ và khối cơ qua các lần đo</div>
+          <div className="mb-1 text-sm font-medium">{t('% mỡ và khối cơ qua các lần đo')}</div>
           <SimpleLine
             data={logs.map((l) => ({ label: formatVN(l.measured_on), pbf: l.pbf_pct, smm: l.smm_kg, kg: l.weight_kg }))}
-            lines={[{ key: 'pbf', name: '% mỡ' }, { key: 'smm', name: 'SMM', color: 'var(--ok)' }]}
+            lines={[{ key: 'pbf', name: t('% mỡ') }, { key: 'smm', name: 'SMM', color: 'var(--ok)' }]}
           />
         </Card>
       )}
 
-      <SectionTitle>Nhập lần đo mới</SectionTitle>
+      <SectionTitle>{t('Nhập lần đo mới')}</SectionTitle>
       <Card>
-        <Field label="Ngày đo">
+        <Field label={t('Ngày đo')}>
           <Input type="date" value={date} max={todayVN()} onChange={(e) => setDate(e.target.value)} />
         </Field>
         <div className="grid grid-cols-2 gap-x-3">
@@ -129,7 +130,7 @@ export function InbodyPage() {
             </Field>
           ))}
         </div>
-        <Button variant="primary" block disabled={busy || !vals.weight_kg} onClick={() => void save()}>Lưu lần đo</Button>
+        <Button variant="primary" block disabled={busy || !vals.weight_kg} onClick={() => void save()}>{t('Lưu lần đo')}</Button>
       </Card>
     </Page>
   );

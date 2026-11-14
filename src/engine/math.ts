@@ -1,3 +1,4 @@
+import { intlLocale } from '../i18n';
 export function sum(xs: number[]): number {
   return xs.reduce((a, b) => a + b, 0);
 }
@@ -27,9 +28,9 @@ export function slope(points: { x: number; y: number }[]): number {
   return den === 0 ? 0 : num / den;
 }
 
-/** "1.452" — dot as thousands separator, comma as decimal separator. */
+/** "1.452,5" in Vietnamese, "1,452.5" in English. */
 export function formatNumberVN(n: number, digits = 0): string {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat(intlLocale(), {
     maximumFractionDigits: digits,
     minimumFractionDigits: 0,
   }).format(n);
