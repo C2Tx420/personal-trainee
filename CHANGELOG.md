@@ -29,6 +29,7 @@ The app ships continuously, so releases are named by date. Each one matches an e
 - **Personal data out of the repo.** The seed profile, goals and InBody are sample values; the hosted DB keeps the real ones (`0600` already ran there). The coach's profile and one-off notes moved to the gitignored `coach/CLAUDE.local.md`.
 - **Goal line from the first weigh-in.** The weight chart and the Today goal bar start from the first logged weight instead of a hard-coded value; kcal estimates before any weigh-in use `DEFAULT_BODY_WEIGHT_KG` (70).
 - **README for a public repo.** English screenshots in `.github/screenshots/` (from the e2e run on sample data), measured test / Lighthouse / bundle numbers, local and hosted setup, the coach workflow. MIT `LICENSE`.
+- **README: your data and your progress.** How real data gets in (seed profile, live and past workouts, body, backup) and where the app shows improvement, with a worked example of how one lift moves forward.
 - **Editor and agent settings untracked.** `.claude/` and `.vscode/` are now gitignored.
 
 ### Fixed

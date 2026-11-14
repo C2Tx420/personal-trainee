@@ -4,7 +4,7 @@ A single-user PWA for strength training and body recomposition. It runs a fixed 
 
 Every Monday **Claude Code acts as the coach**: it reads the week through a read-only Postgres role, writes a review note and submits next week's plan as a **draft**. Nothing changes until the user approves it in the app.
 
-Vietnamese and English UI · mobile-first · dark theme · online-only (no health data cached on the device).
+Mobile-first · dark theme · online-only (no health data cached on the device).
 
 <table>
   <tr>
@@ -39,7 +39,7 @@ Vietnamese and English UI · mobile-first · dark theme · online-only (no healt
   </tr>
 </table>
 
-<sub>Screenshots come from the Playwright run against a local Supabase with sample seed data, with the UI set to English. Content written by the user or the coach (exercise cues, coach notes) stays in the language it was written in.</sub>
+<sub>Screenshots come from the Playwright run against a local Supabase with sample seed data. Content written by the user or the coach (exercise cues, coach notes) is shown as it was written.</sub>
 
 ## Features
 
@@ -50,8 +50,45 @@ Vietnamese and English UI · mobile-first · dark theme · online-only (no healt
 - **Goals**: dated milestones with the required weekly rate. Loss faster than 0.7 kg/week gets flagged.
 - **Coach loop**: a weekly report → plan draft with reasons → a diff screen to approve or reject → the review note shows in the app.
 - **Reminders**: Web Push for weigh-in, measurements, progress photos, InBody, workout, missed workout, weekly review and goal milestones, sent by an Edge Function on pg_cron.
-- **Two languages**: Vietnamese (default) and English, switched under More → Language. Dates and numbers follow the language.
+- **Language**: switch the interface language under More → Language; dates and numbers follow it.
 - **Safety**: PIN lock on open, one account (sign-up disabled), hard rules enforced in the DB and the app: reference calories ≥ 1,700, Legs never next to badminton, no Legs on Sunday.
+
+## Your data and your progress
+
+The app is built to run on real numbers from day one and to show, week by week, whether they are moving the right way.
+
+### Getting your data in
+
+| What | How |
+|---|---|
+| **Profile, goals, starting InBody** | Edit the sample values in `scripts/build-seed.ts`, run `pnpm run seed:build`, then sign in for the first time: the seed is copied into your account once. There is no in-app editor for these yet. |
+| **Workouts as they happen** | The guided flow logs every set: kg, reps or seconds, effort, a note, and the reason when you lift something other than planned (too heavy, machine busy…). |
+| **Past workouts** | "Log past session" fills a session from the plan for any date. "Quick log" turns a pasted gym note into exercises and sets that you check before saving. |
+| **Body** | Weigh-ins (any day, best on a weekly morning), the five main measurements (waist, hips, chest, upper arm, thigh), InBody scans (weight, skeletal muscle, body fat %, visceral fat, fat-free mass, BMR, score) and progress photos by angle. |
+| **Another device or a fresh install** | More → Backup exports everything as one JSON file (`pt-backup/1`) and imports it back. Photos are left out by default. |
+
+### Following the improvement
+
+| Question | Where the app answers it |
+|---|---|
+| Am I getting stronger? | After every workout, each working set gets ↑ / = / ↓ against the same set last time, and new personal records get a 🏆. The Training tab charts the top set or estimated 1RM per exercise. Today's **progress card** compares the first and latest top set of up to four lifts since the program started: more reps at the same load, or more load. |
+| When do I add weight? | When every working set reaches the top of the rep range without a Hard set, next week's plan raises the target one step: one pin on an lb stack, less help on an assisted machine. For exercises where you pick the load yourself, the set screen suggests that step directly. Two stalled sessions in a row are flagged in the weekly report, with lighter options on the real load grid. |
+| Is my weight on track? | The Body tab shows the weekly average against a goal line drawn from your first weigh-in to each goal date. Today shows the active goal with the required kg per week and whether you are on track. A loss rate outside 0.5–0.7 kg/week is called out. Two flat weeks bring practical suggestions and a one-tap calorie draft (never below 1,700 kcal). |
+| Is it fat or muscle? | Each InBody scan is compared with the previous one (muscle, fat %, visceral fat, fat-free mass). The goal card estimates body fat from your last fat-free mass. Waist and waist-to-hip ratio are tracked across measurements. |
+| Does it show? | Progress photos from the same angle, side by side or with an overlay slider. |
+| Am I training enough? | Sets per muscle group each week, against a 10–20 set reference band and your average over the previous four weeks, plus warm-up completion. |
+
+Every Monday the coach report pulls these same numbers together: load trend and stalls per exercise, sets per muscle, weight trend, notes about pain or busy machines. Next week's plan is proposed from them, with a reason for each change.
+
+### How one lift moves forward
+
+An illustration of the rules (not real data), for a machine with a 10–12 rep range on an lb stack:
+
+1. **Calibration week**: no target yet; you pick the load and log what you did.
+2. **Target set**: the plan sets 27 kg × 3 sets of 10–12.
+3. **Range reached**: 27 kg × 12, 12, 12 without a Hard set → the next weekly plan raises the target to 32 kg (one pin).
+4. **New load**: 32 kg × 10, 9, 8 → stay at 32 kg until all sets reach 12.
+5. **Stalled**: two sessions with no more reps at 32 kg → the report offers a lighter option on the pin ladder (e.g. 27 kg × 12), and the coach decides.
 
 ## Quality
 
