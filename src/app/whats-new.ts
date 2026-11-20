@@ -12,6 +12,15 @@ export type WhatsNewRelease = { id: string; date: string; title: string; plan: s
 
 export const RELEASES: WhatsNewRelease[] = [
   {
+    id: '2026-11-20',
+    date: '20/11/2026',
+    title: t('Ghi bù buổi cầu lông'),
+    plan: 'v2.8',
+    items: [
+      { icon: '🏸', title: t('Quên ghi cầu lông?'), body: t('Vào "+ Ghi bù", chọn ngày cầu lông chưa ghi: có nút "Ghi buổi cầu lông" để ghi đúng ngày đó (thời lượng, cường độ, khởi động).'), to: '/training/backfill' },
+    ],
+  },
+  {
     id: '2026-11-14',
     date: '14/11/2026',
     title: t('Giao diện tiếng Anh'),

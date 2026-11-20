@@ -19,6 +19,7 @@ The app ships continuously, so releases are named by date. Each one matches an e
 ## Unreleased
 
 ### Added
+- **Backfill badminton.** "+ Ghi bù" on a scheduled badminton day with nothing logged has a "Ghi buổi cầu lông" button that opens the badminton form on that date (before, only the Zone 2 / walk substitutes were offered).
 - **English UI.** Thêm → "Ngôn ngữ / Language" switches between Tiếng Việt (default) and English, saved per device (`localStorage['pt-locale']`).
   - gettext style (`src/i18n/`): the Vietnamese string stays in the code as the key, `t('…')` looks it up in `src/i18n/en/*` and falls back to Vietnamese.
   - Dates (`formatVN`) and numbers (`formatNumberVN`) follow the language: "27 Oct", "1,452.5".

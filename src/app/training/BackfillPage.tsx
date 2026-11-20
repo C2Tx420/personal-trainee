@@ -105,16 +105,17 @@ export function BackfillPage() {
         </div>
         {scheduled && (
           <div className="glass-subtle rounded-ctl mb-3 p-3 text-sm" data-testid="backfill-replace">
-            <p className="mb-2">
-              {t('{date} theo lịch là {kind}, chưa ghi gì.', { date: formatVN(date), kind: SESSION_KIND_LABEL[scheduled] })}
-              {scheduled === 'badminton' && ` ${t('Không đánh thì thay bằng cardio nhẹ:')}`}
-            </p>
+            <p className="mb-2">{t('{date} theo lịch là {kind}, chưa ghi gì.', { date: formatVN(date), kind: SESSION_KIND_LABEL[scheduled] })}</p>
             {scheduled === 'badminton' && (
-              <div className="mb-2 grid grid-cols-2 gap-2">
-                {BADMINTON_SUBSTITUTES.map((k) => (
-                  <Button key={k} size="sm" onClick={() => nav(`/training/simple/${k}?thay=badminton&ngay=${date}`)}>{SESSION_KIND_LABEL[k]}</Button>
-                ))}
-              </div>
+              <>
+                <Button variant="primary" block className="mb-2" onClick={() => nav(`/training/simple/badminton?ngay=${date}`)}>{t('Ghi buổi cầu lông')}</Button>
+                <p className="mb-2">{t('Không đánh thì thay bằng cardio nhẹ:')}</p>
+                <div className="mb-2 grid grid-cols-2 gap-2">
+                  {BADMINTON_SUBSTITUTES.map((k) => (
+                    <Button key={k} size="sm" onClick={() => nav(`/training/simple/${k}?thay=badminton&ngay=${date}`)}>{SESSION_KIND_LABEL[k]}</Button>
+                  ))}
+                </div>
+              </>
             )}
             {!canReplace ? (
               kind === 'legs' && <p className="text-xs text-muted">{t('Legs không thay được buổi ngày này (sát ngày cầu lông hoặc Chủ nhật) — buổi này ghi riêng.')}</p>

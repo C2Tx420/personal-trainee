@@ -1,6 +1,9 @@
 import type { Dict } from '../util';
 
 export const WHATS_NEW: Dict = {
+  'Ghi bù buổi cầu lông': 'Log a past badminton session',
+  'Quên ghi cầu lông?': 'Forgot to log badminton?',
+  'Vào "+ Ghi bù", chọn ngày cầu lông chưa ghi: có nút "Ghi buổi cầu lông" để ghi đúng ngày đó (thời lượng, cường độ, khởi động).': 'Open "+ Log past session" and pick a badminton day with nothing logged: the "Log badminton" button logs it on that date (duration, intensity, warm-up).',
   'Giao diện tiếng Anh': 'English interface',
   'Chọn ngôn ngữ': 'Choose a language',
   'Thêm → "Ngôn ngữ / Language": Tiếng Việt (mặc định) hoặc English. Chỉ đổi trên máy này; ngày và số hiển thị theo ngôn ngữ.': 'More → "Ngôn ngữ / Language": Tiếng Việt (default) or English. It only changes this device; dates and numbers follow the language.',
